@@ -18,9 +18,6 @@ body {
 	grid-area: a;
 }
 
-canvas {
-}
-
 #gui {
 	width: 100%;
 	height: 100%;
@@ -30,7 +27,7 @@ canvas {
 
 #gui header {
 	background-color: bisque;
-	height: 5vmin;
+	height: 5vh;
 }
 
 #gui-content {

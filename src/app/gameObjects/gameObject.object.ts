@@ -1,9 +1,9 @@
-import { Vector } from "../vector.module.js"
-import { State } from "../../states/state.state.js"
-import { DrawBehaviour } from "../../behaviours/draw.behaviour.js"
-import { MovementBehaviour } from "../../behaviours/movement.behaviour.js"
-import { GravityBehaviour } from "../../behaviours/gravity.behaviour.js"
-import { AnimationBehaviour } from "../../behaviours/animation.behaviour.js"
+import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
+import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
+import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
+import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { Vector } from "../modules/vector.module.js"
+import { State } from "../states/state.state.js"
 
 export class GameObject {
 	dimensions = new Vector(50, 60)
@@ -23,6 +23,13 @@ export class GameObject {
 	movementBehaviour?: MovementBehaviour
 	gravityBehavoir?: GravityBehaviour
 	animationBehaviour?: AnimationBehaviour
+
+	focusOffset?: number
+	protected getFocus?(): Vector
+
+	get focusVector(): Vector {
+		return this.getFocus?.() || this.getCenterPoint()
+	}
 
 	constructor(public name: string) {}
 
@@ -55,16 +62,8 @@ export class GameObject {
 		this.drawBehaviour?.draw(ctx)
 	}
 
-	canJump(): boolean {
-		return this.input.isJumping
-	}
-
-	canMove(): boolean {
-		return this.input.isMovingLeft || this.input.isMovingRight
-	}
-
-	canFall(): boolean {
-		return this.position.y > 0
+	getCenterPoint(): Vector {
+		return this.position.plus(this.dimensions.scale(0.5))
 	}
 }
 export async function getImages(srcs: string[]): Promise<CanvasImageSource[]>

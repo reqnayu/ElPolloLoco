@@ -1,10 +1,17 @@
-import { GameObject } from "../modules/gameObjects/gameObject.object.js"
 import { Drawable } from "../.types/behaviours.interface.js"
 import { Frame } from "../.types/frame.type.js"
+import { DrawParams } from "../.types/behaviour.type.js"
+import { GameObject } from "../gameObjects/gameObject.object.js"
+import { MESSAGER } from "../../script.js"
 
 export class DrawBehaviour implements Drawable {
 	private gameObject!: GameObject
 	scaleFactor = 1 / 2000
+	private renderer
+
+	constructor(options: DrawParams) {
+		this.renderer = MESSAGER.dispatch("main").renderer
+	}
 
 	onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
@@ -13,43 +20,38 @@ export class DrawBehaviour implements Drawable {
 	}
 
 	draw(ctx: CanvasRenderingContext2D): void {
-		const frame = this.requestFrame(ctx.canvas)
+		const frame = this.requestFrame()
 		const { image, dx: rawDx, dy: rawDy, dWidth, dHeight, direction } = frame
-		if (image === undefined) return
+		if (!this.frameShouldBeRendered(frame)) return
 		ctx.save()
-		ctx.scale(direction, 1)
-		ctx.translate(direction === 1 ? 0 : -dWidth, ctx.canvas.height)
 
-		const dx = rawDx * direction
+		const scale = ctx.canvas.width / this.renderer.baseResolutionWidth
+		ctx.scale(direction * scale, scale)
+
+		const { x, y } = this.renderer.camera.focus
+		ctx.translate(-x * direction, y)
+		if (direction === 1) ctx.translate(rawDx, ctx.canvas.height / scale)
+		else ctx.translate(-(rawDx + dWidth), ctx.canvas.height / scale)
 		const dy = -rawDy - dHeight
-		ctx.drawImage(image, dx, dy, dWidth, dHeight)
-
+		ctx.drawImage(image, 0, dy, dWidth, dHeight)
 		ctx.restore()
 	}
 
-	private requestFrame(canvas: HTMLCanvasElement): Frame {
-		return this.scaleToCanvas(
-			{
-				image: this.gameObject.image!,
-				dx: this.gameObject.position.x,
-				dy: this.gameObject.position.y,
-				dWidth: this.gameObject.dimensions.x,
-				dHeight: this.gameObject.dimensions.y,
-				direction: this.gameObject.direction
-			},
-			canvas
-		)
+	private requestFrame(): Frame {
+		const frame = {
+			image: this.gameObject.image!,
+			dx: this.gameObject.position.x,
+			dy: this.gameObject.position.y,
+			dWidth: this.gameObject.dimensions.x,
+			dHeight: this.gameObject.dimensions.y,
+			direction: this.gameObject.direction
+		}
+		return frame
 	}
 
-	private scaleToCanvas({ image, dx, dy, dWidth, dHeight, direction }: Frame, canvas: HTMLCanvasElement): Frame {
-		const scale = this.scaleFactor * canvas.width
-		return {
-			image,
-			dx: dx * scale,
-			dy: dy * scale,
-			dWidth: dWidth * scale,
-			dHeight: dHeight * scale,
-			direction
-		}
+	private frameShouldBeRendered({ image, dx, dy, dWidth, dHeight }: Frame): boolean {
+		const { x, y } = this.renderer.camera.focus
+		if (image === undefined) return false
+		return true
 	}
 }

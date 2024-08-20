@@ -1,28 +1,47 @@
 import { MESSAGER } from "../../script.js"
-import { throttle } from "../util/general.util.js"
+import { GameObject } from "../gameObjects/gameObject.object.js"
+import { Camera } from "./camera.module.js"
 
 export class Renderer {
-	ctx
+	main
+	camera
+	baseResolutionWidth = 720
+	private scale = 0.8
+
 	constructor(private canvas: HTMLCanvasElement) {
-		this.ctx = this.canvas.getContext("2d")!
+		this.main = MESSAGER.dispatch("main")
+
+		this.camera = new Camera(this.baseResolutionWidth)
 		this.updateDimensions()
-		window.addEventListener(
-			"resize",
-			throttle(() => {
-				this.updateDimensions()
-			}, MESSAGER.dispatch("main").frameRate)
-		)
 	}
 
-	updateDimensions() {
+	updateDimensions(): void {
 		const { innerWidth, innerHeight } = window
+		if (innerWidth === this.canvas.width) return
 		const isDependantOnWidth = innerWidth / innerHeight < 16 / 9
-		this.canvas.width = (isDependantOnWidth ? innerWidth : (innerHeight * 16) / 9) * 0.8
-		this.canvas.height = (isDependantOnWidth ? (innerWidth * 9) / 16 : innerHeight) * 0.8
+		this.canvas.width = (isDependantOnWidth ? innerWidth : (innerHeight * 16) / 9) * this.scale
+		this.canvas.height = (isDependantOnWidth ? (innerWidth * 9) / 16 : innerHeight) * this.scale
 	}
 
-	wipe() {
+	private wipe() {
 		const { width, height } = this.canvas
-		this.ctx.clearRect(0, 0, width, height)
+		this.main.ctx.clearRect(0, 0, width, height)
+	}
+
+	render() {
+		this.updateDimensions()
+		this.wipe()
+		this.camera.updateFocus()
+		const { allObjects } = this.main
+
+		allObjects.forEach(this.renderObject)
+
+		this.main.currentFrame++
+	}
+
+	private renderObject = (gameObject: GameObject) => {
+		// console.log("rendering object")
+		gameObject.draw(this.main.ctx)
+		if (!this.main.isPaused) gameObject.update(this.main.frameRate)
 	}
 }

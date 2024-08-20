@@ -1,4 +1,4 @@
-import { GameObject } from "../modules/gameObjects/gameObject.object.js"
+import { GameObject } from "../gameObjects/gameObject.object.js"
 import { AnimationState } from "./animation.type.js"
 
 export interface Behaviour {

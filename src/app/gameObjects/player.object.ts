@@ -1,16 +1,23 @@
+import { BehaviourFactory } from "../factories/behaviour.factory.js"
+import { Vector } from "../modules/vector.module.js"
+import { IdleState } from "../states/idle.state.js"
 import { GameObject, getImages } from "./gameObject.object.js"
-import { BehaviourFactory } from "../../factories/behaviour.factory.js"
-import { IdleState } from "../../states/idle.state.js"
 import { AnimationSet } from "src/app/.types/animation.type.js"
 
 export class Player extends GameObject {
 	walkSpeed = 20
 	jumpStrength = 40
 
+	focusOffset = 100
+
+	protected getFocus(): Vector {
+		return this.getCenterPoint().plus(new Vector(this.focusOffset * this.direction, 0))
+	}
+
 	constructor() {
 		super("Player")
-		this.dimensions.set(610, 1200).toScaled(0.5)
-		this.position.set(0, 0)
+		this.dimensions.set(610, 1200).toScaled(0.2)
+		this.position.set(0, 100)
 		this.initialize()
 	}
 
@@ -26,7 +33,7 @@ export class Player extends GameObject {
 		this.image = animationSet.idle[0]
 
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
-		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
+		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
 		this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed, jumpStrength }).onAttach(this)
 		this.gravityBehavoir = BehaviourFactory.create("gravity").onAttach(this)
 	}

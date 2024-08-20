@@ -1,22 +1,28 @@
 import { MESSAGER } from "../../script.js"
 import { GameObjectFactory } from "../factories/gameObject.factory.js"
-import { Background } from "./gameObjects/background.object.js"
-import { GameObject } from "./gameObjects/gameObject.object.js"
-import { Player } from "./gameObjects/player.object.js"
+import { Background } from "../gameObjects/background.object.js"
+import { GameObject } from "../gameObjects/gameObject.object.js"
+import { Player } from "../gameObjects/player.object.js"
 import { Interval } from "./interval.module.js"
 import { Renderer } from "./renderer.module.js"
+import { Timer } from "./timer.module.js"
+import { Vector } from "./vector.module.js"
 
 export class Main {
 	ctx
 	isPaused = true
 	frameRate = 60 / 1000
 	currentFrame = 0
-	gameLoop = new Interval(() => this.update(), this.frameRate, false)
+	gameLoop = new Interval({
+		handler: () => this.update(),
+		timeout: this.frameRate
+	})
 
 	renderer
 
-	player: Player = GameObjectFactory.create("player")
-	background: Background = GameObjectFactory.create("background")
+	player
+	background
+	// tstBottle
 
 	get allObjects(): GameObject[] {
 		return [this.background, this.player]
@@ -26,11 +32,17 @@ export class Main {
 		this.ctx = this.canvas.getContext("2d")!
 		MESSAGER.elements.set("main", this)
 		this.renderer = new Renderer(this.canvas)
+		this.player = GameObjectFactory.create("player")
+		this.background = GameObjectFactory.create("background")
+		// this.tstBottle = GameObjectFactory.create("bottle", { position: new Vector(0, 200) })
+
+		this.renderer.camera.focusObjects = [this.player]
 	}
 
 	startGame(): void {
 		this.gameLoop.toggle()
-		this.togglePause()
+		// this.togglePause()
+		this.isPaused = false
 	}
 
 	togglePause() {
@@ -50,19 +62,7 @@ export class Main {
 	}
 
 	private update() {
-		this.render()
-	}
-
-	private render() {
-		this.renderer.wipe()
-		this.allObjects.forEach(this.renderObject)
-		this.currentFrame++
-	}
-
-	private renderObject = (gameObject: GameObject) => {
-		// console.log("rendering object")
-		gameObject.draw(this.ctx)
-		if (!this.isPaused) gameObject.update(this.frameRate)
+		this.renderer.render()
 	}
 
 	toggleRender() {

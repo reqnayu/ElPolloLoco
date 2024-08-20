@@ -1,8 +1,8 @@
 import { MESSAGER } from "../../script.js"
-import { GameObject } from "../modules/gameObjects/gameObject.object.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { AnimationState } from "../.types/animation.type.js"
 import { AnimationParams } from "../.types/behaviour.type.js"
+import { GameObject } from "../gameObjects/gameObject.object.js"
 
 export class AnimationBehaviour implements Updateable {
 	private gameObject!: GameObject

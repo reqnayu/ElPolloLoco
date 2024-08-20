@@ -1,6 +1,6 @@
 import { MovementParams } from "../.types/behaviour.type.js"
 import { Updateable } from "../.types/behaviours.interface.js"
-import { GameObject } from "../modules/gameObjects/gameObject.object.js"
+import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Vector } from "../modules/vector.module.js"
 
 export class MovementBehaviour implements Updateable {
@@ -8,7 +8,7 @@ export class MovementBehaviour implements Updateable {
 	speed: Vector
 	currentVelocity = new Vector(0, 0)
 	constructor({ walkSpeed, jumpStrength }: MovementParams) {
-		this.speed = new Vector(walkSpeed, jumpStrength)
+		this.speed = new Vector(walkSpeed, jumpStrength || 0)
 	}
 
 	onAttach(gameObject: GameObject): this {
@@ -32,5 +32,13 @@ export class MovementBehaviour implements Updateable {
 
 	jump(): void {
 		this.currentVelocity.y = this.speed.y
+	}
+
+	canMove(): boolean {
+		return this.gameObject.input.isMovingLeft || this.gameObject.input.isMovingRight
+	}
+
+	canJump(): boolean {
+		return this.gameObject.input.isJumping
 	}
 }

@@ -1,13 +1,20 @@
 import { Timer } from "./timer.module.js"
 
 export class Interval {
+	private handler
+	private timeout
 	private intervalId?: number
 	private timeOfLastExecution = 0
-	private timeToNextExecution = this.timeout
+	private timeToNextExecution
 	private timerToNextExecution?: Timer
 	private abortController = new AbortController()
+	private stopConditionCallback?(): boolean
 
-	constructor(public handler: () => void, public timeout: number, pauseOnGamePause: boolean = true) {
+	constructor({ handler, timeout, pauseOnGamePause, stopConditionCallback }: IntervalParams) {
+		this.handler = handler
+		this.timeout = timeout
+		this.stopConditionCallback = stopConditionCallback
+		this.timeToNextExecution = timeout
 		if (pauseOnGamePause === true) {
 			window.addEventListener("resumegame", () => this.resume(), {
 				signal: this.abortController.signal
@@ -23,6 +30,9 @@ export class Interval {
 		if (this.intervalId !== undefined) return
 		this.timeOfLastExecution = Date.now()
 		this.intervalId = setInterval(() => {
+			if (this.stopConditionCallback?.() === true) {
+				return this.dispose()
+			}
 			this.timeOfLastExecution = Date.now()
 			this.handler()
 		}, this.timeout)
@@ -60,4 +70,11 @@ export class Interval {
 		this.timerToNextExecution?.dispose()
 		this.abortController.abort()
 	}
+}
+
+type IntervalParams = {
+	handler(): void
+	timeout: number
+	pauseOnGamePause?: boolean
+	stopConditionCallback?(): boolean
 }

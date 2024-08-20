@@ -17,14 +17,16 @@ export type BehaviourParamMap = {
 	gravity: GravityParams
 }
 
-type DrawParams = {}
+export type DrawParams = {
+	isScaled: boolean
+}
 
 export type MovementParams = {
 	walkSpeed: number
-	jumpStrength: number
+	jumpStrength?: number
 }
 
-type GravityParams = {}
+export type GravityParams = {}
 
 export type BehaviourMap = {
 	animation: AnimationBehaviour

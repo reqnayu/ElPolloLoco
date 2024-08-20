@@ -1,8 +1,9 @@
-import { Player } from "../modules/gameObjects/player.object.js"
-import { Bottle } from "../modules/gameObjects/bottle.object.js"
-import { Enemy } from "../modules/gameObjects/enemy.object.js"
-import { Endboss } from "../modules/gameObjects/endboss.object.js"
-import { Background } from "../modules/gameObjects/background.object.js"
+import { Background } from "../gameObjects/background.object.js"
+import { Bottle } from "../gameObjects/bottle.object.js"
+import { Endboss } from "../gameObjects/endboss.object.js"
+import { Enemy } from "../gameObjects/enemy.object.js"
+import { Player } from "../gameObjects/player.object.js"
+import { Vector } from "../modules/vector.module.js"
 
 export type GameObjectType = "player" | "bottle" | "enemy" | "endboss" | "background"
 
@@ -13,3 +14,9 @@ export type GameObjectMap = {
 	endboss: Endboss
 	background: Background
 }
+
+export type BottleParams = {
+	position: Vector
+}
+
+export type GameObjectParams = BottleParams

@@ -37,15 +37,20 @@ export class Timer {
 		this.timerId ? this.pause() : this.resume()
 	}
 
-	reset() {
+	reset(): void {
 		clearTimeout(this.timerId)
 		this.timerId = undefined
 		this.done = false
 		this.timeRemaining = this.timeout
 	}
 
-	dispose() {
+	dispose(): void {
 		this.done = true
 		this.abortController.abort()
+	}
+
+	kill(): void {
+		this.reset()
+		this.dispose()
 	}
 }
