@@ -11,7 +11,7 @@ export class WalkState implements State {
 		// console.log(`'${gameObject.name}' started walking!`)
 		gameObject.animationBehaviour?.setAnimation("walk")
 		gameObject.movementBehaviour?.startWalking()
-		this.addFocusOffsetTimer(gameObject)
+		gameObject.focusOffset = 400
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {
@@ -22,13 +22,5 @@ export class WalkState implements State {
 	exit(gameObject: GameObject): void {
 		gameObject.movementBehaviour?.stopWalking()
 		this.timers.forEach((timer) => timer.kill())
-	}
-
-	private addFocusOffsetTimer(gameObject: GameObject): void {
-		const focusOffsetTimer = new Timer(() => {
-			gameObject.focusOffset = 200
-		}, 500)
-		this.timers.push(focusOffsetTimer)
-		focusOffsetTimer.resume()
 	}
 }

@@ -25,7 +25,7 @@ export class DrawBehaviour implements Drawable {
 		if (!this.frameShouldBeRendered(frame)) return
 		ctx.save()
 
-		const scale = ctx.canvas.width / this.renderer.baseResolutionWidth
+		const scale = ctx.canvas.width / this.renderer.camera.baseResolution.x
 		ctx.scale(direction * scale, scale)
 
 		const { x, y } = this.renderer.camera.focus

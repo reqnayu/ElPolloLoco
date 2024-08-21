@@ -5,18 +5,18 @@ import { GameObject, getImages } from "./gameObject.object.js"
 import { AnimationSet } from "src/app/.types/animation.type.js"
 
 export class Player extends GameObject {
-	walkSpeed = 20
-	jumpStrength = 40
+	private walkSpeed = 40
+	private jumpStrength = 40
 
-	focusOffset = 100
+	focusOffset = 400
 
 	protected getFocus(): Vector {
 		return this.getCenterPoint().plus(new Vector(this.focusOffset * this.direction, 0))
 	}
 
 	constructor() {
-		super("Player")
-		this.dimensions.set(610, 1200).toScaled(0.2)
+		super("player")
+		this.dimensions.set(610, 1200).toScaled(0.4)
 		this.position.set(0, 100)
 		this.initialize()
 	}

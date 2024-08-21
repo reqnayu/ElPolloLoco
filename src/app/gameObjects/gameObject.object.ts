@@ -1,3 +1,4 @@
+import { GameObjectType } from "../.types/gameObject.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
@@ -6,7 +7,7 @@ import { Vector } from "../modules/vector.module.js"
 import { State } from "../states/state.state.js"
 
 export class GameObject {
-	dimensions = new Vector(50, 60)
+	dimensions = new Vector(0, 0)
 	position = new Vector(0, 0)
 	image?: CanvasImageSource
 	// finishedLoading = false
@@ -31,7 +32,7 @@ export class GameObject {
 		return this.getFocus?.() || this.getCenterPoint()
 	}
 
-	constructor(public name: string) {}
+	constructor(public name: GameObjectType) {}
 
 	protected async initialize(imgSrc: string): Promise<void> {
 		await this.setImage(imgSrc)

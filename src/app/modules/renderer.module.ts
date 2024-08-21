@@ -5,13 +5,12 @@ import { Camera } from "./camera.module.js"
 export class Renderer {
 	main
 	camera
-	baseResolutionWidth = 720
 	private scale = 0.8
 
 	constructor(private canvas: HTMLCanvasElement) {
 		this.main = MESSAGER.dispatch("main")
 
-		this.camera = new Camera(this.baseResolutionWidth)
+		this.camera = new Camera()
 		this.updateDimensions()
 	}
 
@@ -31,9 +30,8 @@ export class Renderer {
 	render() {
 		this.updateDimensions()
 		this.wipe()
-		this.camera.updateFocus()
+		if (!this.main.isPaused) this.camera.updateFocus()
 		const { allObjects } = this.main
-
 		allObjects.forEach(this.renderObject)
 
 		this.main.currentFrame++
@@ -41,6 +39,7 @@ export class Renderer {
 
 	private renderObject = (gameObject: GameObject) => {
 		// console.log("rendering object")
+		// if (gameObject.name === "background") gameObject.draw(this.main.ctx)
 		gameObject.draw(this.main.ctx)
 		if (!this.main.isPaused) gameObject.update(this.main.frameRate)
 	}

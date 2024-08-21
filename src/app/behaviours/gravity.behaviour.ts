@@ -5,7 +5,7 @@ import { GameObject } from "../gameObjects/gameObject.object.js"
 export class GravityBehaviour implements Updateable {
 	private gameObject!: GameObject
 	private gravity = new Vector(0, -4)
-	private floorHeight = 50
+	private floorHeight = 85
 
 	onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject

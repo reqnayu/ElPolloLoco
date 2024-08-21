@@ -22,3 +22,7 @@ export function roundTo(number: number, digits?: number): number {
 	const _digits = digits || 1
 	return Math.round(number * _digits) / _digits
 }
+
+export function clamp(number: number, min: number, max: number): number {
+	return Math.min(Math.max(number, min), max)
+}

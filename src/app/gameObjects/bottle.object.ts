@@ -4,7 +4,7 @@ import { GameObject } from "./gameObject.object.js"
 
 export class Bottle extends GameObject {
 	constructor(options: BottleParams) {
-		super("Bottle")
+		super("bottle")
 		this.dimensions.set(400, 400).toScaled(0.5)
 		this.position.setToVector(options.position)
 		this.initialize()
