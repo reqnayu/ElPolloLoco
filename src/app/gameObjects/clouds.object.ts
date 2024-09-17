@@ -27,10 +27,8 @@ export class Clouds extends GameObject {
 		const { x } = MESSAGER.dispatch("main").renderer.camera.focus
 		const cameraOffset = x - this.position.x
 		if (cameraOffset > this.cameraResolution.x) {
-			console.log("repo")
 			this.posX += this.cameraResolution.x * 3
 		} else if (cameraOffset < -this.cameraResolution.x) {
-			console.log("repo left")
 			this.posX -= this.cameraResolution.x * 3
 		}
 		this.posX -= this.windSpeed

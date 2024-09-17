@@ -1,16 +1,20 @@
 import { GameObjectType } from "../.types/gameObject.type.js"
+import { State, StateMap } from "../.types/state.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
+import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
+import { HealthBehaviour } from "../behaviours/health.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { StateFactory } from "../factories/State.factory.js"
 import { Vector } from "../modules/vector.module.js"
-import { State } from "../states/state.state.js"
 
 export class GameObject {
 	dimensions = new Vector(0, 0)
 	position = new Vector(0, 0)
 	image?: CanvasImageSource
-	// finishedLoading = false
+
+	isFriendly: boolean = false
 
 	direction: -1 | 1 = 1
 	input = {
@@ -18,12 +22,18 @@ export class GameObject {
 		isMovingLeft: false,
 		isJumping: false
 	}
+	protected walkSpeed: number = 0
 
 	private state?: State
+	states: (keyof StateMap)[] = []
+	protected defaultState!: keyof StateMap
+
 	drawBehaviour?: DrawBehaviour
 	movementBehaviour?: MovementBehaviour
 	gravityBehavoir?: GravityBehaviour
 	animationBehaviour?: AnimationBehaviour
+	health?: HealthBehaviour
+	collisionBehaviour?: CollisionBehaviour
 
 	focusOffset?: number
 	protected getFocus?(): Vector
@@ -44,9 +54,10 @@ export class GameObject {
 		this.image = await createImage(imgSrc)
 	}
 
-	setState(newState: State): void {
+	setState(stateType: keyof StateMap = this.defaultState): void {
+		if (!this.states.includes(stateType)) return
 		this.state?.exit(this)
-		this.state = newState
+		this.state = StateFactory.create(stateType)
 		this.state.enter(this)
 	}
 
@@ -55,6 +66,8 @@ export class GameObject {
 		this.animationBehaviour?.update(deltaTime)
 		this.movementBehaviour?.update(deltaTime)
 		this.gravityBehavoir?.update(deltaTime)
+		this.health?.update(deltaTime)
+		this.collisionBehaviour?.update(deltaTime)
 
 		this.state?.update(this, deltaTime)
 	}
@@ -65,6 +78,14 @@ export class GameObject {
 
 	getCenterPoint(): Vector {
 		return this.position.plus(this.dimensions.scale(0.5))
+	}
+
+	canMove(): boolean {
+		return false
+	}
+
+	canJump(): boolean {
+		return false
 	}
 }
 export async function getImages(srcs: string[]): Promise<CanvasImageSource[]>
@@ -82,4 +103,22 @@ async function createImage(src: string): Promise<CanvasImageSource> {
 		img.onload = () => resolve(img)
 		setTimeout(() => reject(src), 5000)
 	})
+}
+
+export function getSingleAnimation(
+	path: string,
+	startNumber: number,
+	endNumber: number = startNumber
+): Promise<CanvasImageSource[]> {
+	const assetPaths: string[] = []
+	const assetInitial = path
+		.split("/")
+		.at(-1)!
+		.match(/(?<=_?)[a-z]/g)![0]
+		.toUpperCase()
+	for (let i = startNumber; i <= endNumber; i++) {
+		const src = `${path}/${assetInitial}-${i}.png`
+		assetPaths.push(src)
+	}
+	return getImages(assetPaths)
 }

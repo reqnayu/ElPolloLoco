@@ -25,7 +25,6 @@ export class Camera {
 
 	constructor() {
 		this.maxPosX = MESSAGER.dispatch("main").maxPosX
-		console.log("new Camera Added")
 	}
 
 	updateFocus() {

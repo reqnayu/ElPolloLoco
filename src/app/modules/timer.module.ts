@@ -22,14 +22,15 @@ export class Timer {
 		// console.log(this.timeRemaining, "pausing timer")
 	}
 
-	resume(): void {
-		if (this.done || this.timerId) return
+	resume(): this {
+		if (this.done || this.timerId) return this
 		this.startTime = Date.now()
 		this.timerId = setTimeout(() => {
 			this.handler()
 			this.dispose()
 		}, this.timeRemaining)
-		if (this.timeRemaining === this.timeout) return
+		if (this.timeRemaining === this.timeout) return this
+		return this
 		// console.log(`resuming... time remaining: ${this.timeRemaining}s`)
 	}
 

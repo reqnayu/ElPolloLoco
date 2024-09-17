@@ -1,0 +1,62 @@
+:root {
+	--txt-color: #f0f0f0;
+	--bg-color-btn: hsl(40, 100%, 45%);
+	--bg-color-btn-hover: hsl(40, 100%, 35%);
+	--bg-color-container: hsl(40, 100%, 90%);
+	--border-color-btn: hsl(40, 100%, 25%);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+button {
+	all: unset;
+}
+
+html {
+	user-select: none;
+}
+
+body {
+	font-family: "Spicy Rice";
+}
+
+.txt-normal {
+	color: var(--txt-color);
+	font-size: 3vmin;
+	font-weight: 400;
+	letter-spacing: 2px;
+}
+
+button {
+	cursor: pointer;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+}
+
+.gap-20 {
+	gap: 20px;
+}
+
+@media (hover: hover) {
+	.mobile {
+		display: none;
+	}
+}
+
+@media (hover: none) {
+	.desktop {
+		display: none;
+	}
+}

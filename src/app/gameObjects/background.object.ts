@@ -63,7 +63,6 @@ export class Background extends GameObject {
 	protected async initialize(): Promise<void> {
 		this.srcSet.forEach((src, i) => {
 			const elementSet = [new BackgroundElement(i, false), new BackgroundElement(i, true)]
-			// const elementSet = [new BackgroundElement(i, false)]
 			this.elements.push(...elementSet)
 		})
 		this.setBehaviours()

@@ -6,7 +6,6 @@ import { MESSAGER } from "../../script.js"
 
 export class DrawBehaviour implements Drawable {
 	private gameObject!: GameObject
-	scaleFactor = 1 / 2000
 	private renderer
 
 	constructor(options: DrawParams) {
@@ -22,7 +21,7 @@ export class DrawBehaviour implements Drawable {
 	draw(ctx: CanvasRenderingContext2D): void {
 		const frame = this.requestFrame()
 		const { image, dx: rawDx, dy: rawDy, dWidth, dHeight, direction } = frame
-		if (!this.frameShouldBeRendered(frame)) return
+		if (this.frameShouldBeRendered(frame) === false) return
 		ctx.save()
 
 		const scale = ctx.canvas.width / this.renderer.camera.baseResolution.x
@@ -52,6 +51,7 @@ export class DrawBehaviour implements Drawable {
 	private frameShouldBeRendered({ image, dx, dy, dWidth, dHeight }: Frame): boolean {
 		const { x, y } = this.renderer.camera.focus
 		if (image === undefined) return false
+		if (x > dx + dWidth && y > dy + dHeight) return false
 		return true
 	}
 }

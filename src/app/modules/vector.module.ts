@@ -34,14 +34,6 @@ export class Vector {
 		return new Vector(this.x + v.x, this.y + v.y)
 	}
 
-	subtract(v: Vector): void {
-		this.add(v.scale(-1))
-	}
-
-	minus(v: Vector): Vector {
-		return this.plus(v.scale(-1))
-	}
-
 	/**
 	 * returns new instance
 	 */

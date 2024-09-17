@@ -1,21 +1,139 @@
 body {
 	margin: 0;
-}
-
-* {
-	outline: 1px solid black;
-}
-
-#game {
 	height: 100vh;
 	width: 100vw;
 	display: grid;
-	grid-template-areas: "a";
 	place-items: center;
+}
+
+* {
+	/* outline: 1px solid black; */
+}
+
+#game {
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	grid-template-areas: "a";
+}
+
+#game:has(#pause-screen.open) canvas,
+#game:has(#pause-screen.open) #gui {
+	filter: blur(1px);
 }
 
 #game > * {
 	grid-area: a;
+}
+
+canvas {
+	transition: filter 125ms;
+}
+
+#pause-screen {
+	display: grid;
+	border-radius: 15px;
+	overflow: hidden;
+	grid-template-areas: "a";
+}
+
+#pause-screen {
+	inset: 20%;
+	display: grid;
+}
+
+.menu-btns {
+	width: 60%;
+	margin: auto;
+	gap: 20px;
+}
+
+.btn-primary {
+	background-color: var(--bg-color-btn);
+	padding: 10px 40px;
+	border-radius: 15px;
+	border: 3px solid var(--border-color-btn);
+	display: flex;
+	justify-content: center;
+}
+
+.btn-primary:hover {
+	background-color: var(--bg-color-btn-hover);
+}
+
+.menu-content {
+	display: none;
+}
+
+.menu-content:has(.open) {
+	display: grid;
+	place-items: center;
+}
+
+.grid-center {
+	display: grid;
+	place-items: center;
+}
+
+.container {
+	background-color: var(--bg-color-container);
+	position: absolute;
+	inset: 0;
+	padding: 5vmin;
+}
+
+.container:not(.open) {
+	display: none !important;
+}
+
+.close-btn {
+	width: 30px;
+	height: 30px;
+	border-radius: 999px;
+	padding: 0;
+	font-size: 24px;
+	display: grid;
+	place-items: center;
+	position: absolute;
+	inset: 10px 10px auto auto;
+}
+
+#keyBinds {
+	gap: 10px;
+	width: 75%;
+}
+
+#keyBinds .row {
+	justify-content: space-between;
+	padding: 10px;
+	border-radius: 9999px;
+	border: 3px solid var(--border-color-btn);
+	background-color: var(--bg-color-btn);
+}
+
+#keyBinds .action {
+	width: 120px;
+	white-space: nowrap;
+}
+
+#keyBinds .key {
+	cursor: pointer;
+}
+
+#keyBinds .key:hover {
+	background-color: var(--bg-color-btn-hover);
+}
+
+#keyBindModal:not(.open) {
+	display: none;
+}
+
+#keyBindModal.open {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	background-color: #00000030;
 }
 
 #gui {
@@ -23,13 +141,84 @@ body {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-}
-
-#gui header {
-	background-color: bisque;
-	height: 5vh;
+	justify-content: space-between;
+	transition: filter 125ms;
 }
 
 #gui-content {
 	flex-grow: 1;
+}
+
+#keyBindModal > div {
+	all: initial;
+	font-family: Arial, Helvetica, sans-serif;
+	width: 300px;
+	height: 150px;
+	background-color: #fefefe;
+	padding: 4vmin;
+}
+
+#gui :is(header, footer) {
+	justify-content: space-between;
+	padding: 2vmin;
+}
+
+#gui button.fullscreen {
+	margin-left: auto;
+}
+
+#gui header button:not(.active) img:last-of-type {
+	display: none;
+}
+
+#gui header button.active img:first-of-type {
+	display: none;
+}
+
+#gui :is(header, footer) button {
+	border-radius: 999px;
+	width: 8.918vmin;
+	height: 8.918vmin;
+	padding: 0;
+	display: grid;
+	place-items: center;
+	opacity: 0.75;
+}
+
+#gui img {
+	filter: invert(1);
+	width: 75%;
+	pointer-events: none;
+}
+
+.confirmation-container {
+	position: fixed;
+	inset: 0;
+	background-color: #00000010;
+	display: grid;
+	place-items: center;
+}
+
+.confirmation {
+	background-color: white;
+	padding: 50px;
+	gap: 50px;
+}
+
+.confirmation .row {
+	gap: 20px;
+}
+
+.confirmation button {
+	padding: 10px 20px;
+	min-width: 80px;
+}
+
+.confirmation .cancel {
+	border: 1px solid lightblue;
+}
+
+.confirmation .affirm {
+	background-color: darkblue;
+	color: white;
 }

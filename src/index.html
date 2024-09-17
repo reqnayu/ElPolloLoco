@@ -4,19 +4,83 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
+		<link rel="stylesheet" href="fonts.css" />
+		<link rel="stylesheet" href="cssLib.css" />
 		<link rel="stylesheet" href="style.css" />
 		<script type="module" src="../dist/script.js"></script>
 	</head>
 	<body>
-		<div id="game">
+		<div id="game" class="txt-normal">
 			<canvas></canvas>
 			<div id="gui">
+				<header class="mobile-1 row">
+					<button class="btn-primary fullscreen" data-click="FULLSCREEN">
+						<img src="app/assets/img/gui/enter-fullscreen.png" alt="" />
+						<img src="app/assets/img/gui/exit-fullscreen.png" alt="" />
+					</button>
+				</header>
+				<footer class="mobile-1 row">
+					<div class="row gap-20">
+						<button class="btn-primary" data-click="MOVE_LEFT">&lt;</button>
+						<button class="btn-primary" data-click="MOVE_RIGHT">&gt;</button>
+					</div>
+					<button class="btn-primary" data-click="JUMP">
+						<img src="app/assets/img/gui/jump.png" alt="" />
+					</button>
+				</footer>
+			</div>
+			<div id="pause-screen" class="container">
+				<button class="close-btn btn-primary" data-click="CLOSE_CONTAINER">x</button>
+				<div class="menu-btns column">
+					<button class="btn-primary" data-click="OPEN_SETTINGS">Settings</button>
+					<button class="btn-primary" data-click="RESTART_GAME">Restart</button>
+				</div>
+				<div class="menu-content">
+					<div id="settings" class="container">
+						<button class="close-btn btn-primary" data-click="CLOSE_CONTAINER">x</button>
+						<div class="menu-btns column">
+							<button class="btn-primary desktop" data-click="OPEN_KEYBIND_SETTINGS">Keybinds</button>
+							<button class="btn-primary" data-click="OPEN_AUDIO_SETTINGS">Audio</button>
+						</div>
+						<div class="menu-content">
+							<div id="keyBindSettings" class="container">
+								<button class="close-btn btn-primary" data-click="CLOSE_CONTAINER">x</button>
+								<div id="keyBinds" class="column">
+									<div class="row" id="MOVE_LEFT">
+										<div class="action">Move left</div>
+										<div class="key" data-click="OPEN_SINGLE_KEYBIND"></div>
+									</div>
+									<div class="row" id="MOVE_RIGHT">
+										<div class="action">Move right</div>
+										<div class="key"></div>
+									</div>
+									<div class="row" id="JUMP">
+										<div class="action">jump</div>
+										<div class="key"></div>
+									</div>
+									<div class="row" id="PAUSE">
+										<div class="action">Pause Game</div>
+										<div class="key"></div>
+									</div>
+								</div>
+								<div id="singleKeyBind" class="container">Single KeyBind!</div>
+							</div>
+							<div id="keyBindModal">
+								<div class="column">
+									<span>Press a key to bind or hold "Esc" to cancel</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- <div id="gui">
 				<header>
 					<button id="pause" data-click="pause">Pause</button>
 					<button id="test" data-click="test">Test</button>
 				</header>
 				<div id="gui-content"></div>
-			</div>
+			</div> -->
 		</div>
 	</body>
 </html>

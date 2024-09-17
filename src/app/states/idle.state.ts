@@ -1,8 +1,6 @@
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Timer } from "../modules/timer.module.js"
-import { JumpState } from "./jump.state.js"
-import { State } from "./state.state.js"
-import { WalkState } from "./walk.state.js"
+import { State } from "../.types/state.type.js"
 
 export class IdleState implements State {
 	timers: Timer[] = []
@@ -16,12 +14,12 @@ export class IdleState implements State {
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {
-		if (gameObject.movementBehaviour?.canMove()) {
+		if (gameObject.canMove() === true) {
 			const direction = gameObject.input.isMovingRight ? 1 : -1
 			gameObject.direction = direction
-			gameObject.setState(new WalkState())
+			gameObject.setState("walk")
 		}
-		if (gameObject.movementBehaviour?.canJump()) gameObject.setState(new JumpState())
+		if (gameObject.canJump() === true) gameObject.setState("jump")
 	}
 
 	exit(gameObject: GameObject): void {
@@ -29,7 +27,10 @@ export class IdleState implements State {
 	}
 
 	private addIdleLongTimer(gameObject: GameObject): void {
-		const longIdleTimer = new Timer(() => gameObject.animationBehaviour?.setAnimation("idle_long"), 3000)
+		const longIdleTimer = new Timer(() => {
+			gameObject.animationBehaviour?.setAnimation("idle_long")
+			gameObject.focusOffset = 0
+		}, 3000)
 		this.timers.push(longIdleTimer)
 		longIdleTimer.resume()
 	}

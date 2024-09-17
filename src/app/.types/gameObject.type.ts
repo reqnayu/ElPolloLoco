@@ -1,8 +1,9 @@
 import { Background } from "../gameObjects/background.object.js"
 import { Bottle } from "../gameObjects/bottle.object.js"
+import { ChickenNormal } from "../gameObjects/chicken_normal.object.js"
+import { ChickenSmall } from "../gameObjects/chicken_small.object.js"
 import { Clouds } from "../gameObjects/clouds.object.js"
 import { Endboss } from "../gameObjects/endboss.object.js"
-import { Enemy } from "../gameObjects/enemy.object.js"
 import { Player } from "../gameObjects/player.object.js"
 import { Vector } from "../modules/vector.module.js"
 
@@ -12,7 +13,7 @@ export type GameObjectMap = {
 	player: Player
 	bottle: Bottle
 	clouds: Clouds
-	enemy: Enemy
+	enemy: ChickenNormal | ChickenSmall
 	endboss: Endboss
 	background: Background
 }

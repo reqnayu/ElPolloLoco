@@ -13,7 +13,7 @@ export interface Drawable extends Behaviour {
 	draw(ctx: CanvasRenderingContext2D): void
 }
 
-export interface Animatable extends Updateable, Behaviour {
+export interface Animatable extends Updateable {
 	animationName: AnimationState
 	setAnimation(animationName: AnimationState): void
 }

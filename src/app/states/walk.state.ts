@@ -1,8 +1,6 @@
+import { State } from "../.types/state.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Timer } from "../modules/timer.module.js"
-import { IdleState } from "./idle.state.js"
-import { JumpState } from "./jump.state.js"
-import { State } from "./state.state.js"
 
 export class WalkState implements State {
 	timers: Timer[] = []
@@ -15,8 +13,8 @@ export class WalkState implements State {
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {
-		if (!gameObject.movementBehaviour?.canMove()) gameObject.setState(new IdleState())
-		if (gameObject.movementBehaviour?.canJump()) gameObject.setState(new JumpState())
+		if (gameObject.canMove() === false) gameObject.setState("idle")
+		if (gameObject.canJump() === true) gameObject.setState("jump")
 	}
 
 	exit(gameObject: GameObject): void {

@@ -38,12 +38,4 @@ export class MovementBehaviour implements Updateable {
 	jump(): void {
 		this.currentVelocity.y = this.speed.y
 	}
-
-	canMove(): boolean {
-		return this.gameObject.input.isMovingLeft || this.gameObject.input.isMovingRight
-	}
-
-	canJump(): boolean {
-		return this.gameObject.input.isJumping
-	}
 }

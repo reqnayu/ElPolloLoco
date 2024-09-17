@@ -38,9 +38,12 @@ export class Renderer {
 	}
 
 	private renderObject = (gameObject: GameObject) => {
-		// console.log("rendering object")
-		// if (gameObject.name === "background") gameObject.draw(this.main.ctx)
 		gameObject.draw(this.main.ctx)
 		if (!this.main.isPaused) gameObject.update(this.main.frameRate)
+	}
+
+	toggleFullscreen(): Promise<void> {
+		if (document.fullscreenElement) return document.exitFullscreen()
+		return this.main.gameElement.requestFullscreen()
 	}
 }
