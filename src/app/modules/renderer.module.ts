@@ -1,11 +1,12 @@
 import { MESSAGER } from "../../script.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Camera } from "./camera.module.js"
+import { Vector } from "./vector.module.js"
 
 export class Renderer {
 	main
 	camera
-	private scale = 0.8
+	private windowScale = 0.8
 
 	constructor(private canvas: HTMLCanvasElement) {
 		this.main = MESSAGER.dispatch("main")
@@ -15,11 +16,13 @@ export class Renderer {
 	}
 
 	updateDimensions(): void {
-		const { innerWidth, innerHeight } = window
-		if (innerWidth === this.canvas.width) return
-		const isDependantOnWidth = innerWidth / innerHeight < 16 / 9
-		this.canvas.width = (isDependantOnWidth ? innerWidth : (innerHeight * 16) / 9) * this.scale
-		this.canvas.height = (isDependantOnWidth ? (innerWidth * 9) / 16 : innerHeight) * this.scale
+		const { x, y } = this.getAvailableWindowDimensions()
+		const isDependantOnWidth = x / y < 16 / 9
+		const desiredWidth = Math.floor(isDependantOnWidth ? x : (y * 16) / 9)
+		if (desiredWidth === this.canvas.width) return
+		this.canvas.width = desiredWidth
+		console.log(x, desiredWidth, this.canvas.width)
+		this.canvas.height = Math.floor(isDependantOnWidth ? (x * 9) / 16 : y)
 	}
 
 	private wipe() {
@@ -45,5 +48,11 @@ export class Renderer {
 	toggleFullscreen(): Promise<void> {
 		if (document.fullscreenElement) return document.exitFullscreen()
 		return this.main.gameElement.requestFullscreen()
+	}
+
+	private getAvailableWindowDimensions(): Vector {
+		const x = document.fullscreenElement?.clientWidth || window.innerWidth * this.windowScale
+		const y = document.fullscreenElement?.clientHeight || window.innerHeight * this.windowScale
+		return new Vector(x, y)
 	}
 }

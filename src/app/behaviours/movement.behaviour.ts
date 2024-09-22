@@ -33,7 +33,9 @@ export class MovementBehaviour implements Updateable {
 		this.currentVelocity.x = this.gameObject.direction * this.speed.x
 	}
 
-	stopWalking(): void {}
+	stopWalking(): void {
+		this.currentVelocity.x = 0
+	}
 
 	jump(): void {
 		this.currentVelocity.y = this.speed.y

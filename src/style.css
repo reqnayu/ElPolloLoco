@@ -30,6 +30,10 @@ canvas {
 	transition: filter 125ms;
 }
 
+#game:fullscreen canvas {
+	margin: auto;
+}
+
 #pause-screen {
 	display: grid;
 	border-radius: 15px;
