@@ -20,8 +20,8 @@ export class Renderer {
 		const isDependantOnWidth = x / y < 16 / 9
 		const desiredWidth = Math.floor(isDependantOnWidth ? x : (y * 16) / 9)
 		if (desiredWidth === this.canvas.width) return
+		document.documentElement.style.setProperty("--game-width", `${desiredWidth}px`)
 		this.canvas.width = desiredWidth
-		console.log(x, desiredWidth, this.canvas.width)
 		this.canvas.height = Math.floor(isDependantOnWidth ? (x * 9) / 16 : y)
 	}
 

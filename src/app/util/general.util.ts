@@ -51,7 +51,7 @@ export async function confirmation(options: confirmationOptions): Promise<any> {
 		template.querySelector(".affirm")!.addEventListener("click", () => {
 			resolve(affirmConfirmation(template, options.successCallback))
 		})
-		document.documentElement.append(template)
+		document.querySelector("#game")!.append(template)
 	})
 }
 
@@ -60,8 +60,8 @@ function confirmationTemplate(options: confirmationOptions): HTMLElement {
 			<div class="confirmation column">
 				<p>${options.requestMessage}</p>
 				<div class="row">
-					<button class="cancel">${options.cancelMessage || "Cancel"}</button>
-					<button class="affirm">${options.affirmMessage || "OK"}</button>
+					<button class="cancel btn btn-secondary">${options.cancelMessage || "Cancel"}</button>
+					<button class="affirm btn btn-primary">${options.affirmMessage || "OK"}</button>
 				</div>
 			</div>
 	`

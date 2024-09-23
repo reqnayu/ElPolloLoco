@@ -6,10 +6,11 @@ export type inputMap<T extends "key" | "mouse"> = Record<
 	}
 >
 
-export type keyInputAction = "MOVE_LEFT" | "MOVE_RIGHT" | "JUMP" | "PAUSE" | "FULLSCREEN"
+export type keyInputAction = "MOVE_LEFT" | "MOVE_RIGHT" | "JUMP" | "PAUSE" | "FULLSCREEN" | "THROW"
 export type mouseInputAction =
 	| keyInputAction
 	| "OPEN_SETTINGS"
 	| "OPEN_KEYBIND_SETTINGS"
 	| "OPEN_SINGLE_KEYBIND"
 	| "CLOSE_CONTAINER"
+	| "RESTART_GAME"

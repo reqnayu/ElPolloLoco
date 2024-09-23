@@ -1,9 +1,15 @@
 :root {
-	--txt-color: #f0f0f0;
+	--txt-color-light: #f0f0f0;
+	--txt-color-dark: #414141;
+	--txt-color-hover: #ffffff;
+
 	--bg-color-btn: hsl(40, 100%, 45%);
 	--bg-color-btn-hover: hsl(40, 100%, 35%);
 	--bg-color-container: hsl(40, 100%, 90%);
 	--border-color-btn: hsl(40, 100%, 25%);
+
+	--game-width: 0px;
+	--game-height: calc(var(--game-width) * 9 / 16);
 }
 
 *,
@@ -25,10 +31,10 @@ body {
 }
 
 .txt-normal {
-	color: var(--txt-color);
-	font-size: 3vmin;
+	color: var(--txt-color-dark);
+	font-size: calc(var(--game-width) * 0.03);
 	font-weight: 400;
-	letter-spacing: 2px;
+	letter-spacing: calc(var(--game-width) * 0.002);
 }
 
 button {
@@ -46,7 +52,11 @@ button {
 }
 
 .gap-20 {
-	gap: 20px;
+	gap: calc(var(--game-width) * 0.02);
+}
+
+.border {
+	border: calc(var(--game-width) * 0.003) solid var(--border-color-btn);
 }
 
 @media (hover: hover) {

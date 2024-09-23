@@ -5,8 +5,9 @@ export class Settings {
 		MOVE_RIGHT: "KeyD",
 		MOVE_LEFT: "KeyA",
 		JUMP: "Space",
-		PAUSE: "Escape",
-		FULLSCREEN: "KeyF"
+		PAUSE: "Tab",
+		FULLSCREEN: "KeyF",
+		THROW: "KeyT"
 	}
 
 	async setKeyBind(action: keyof typeof this.keyBindings, key: string): Promise<void> {

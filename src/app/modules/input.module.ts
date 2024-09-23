@@ -26,6 +26,9 @@ export class Input {
 		MOVE_RIGHT: {
 			press: () => this.startMove("right"),
 			release: () => this.stopMove()
+		},
+		THROW: {
+			press: () => this.throw()
 		}
 	}
 
@@ -42,12 +45,16 @@ export class Input {
 		},
 		CLOSE_CONTAINER: {
 			press: (e?: Event) => this.closeContainer(e)
+		},
+		RESTART_GAME: {
+			press: () => this.restartGame()
 		}
 	}
 
 	constructor() {
 		this.main = MESSAGER.dispatch("main")
 		this.initialize()
+		this.renderKeyboardKeys()
 	}
 
 	initialize(): void {
@@ -72,6 +79,7 @@ export class Input {
 	}
 
 	private keyHandler(e: KeyboardEvent): void {
+		console.log(e.code)
 		const isKeyDown = e.type === "keydown"
 		const action = Object.entries(this.main.settings.keyBindings).find(
 			([, key]) => key === e.code
@@ -90,44 +98,6 @@ export class Input {
 
 	private releaseKey(action: keyInputAction): void {
 		this.keyMap[action].release?.()
-	}
-
-	toggleKeyHandler(event: KeyboardEvent): void {
-		// if (this.isBlocked) return
-		// const action = Object.entries(this.main.settings.keyBindings).find(
-		// 	([action, key]) => this.toggleKeyMap.has(action) && key === event.code
-		// )?.[0]
-		// if (!action) return
-		// console.log(action)
-		// this.toggleKeyMap.get(action)?.()
-	}
-
-	holdKeyHandler(event: KeyboardEvent): void {
-		if (this.isBlocked) return
-		const action = Object.entries(this.main.settings.keyBindings).find(([action, key]) => key === event.code)?.[0]
-		if (!action) return
-		const isKeyDown = event.type === "keydown"
-		console.log(action, isKeyDown)
-		return
-
-		// const { keyBindings } = this.main.settings
-		// if (!Object.values(keyBindings).includes(event.code)) return
-		// const isKeyDown = event.type === "keydown"
-		// if (this.activeInputs.has(event.code) === isKeyDown) return
-
-		// isKeyDown ? this.activeInputs.add(event.code) : this.activeInputs.delete(event.code)
-		// const { input } = MESSAGER.dispatch("main").player
-		// switch (event.code) {
-		// 	case keyBindings.MOVE_LEFT:
-		// 		input.isMovingLeft = isKeyDown
-		// 		break
-		// 	case keyBindings.MOVE_RIGHT:
-		// 		input.isMovingRight = isKeyDown
-		// 		break
-		// 	case keyBindings.JUMP:
-		// 		input.isJumping = isKeyDown
-		// 		break
-		// }
 	}
 
 	private startMove(direction: "left" | "right"): void {
@@ -151,12 +121,18 @@ export class Input {
 		document.querySelector("button.fullscreen")!.classList.toggle("active")
 	}
 
-	private openWindow(id: string): void {
+	private throw(): void {
+		console.log("throwing!")
+	}
+
+	openWindow(id: string): void {
 		this.main.gameElement.querySelector(`#${id}`)!.classList.add("open")
 	}
 
-	private closeWindow(id: string): void {
-		this.main.gameElement.querySelector(`#${id}`)!.classList.remove("open")
+	closeWindow(id: string): void {
+		const container = this.main.gameElement.querySelector(`#${id}`)!
+		container.classList.remove("open")
+		container.querySelectorAll(".open").forEach((el) => el.classList.remove("open"))
 	}
 
 	private closeContainer(e?: Event): void {
@@ -211,12 +187,34 @@ export class Input {
 		)
 	}
 
-	private mobileInput(input: keyInputAction): void {
-		const { keyBindings } = this.main.settings
-		const e = new KeyboardEvent("keydown", {
-			code: keyBindings[input]
+	pauseGame(): void {
+		this.openWindow("pause-screen")
+		document.querySelector("[data-click='PAUSE']")?.classList.add("active")
+	}
+
+	resumeGame(): void {
+		this.closeWindow("pause-screen")
+		document.querySelector("[data-click='PAUSE']")?.classList.remove("active")
+	}
+
+	async restartGame(): Promise<void> {
+		await confirmation({
+			requestMessage: "Do you want to restart? All Progress will be lost!",
+			affirmMessage: "Restart",
+			successCallback: () => {
+				console.log("restarting")
+			}
 		})
-		window.dispatchEvent(e)
+	}
+
+	private renderKeyboardKeys(): void {
+		document.querySelectorAll<HTMLElement>(".keyboard span").forEach((el) => {
+			const action = el.closest<HTMLElement>(".btn-input")!.dataset.click as keyInputAction
+			const key = this.main.settings.keyBindings[action]
+			const keyboardKey = mapCodeToKeyboardFont(key)
+			el.parentElement!.classList.toggle("space", key === "Space")
+			el.innerHTML = keyboardKey
+		})
 	}
 }
 
@@ -224,4 +222,48 @@ function mapCodeToKey(code: string): string {
 	if (code.startsWith("Key")) return code.slice(-1)
 	if (code === "Escape") return "Esc"
 	return code
+}
+
+function mapCodeToKeyboardFont(code: string): string {
+	const keyboardFontMap: Record<string, string> = {
+		Tab: "C",
+		Space: "S",
+		Escape: "Q",
+		NumPad0: "?",
+		NumPad1: "!",
+		NumPad2: '"',
+		NumPad3: "#",
+		NumPad4: "$",
+		NumPad5: "%",
+		NumPad6: "&",
+		NumPad7: "'",
+		NumPad8: "(",
+		NumPad9: ")",
+		NumPadAdd: "*",
+		ShiftLeft: "A",
+		">": "<",
+		ControlLeft: "D",
+		ControlRight: "E",
+		AltLeft: "F",
+		AltRight: "G",
+		ArrowLeft: "H",
+		ArrowRight: "I",
+		ArrowDown: "J",
+		ArrowUp: "K",
+		Enter: "L",
+		F1: "É",
+		F2: "È",
+		F3: "Ê",
+		F4: "Á",
+		F5: "À",
+		F6: "Â",
+		F7: "Ú",
+		F8: "Ù",
+		F9: "Û",
+		F10: "Ó",
+		F11: "Ò",
+		F12: "Ô"
+	}
+	if (code.startsWith("Key")) return code.slice(3).toLowerCase()
+	return keyboardFontMap[code] || code
 }

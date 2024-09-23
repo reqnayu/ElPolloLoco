@@ -1,7 +1,6 @@
 import { MESSAGER } from "../../script.js"
 import { GameObjectFactory } from "../factories/gameObject.factory.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Gui } from "./gui.module.js"
 import { Interval } from "./interval.module.js"
 import { Renderer } from "./renderer.module.js"
 import { Settings } from "./settings.module.js"
@@ -18,7 +17,6 @@ export class Main {
 	})
 
 	renderer
-	gui = new Gui()
 	settings = new Settings()
 
 	player
@@ -64,14 +62,14 @@ export class Main {
 		if (this.isPaused) return
 		window.dispatchEvent(new CustomEvent("pausegame"))
 		console.log("pausing")
-		this.gui.elements["pause-screen"].classList.add("open")
+		MESSAGER.dispatch("input").pauseGame()
 		this.isPaused = true
 	}
 
 	resume() {
 		if (!this.isPaused) return
 		window.dispatchEvent(new CustomEvent("resumegame"))
-		this.gui.elements["pause-screen"].classList.remove("open")
+		MESSAGER.dispatch("input").resumeGame()
 		this.isPaused = false
 	}
 
