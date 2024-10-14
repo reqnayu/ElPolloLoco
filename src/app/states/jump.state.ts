@@ -1,6 +1,5 @@
 import { State } from "../.types/state.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { IdleState } from "./idle.state.js"
 
 export class JumpState implements State {
 	timers = []
@@ -8,11 +7,14 @@ export class JumpState implements State {
 		// console.log(`'${gameObject.name}' entering Jump state!`)
 		gameObject.animationBehaviour?.setAnimation("jump")
 		gameObject.movementBehaviour?.jump()
+		gameObject.soundBehaviour?.playOnce("Jump")
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {
-		if (!gameObject.gravityBehavoir?.canFall()) gameObject.setState("idle")
+		gameObject.movementBehaviour?.move()
 	}
 
-	exit(gameObject: GameObject): void {}
+	exit(gameObject: GameObject): void {
+		gameObject.soundBehaviour?.playOnce("Landing")
+	}
 }

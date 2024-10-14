@@ -4,8 +4,8 @@ import { clamp } from "../util/general.util.js"
 import { Vector } from "./vector.module.js"
 
 export class Camera {
-	private _focus = new Vector(-1000, 0)
-	private pixelsPerFrame = 5
+	_focus = new Vector(-1000, 0)
+	private pixelsPerFrame = 1
 	aspectRatio = 16 / 9
 	baseResolution = new Vector(1280, 720)
 	focusObjects: GameObject[] = []
@@ -27,14 +27,14 @@ export class Camera {
 		this.maxPosX = MESSAGER.dispatch("main").maxPosX
 	}
 
-	updateFocus() {
+	updateFocus(deltaTime: number) {
 		if (this.focusObjects.length === 0) return
 		const objectFocus = Vector.average(this.focusObjects.map(({ focusVector }) => focusVector))
 		// objectFocus.x = clamp(objectFocus.x, 0, this.maxPosX)
 
 		const distance = this._focus.plus(objectFocus.scale(-1))
 		if (Math.abs(distance.x) <= 1) return (this._focus.x = objectFocus.x)
-		const step = distance.normalize().scale(-this.pixelsPerFrame)
+		const step = distance.normalize().scale(-this.pixelsPerFrame * deltaTime)
 		this._focus.x += step.x
 	}
 }

@@ -1,28 +1,43 @@
+import "../.types/prototypes.js"
 import { MESSAGER } from "../../script.js"
 import { GameObjectFactory } from "../factories/gameObject.factory.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Interval } from "./interval.module.js"
+import { Gui } from "./gui.modules.js"
 import { Renderer } from "./renderer.module.js"
 import { Settings } from "./settings.module.js"
+import { SoundManager } from "../managers/sound_manager.module.js"
+import { TimerManager } from "../managers/timer_manager.js"
+import { Player } from "../gameObjects/player.object.js"
+import { Background } from "../gameObjects/background.object.js"
+import { Clouds } from "../gameObjects/clouds.object.js"
+import { Enemy } from "../gameObjects/enemy.object.js"
+import { Vector } from "./vector.module.js"
+import { Timer } from "./timer.module.js"
+import "../managers/asset_manager.module.js"
+import { loadAssets } from "../managers/asset_manager.module.js"
+import { CollisionManager } from "../managers/collision_managermodule.js"
+import { getElement, sleep } from "../util/general.util.js"
 
 export class Main {
 	ctx
 	isPaused = true
-	frameRate = 60 / 1000
-	currentFrame = 0
-	maxPosX = 10 * 1000
-	gameLoop = new Interval({
-		handler: () => this.update(),
-		timeout: this.frameRate
-	})
+	readonly frameRate = 60 / 1000
+	readonly maxPosX = 10 * 1000
 
-	renderer
-	settings = new Settings()
+	hasStarted = false
+	countdownTimer?: Timer
 
-	player
-	background
-	clouds
-	enemies
+	renderer!: Renderer
+	soundManager!: SoundManager
+	timerManager!: TimerManager
+	collisionManager!: CollisionManager
+	settings!: Settings
+	gui!: Gui
+
+	player!: Player
+	background!: Background
+	clouds!: Clouds
+	enemies!: Enemy[]
 	// tstBottle
 
 	get allObjects(): GameObject[] {
@@ -32,7 +47,24 @@ export class Main {
 	constructor(public canvas: HTMLCanvasElement, public gameElement: HTMLElement) {
 		this.ctx = this.canvas.getContext("2d")!
 		MESSAGER.elements.set("main", this)
+	}
+
+	async initialize(): Promise<void> {
+		this.initializeGamePauseOnVisibilityChange()
 		this.renderer = new Renderer(this.canvas)
+		await loadAssets()
+		this.soundManager = new SoundManager()
+		this.timerManager = new TimerManager()
+		this.collisionManager = new CollisionManager()
+		this.settings = new Settings()
+		this.gui = new Gui()
+	}
+
+	setupNewGame(): void {
+		MESSAGER.dispatch("input").isKeyInputBlocked = false
+		this.collisionManager.allObjects.length = 0
+		this.hasStarted = false
+		this.countdownTimer?.kill()
 		this.background = GameObjectFactory.create("background")
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
@@ -42,15 +74,15 @@ export class Main {
 			GameObjectFactory.create("enemy")
 		]
 		// this.tstBottle = GameObjectFactory.create("bottle", { position: new Vector(0, 200) })
-
+		this.renderer.camera._focus = new Vector(0, 0)
 		this.renderer.camera.focusObjects = [this.player]
-		this.initializeGamePauseOnVisibilityChange()
+		this.update()
+		this.startCountDown()
 	}
 
-	startGame(): void {
-		this.gameLoop.toggle()
-		// this.togglePause()
-		this.isPaused = false
+	async startGame(): Promise<void> {
+		this.resume()
+		this.player.setState("idle")
 	}
 
 	togglePause() {
@@ -59,26 +91,18 @@ export class Main {
 	}
 
 	pause() {
-		if (this.isPaused) return
 		window.dispatchEvent(new CustomEvent("pausegame"))
-		console.log("pausing")
-		MESSAGER.dispatch("input").pauseGame()
 		this.isPaused = true
 	}
 
 	resume() {
-		if (!this.isPaused) return
 		window.dispatchEvent(new CustomEvent("resumegame"))
-		MESSAGER.dispatch("input").resumeGame()
 		this.isPaused = false
 	}
 
 	private update() {
 		this.renderer.render()
-	}
-
-	toggleRender() {
-		this.gameLoop.toggle()
+		requestAnimationFrame(() => this.update())
 	}
 
 	private initializeGamePauseOnVisibilityChange(): void {
@@ -86,5 +110,21 @@ export class Main {
 			if (document.visibilityState === "visible") return
 			this.pause()
 		})
+	}
+
+	startCountDown(secondsLeft = 1): void {
+		this.gui.updateCountDown(secondsLeft)
+		if (secondsLeft === 0) {
+			this.hasStarted = true
+			this.startGame()
+			return
+		}
+		this.countdownTimer = new Timer({
+			handler: () => {
+				this.startCountDown(secondsLeft - 1)
+			},
+			timeout: 1000,
+			isPausable: false
+		}).resume()
 	}
 }

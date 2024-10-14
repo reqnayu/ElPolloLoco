@@ -3,7 +3,10 @@ import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { HealthBehaviour } from "../behaviours/health.behaviour.js"
+import { InventoryBehaviour } from "../behaviours/inventory.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
+import { SoundAsset } from "../modules/sound_asset.module.js"
 import { AnimationSet } from "./animation.type.js"
 
 export type AnimationParams = {
@@ -17,6 +20,8 @@ export type BehaviourParamMap = {
 	gravity: GravityParams
 	health: HealthParams
 	collision: CollisionParams
+	sound: SoundParams
+	inventory: InventoryParams
 }
 
 export type DrawParams = {
@@ -26,6 +31,7 @@ export type DrawParams = {
 export type MovementParams = {
 	walkSpeed: number
 	jumpStrength?: number
+	clampToWorld?: boolean
 }
 
 export type GravityParams = {}
@@ -35,7 +41,15 @@ export type HealthParams = {
 }
 
 export type CollisionParams = {
-	damage: number
+	damage?: number
+	cooldown?: number
+}
+
+export type SoundParams = SoundAsset[]
+
+export type InventoryParams = {
+	throwables?: number
+	healthPotions?: number
 }
 
 export type BehaviourMap = {
@@ -45,4 +59,6 @@ export type BehaviourMap = {
 	gravity: GravityBehaviour
 	health: HealthBehaviour
 	collision: CollisionBehaviour
+	sound: SoundBehaviour
+	inventory: InventoryBehaviour
 }

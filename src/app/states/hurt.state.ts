@@ -6,14 +6,20 @@ export class HurtState implements State {
 	timers: Timer[] = []
 	enter(gameObject: GameObject): void {
 		gameObject.animationBehaviour?.setAnimation("hurt")
-		const hurtTimer = new Timer(() => {
-			gameObject.setState()
-		}, gameObject.collisionBehaviour!.coolDown)
+		const hurtTimer = new Timer({
+			handler: () => {
+				gameObject.setState()
+			},
+			timeout: gameObject.collisionBehaviour!.cooldown
+		})
 		this.timers.push(hurtTimer)
 		hurtTimer.resume()
+		console.log("entering hurt state")
 	}
 
-	update(gameObject: GameObject, deltaTime: number): void {}
+	update(gameObject: GameObject, deltaTime: number): void {
+		gameObject.movementBehaviour?.move()
+	}
 
 	exit(gameObject: GameObject): void {
 		this.timers.forEach((timer) => timer.kill())

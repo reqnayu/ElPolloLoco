@@ -11,6 +11,15 @@
 	</head>
 	<body>
 		<div id="game" class="txt-normal">
+			<div class="loading column">
+				<span>LOADING...</span>
+				<div class="row gap-20">
+					<div class="progress-track border btn">
+						<div class="progress-thumb"></div>
+					</div>
+					<span>20%</span>
+				</div>
+			</div>
 			<canvas></canvas>
 			<div id="gui">
 				<header class="mobile-1 row">
@@ -24,33 +33,36 @@
 						<img src="app/assets/img/gui/exit-fullscreen.png" alt="" />
 					</button>
 				</header>
+				<div id="countdown"><span>2</span></div>
 				<footer class="mobile-1 row">
 					<div class="row gap-20">
-						<button class="btn btn-primary btn-input" data-click="MOVE_LEFT">
+						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_LEFT">
 							<div class="keyboard ur"><span></span></div>
 							&lt;
 						</button>
-						<button class="btn btn-primary btn-input" data-click="MOVE_RIGHT">
+						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_RIGHT">
 							<div class="keyboard ur"><span></span></div>
 							&gt;
 						</button>
 					</div>
 					<div class="row gap-20">
-						<button class="btn btn-primary btn-input" data-click="THROW">
+						<button class="btn btn-primary btn-input no-sound" data-click="THROW">
 							<div class="keyboard ul"><span></span></div>
 							<img src="app/assets/img/gui/throw.png" alt="" />
 						</button>
-						<button class="btn btn-primary btn-input" data-click="JUMP">
+						<button class="btn btn-primary btn-input no-sound" data-click="JUMP">
 							<div class="keyboard ul"><span></span></div>
 							<img src="app/assets/img/gui/jump.png" alt="" />
 						</button>
 					</div>
 				</footer>
 			</div>
-			<div id="pause-screen" class="container">
+			<div id="main-menu" class="container open start">
+				<div class="title">El Pollo Loco</div>
 				<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 				<div class="menu-btns column">
-					<button class="btn btn-primary" data-click="CLOSE_CONTAINER">Resume</button>
+					<button class="btn btn-primary" data-click="NEW_GAME">New Game</button>
+					<button class="btn btn-primary" data-click="RESUME_GAME">Resume</button>
 					<button class="btn btn-primary" data-click="OPEN_SETTINGS">Settings</button>
 					<button class="btn btn-primary" data-click="RESTART_GAME">Restart</button>
 				</div>
@@ -58,10 +70,19 @@
 					<div id="settings" class="container">
 						<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 						<div class="menu-btns column">
+							<button class="btn btn-primary" data-click="OPEN_GAME_SETTINGS">Game Settings</button>
 							<button class="btn btn-primary desktop" data-click="OPEN_KEYBIND_SETTINGS">Keybinds</button>
 							<button class="btn btn-primary" data-click="OPEN_AUDIO_SETTINGS">Audio</button>
 						</div>
 						<div class="menu-content">
+							<div id="game-settings" class="container">
+								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+								<div>
+									<span>countdown</span>
+									<input data-click="TOGGLE_COUNTDOWN" type="checkbox" name="" id="snore" />
+								</div>
+							</div>
+							</div>
 							<div id="keyBindSettings" class="container">
 								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 								<div id="keyBinds" class="column">
@@ -84,14 +105,40 @@
 								</div>
 								<div id="singleKeyBind" class="container">Single KeyBind!</div>
 							</div>
-							<div id="keyBindModal">
-								<div class="column">
-									<span>Press a key to bind or hold "Esc" to cancel</span>
+							<div id="audio-settings" class="container">
+								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+								Volume
+								<div class="audio-options">
+									<div>
+										<span>Master</span>
+										<input type="range" min="0" max="100" id="master" />
+									</div>
+									<div>
+										<span>Music</span>
+										<input type="range" min="0" max="100" id="music" />
+									</div>
+									<div>
+										<span>SFX</span>
+										<input type="range" min="0" max="100" id="sfx" />
+									</div>
+									<div>
+										<span>Menu</span>
+										<input type="range" min="0" max="100" id="menu" />
+									</div>
+									<div>
+										<span>Snore</span>
+										<input data-click="TOGGLE_SNORE" type="checkbox" name="" id="snore" />
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div id="keyBindModal">
+			<div class="column">
+				<span>Press a key to bind or hold "Esc" to cancel</span>
 			</div>
 		</div>
 	</body>

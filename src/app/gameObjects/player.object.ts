@@ -2,11 +2,26 @@ import { AnimationSet, PlayerAnimationState } from "../.types/animation.type.js"
 import { StateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Vector } from "../modules/vector.module.js"
-import { GameObject, getSingleAnimation } from "./gameObject.object.js"
+import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
+import { SoundAsset } from "../modules/sound_asset.module.js"
+import { Assets } from "../managers/asset_manager.module.js"
 
+@Assets({
+	img: [
+		...getSingleAnimation("2_character_pepe/1_idle/idle", 1, 10),
+		...getSingleAnimation("2_character_pepe/1_idle/idle_long", 11, 20),
+		...getSingleAnimation("2_character_pepe/2_walk", 21, 26),
+		...getSingleAnimation("2_character_pepe/3_jump", 31, 39),
+		...getSingleAnimation("2_character_pepe/4_hurt", 41, 43),
+		...getSingleAnimation("2_character_pepe/5_dead", 51, 57)
+	],
+	audio: ["player/Jump.mp3", "player/Landing.mp3", "player/Walk.mp3", "player/Snore.mp3"]
+})
 export class Player extends GameObject {
-	protected walkSpeed = 40
-	private jumpStrength = 50
+	protected walkSpeed = 0.4
+	private jumpStrength = 1
+	private throwables = 5
+	private healthPotions = 3
 
 	isFriendly: boolean = true
 
@@ -26,33 +41,44 @@ export class Player extends GameObject {
 		this.initialize()
 	}
 
-	protected async initialize(): Promise<void> {
-		await this.setBehaviours()
-		await super.initialize("./app/assets/img/2_character_pepe/1_idle/idle/I-1.png")
+	protected initialize(): void {
+		this.setBehaviours()
+		super.initialize("2_character_pepe/1_idle/idle/I-1.png")
 		this.setState()
 	}
 
-	protected async setBehaviours(): Promise<void> {
-		const animationSet = await this.getAnimationSet()
-		const { walkSpeed, jumpStrength } = this
+	protected setBehaviours(): void {
+		const animationSet = this.getAnimationSet()
+		const { walkSpeed, jumpStrength, throwables, healthPotions } = this
 		this.image = animationSet.idle[0]
 
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
-		this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed, jumpStrength }).onAttach(this)
-		this.gravityBehavoir = BehaviourFactory.create("gravity").onAttach(this)
+		this.movementBehaviour = BehaviourFactory.create("movement", {
+			walkSpeed,
+			jumpStrength,
+			clampToWorld: true
+		}).onAttach(this)
+		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
+		this.soundBehaviour = BehaviourFactory.create("sound", [
+			new SoundAsset("sfx", "player/Jump.mp3"),
+			new SoundAsset("sfx", "player/Landing.mp3"),
+			new SoundAsset("sfx", "player/Walk.mp3"),
+			new SoundAsset("sfx", "player/Snore.mp3")
+		])
 		this.health = BehaviourFactory.create("health", { maximum: 200 }).onAttach(this)
-		// this.collisionBehaviour = BehaviourFactory.create("collision").onAttach(this)
+		this.collisionBehaviour = BehaviourFactory.create("collision", { cooldown: 2000 }).onAttach(this)
+		this.inventoryBehaviour = BehaviourFactory.create("inventory", { throwables, healthPotions })
 	}
 
-	protected async getAnimationSet(): Promise<Pick<AnimationSet, PlayerAnimationState>> {
+	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {
 		return {
-			idle: await getSingleAnimation("./app/assets/img/2_character_pepe/1_idle/idle", 1, 10),
-			idle_long: await getSingleAnimation("./app/assets/img/2_character_pepe/1_idle/idle_long", 11, 20),
-			walk: await getSingleAnimation("./app/assets/img/2_character_pepe/2_walk", 21, 26),
-			jump: await getSingleAnimation("./app/assets/img/2_character_pepe/3_jump", 31, 39),
-			hurt: await getSingleAnimation("./app/assets/img/2_character_pepe/4_hurt", 41, 43),
-			dead: await getSingleAnimation("./app/assets/img/2_character_pepe/5_dead", 51, 57)
+			idle: getImages(getSingleAnimation("2_character_pepe/1_idle/idle", 1, 10)),
+			idle_long: getImages(getSingleAnimation("2_character_pepe/1_idle/idle_long", 11, 20)),
+			walk: getImages(getSingleAnimation("2_character_pepe/2_walk", 21, 26)),
+			jump: getImages(getSingleAnimation("2_character_pepe/3_jump", 31, 39)),
+			hurt: getImages(getSingleAnimation("2_character_pepe/4_hurt", 41, 43)),
+			dead: getImages(getSingleAnimation("2_character_pepe/5_dead", 51, 57))
 		}
 	}
 
@@ -61,6 +87,6 @@ export class Player extends GameObject {
 	}
 
 	canJump(): boolean {
-		return this.input.isJumping
+		return this.input.isJumping && !this.gravityBehavior?.canFall()
 	}
 }

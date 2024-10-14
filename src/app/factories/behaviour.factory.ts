@@ -5,14 +5,18 @@ import {
 	CollisionParams,
 	DrawParams,
 	HealthParams,
-	MovementParams
+	InventoryParams,
+	MovementParams,
+	SoundParams
 } from "../.types/behaviour.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { HealthBehaviour } from "../behaviours/health.behaviour.js"
+import { InventoryBehaviour } from "../behaviours/inventory.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 
 export class BehaviourFactory {
 	private constructor() {}
@@ -44,8 +48,14 @@ export class BehaviourFactory {
 			}
 			case "collision": {
 				const params = options as CollisionParams
-				if (params && params.damage === undefined) throw Error(`CollisionParams Invalid!`)
 				return new CollisionBehaviour(params) as BehaviourMap[T]
+			}
+			case "sound": {
+				return new SoundBehaviour() as BehaviourMap[T]
+			}
+			case "inventory": {
+				const params = options as InventoryParams
+				return new InventoryBehaviour(params) as BehaviourMap[T]
 			}
 			default:
 				throw new Error(`behaviour of type '${type}' not found!`)

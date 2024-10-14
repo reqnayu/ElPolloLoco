@@ -5,8 +5,11 @@ import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { HealthBehaviour } from "../behaviours/health.behaviour.js"
+import { InventoryBehaviour } from "../behaviours/inventory.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { StateFactory } from "../factories/State.factory.js"
+import { getAsset } from "../managers/asset_manager.module.js"
 import { Vector } from "../modules/vector.module.js"
 
 export class GameObject {
@@ -30,10 +33,12 @@ export class GameObject {
 
 	drawBehaviour?: DrawBehaviour
 	movementBehaviour?: MovementBehaviour
-	gravityBehavoir?: GravityBehaviour
+	gravityBehavior?: GravityBehaviour
 	animationBehaviour?: AnimationBehaviour
 	health?: HealthBehaviour
 	collisionBehaviour?: CollisionBehaviour
+	soundBehaviour?: SoundBehaviour
+	inventoryBehaviour?: InventoryBehaviour
 
 	focusOffset?: number
 	protected getFocus?(): Vector
@@ -44,15 +49,11 @@ export class GameObject {
 
 	constructor(public name: GameObjectType) {}
 
-	protected async initialize(imgSrc: string): Promise<void> {
-		await this.setImage(imgSrc)
+	protected initialize(imgSrc: string): void {
+		this.image = getAsset<"img">(imgSrc)
 	}
 
 	protected setBehaviours(): void {}
-
-	private async setImage(imgSrc: string) {
-		this.image = await createImage(imgSrc)
-	}
 
 	setState(stateType: keyof StateMap = this.defaultState): void {
 		if (!this.states.includes(stateType)) return
@@ -64,8 +65,8 @@ export class GameObject {
 	update(deltaTime: number): void {
 		// console.log("updating")
 		this.animationBehaviour?.update(deltaTime)
+		this.gravityBehavior?.update(deltaTime)
 		this.movementBehaviour?.update(deltaTime)
-		this.gravityBehavoir?.update(deltaTime)
 		this.health?.update(deltaTime)
 		this.collisionBehaviour?.update(deltaTime)
 
@@ -81,35 +82,23 @@ export class GameObject {
 	}
 
 	canMove(): boolean {
-		return false
+		return true
 	}
 
 	canJump(): boolean {
 		return false
 	}
 }
-export async function getImages(srcs: string[]): Promise<CanvasImageSource[]>
-export async function getImages(src: string): Promise<CanvasImageSource>
 
-export async function getImages(src: string | string[]): Promise<CanvasImageSource | CanvasImageSource[]> {
-	if (typeof src === "string") return createImage(src)
-	return Promise.all(src.map((src) => createImage(src)))
+export function getImages(srcs: string[]): CanvasImageSource[]
+export function getImages(src: string): CanvasImageSource
+
+export function getImages(src: string | string[]): CanvasImageSource | CanvasImageSource[] {
+	if (typeof src === "string") return getAsset<"img">(src)
+	return src.map((src) => getAsset<"img">(src))
 }
 
-async function createImage(src: string): Promise<CanvasImageSource> {
-	const img = new Image()
-	img.src = src
-	return new Promise((resolve, reject) => {
-		img.onload = () => resolve(img)
-		setTimeout(() => reject(src), 5000)
-	})
-}
-
-export function getSingleAnimation(
-	path: string,
-	startNumber: number,
-	endNumber: number = startNumber
-): Promise<CanvasImageSource[]> {
+export function getSingleAnimation(path: string, startNumber: number, endNumber: number = startNumber): string[] {
 	const assetPaths: string[] = []
 	const assetInitial = path
 		.split("/")
@@ -120,5 +109,5 @@ export function getSingleAnimation(
 		const src = `${path}/${assetInitial}-${i}.png`
 		assetPaths.push(src)
 	}
-	return getImages(assetPaths)
+	return assetPaths
 }

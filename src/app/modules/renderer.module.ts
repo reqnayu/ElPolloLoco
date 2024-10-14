@@ -6,6 +6,8 @@ import { Vector } from "./vector.module.js"
 export class Renderer {
 	main
 	camera
+	currentFrame = 0
+	private timeOfLastFrame = 0
 	private windowScale = 0.8
 
 	constructor(private canvas: HTMLCanvasElement) {
@@ -30,19 +32,32 @@ export class Renderer {
 		this.main.ctx.clearRect(0, 0, width, height)
 	}
 
+	private readonly desiredFps = 60
+	private readonly frameDuration = 1000 / this.desiredFps
+
 	render() {
 		this.updateDimensions()
 		this.wipe()
-		if (!this.main.isPaused) this.camera.updateFocus()
 		const { allObjects } = this.main
-		allObjects.forEach(this.renderObject)
+		let deltaTime = 0
+		const now = Date.now()
 
-		this.main.currentFrame++
+		// if (now - this.timeOfLastFrame >= this.frameDuration) {
+		deltaTime = now - this.timeOfLastFrame
+		this.timeOfLastFrame = now
+		// }
+
+		if (this.shouldUpdate()) {
+			this.currentFrame++
+			this.camera.updateFocus(deltaTime)
+			this.main.collisionManager.checkAll()
+		}
+		allObjects.forEach((gameObject) => this.renderObject(gameObject, deltaTime))
 	}
 
-	private renderObject = (gameObject: GameObject) => {
+	private renderObject = (gameObject: GameObject, deltaTime: number) => {
 		gameObject.draw(this.main.ctx)
-		if (!this.main.isPaused) gameObject.update(this.main.frameRate)
+		if (this.shouldUpdate()) gameObject.update(deltaTime)
 	}
 
 	toggleFullscreen(): Promise<void> {
@@ -54,5 +69,9 @@ export class Renderer {
 		const x = document.fullscreenElement?.clientWidth || window.innerWidth * this.windowScale
 		const y = document.fullscreenElement?.clientHeight || window.innerHeight * this.windowScale
 		return new Vector(x, y)
+	}
+
+	private shouldUpdate(): boolean {
+		return this.main.hasStarted && !this.main.isPaused
 	}
 }

@@ -6,10 +6,11 @@ import { AnimationParams } from "../.types/behaviour.type.js"
 
 export class AnimationBehaviour implements Updateable {
 	private gameObject!: GameObject
-	framesPerImage = 30
+	private frameDuration = 1000 / 8
 	private currentAnimation: CanvasImageSource[] = []
 	private currentFrameIndex = 0
 	private currentImage?: CanvasImageSource
+	private timeOfLastFrame = 0
 	animationSet
 
 	constructor({ animationSet }: AnimationParams) {
@@ -31,8 +32,13 @@ export class AnimationBehaviour implements Updateable {
 	}
 
 	update(deltaTime: number): void {
-		if (MESSAGER.dispatch("main").currentFrame % this.framesPerImage > 0) return
-		this.advanceFrame()
+		// if (MESSAGER.dispatch("main").renderer.currentFrame % this.framesPerImage > 0) return
+		const now = Date.now()
+		const dt = now - this.timeOfLastFrame
+		if (dt >= this.frameDuration) {
+			this.timeOfLastFrame = now
+			this.advanceFrame()
+		}
 	}
 
 	private advanceFrame() {

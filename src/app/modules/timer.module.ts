@@ -1,17 +1,21 @@
-export class Timer {
+import { MESSAGER } from "../../script.js"
+
+export class Timer implements timerOrIntervalParams {
 	private timerId?: number
-	private timeRemaining = this.timeout
+	handler
+	timeout
+	isPausable
+	private timeRemaining
 	private startTime = 0
 	private done = false
 	private abortController = new AbortController()
 
-	constructor(private handler: () => void, private timeout: number) {
-		window.addEventListener("resumegame", () => this.resume(), {
-			signal: this.abortController.signal
-		})
-		window.addEventListener("pausegame", () => this.pause(), {
-			signal: this.abortController.signal
-		})
+	constructor({ handler, timeout, isPausable = true }: timerParams) {
+		this.handler = handler
+		this.timeout = timeout
+		this.isPausable = isPausable
+		this.timeRemaining = timeout
+		MESSAGER.dispatch("timerManager").addTimer(this)
 	}
 
 	pause(): void {
@@ -54,4 +58,12 @@ export class Timer {
 		this.reset()
 		this.dispose()
 	}
+}
+
+type timerParams = timerOrIntervalParams & {}
+
+export type timerOrIntervalParams = {
+	handler(): void
+	timeout: number
+	isPausable?: boolean
 }

@@ -4,6 +4,7 @@ body {
 	width: 100vw;
 	display: grid;
 	place-items: center;
+	background: url(app/assets/img/gui/floor.jpg) center/cover no-repeat;
 }
 
 * {
@@ -16,17 +17,29 @@ body {
 
 #game {
 	position: relative;
-	overflow: hidden;
 	display: grid;
 	grid-template-areas: "a";
+	cursor: var(--cursor-normal);
 }
 
-#game:has(#pause-screen.open) > :not(:is(#pause-screen, .confirmation-container)) {
+#game:has(#main-menu.open) > :not(:is(#main-menu, .confirmation-container, .loading)) {
 	filter: blur(1px);
 }
 
 #game > * {
 	grid-area: a;
+}
+
+#game:not(:fullscreen)::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	inset: calc(var(--game-width) * -0.07) calc(var(--game-width) * -0.075);
+	z-index: 1;
+	background: url(app/assets/img/gui/frame.png) center no-repeat;
+	background-size: 100% 100%;
+	pointer-events: none;
+	border-radius: calc(var(--game-width) * 0.005);
 }
 
 canvas {
@@ -37,18 +50,101 @@ canvas {
 	margin: auto;
 }
 
-#pause-screen {
+#main-menu.start {
+	inset: 0;
+	translate: unset;
+	width: 100%;
+	height: 100%;
+	border-radius: 0;
+	background: url(app/assets/img/gui/cover.webp) center/100% no-repeat;
+}
+
+#main-menu.start .container {
+	background: url(app/assets/img/gui/cover.webp) center/100% no-repeat;
+}
+
+#main-menu.start > .menu-btns {
+	/* margin: 20% 50% 0 0; */
+	padding: 0 5%;
+	margin-right: 50%;
+}
+
+#main-menu.start .btn-secondary {
+	background-color: var(--bg-color-btn-light);
+}
+
+#main-menu.start > .close-btn {
+	display: none;
+}
+
+#main-menu.start :is([data-click="RESUME_GAME"], [data-click="RESTART_GAME"]) {
+	display: none;
+}
+
+#main-menu.start .title {
+	font-size: 3em;
+	color: var(--bg-color-container);
+	text-shadow: 1px 0 0 var(--border-color-btn), -1px 0 0 var(--border-color-btn), 0 1px 0 var(--border-color-btn),
+		0 -1px var(--border-color-btn);
+}
+
+#main-menu {
 	display: grid;
 	border-radius: calc(var(--game-width) * 0.01);
 	overflow: hidden;
 	grid-template-areas: "a";
-	width: fit-content;
-	height: fit-content;
+}
+
+#main-menu:not(.start) {
 	margin: auto;
 }
 
+#main-menu:not(.start) [data-click="NEW_GAME"] {
+	display: none;
+}
+
+#main-menu:not(.start) .title {
+	display: none;
+}
+
+.loading {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	justify-content: center;
+	align-items: center;
+	background-color: white;
+	gap: 10%;
+	background-color: var(--bg-color-container);
+}
+
+.loading > span {
+	font-size: calc(var(--game-width) * 0.085);
+}
+
+.loading .row {
+	justify-content: space-between;
+	height: calc(var(--game-width) * 0.05);
+	width: calc(var(--game-width) * 0.8);
+}
+
+.loading .progress-track {
+	background-color: var(--bg-color-btn-light);
+	padding: 0;
+	overflow: hidden;
+	justify-content: flex-start;
+	width: 85%;
+	height: 100%;
+}
+
+.loading .progress-thumb {
+	height: 100%;
+	background-color: var(--bg-color-btn-hover);
+	width: 0%;
+	transition: width 100ms;
+}
+
 .menu-btns {
-	margin: auto;
 	gap: calc(var(--game-width) * 0.015);
 }
 
@@ -103,7 +199,15 @@ canvas {
 	background-color: var(--bg-color-container);
 	position: absolute;
 	inset: 0;
-	padding: calc(var(--game-width) * 0.05) calc(var(--game-width) * 0.15);
+	padding: calc(var(--game-width) * 0.07) calc(var(--game-width) * 0.07);
+}
+
+#main-menu:not(.start) .container,
+#main-menu:not(.start).container {
+	inset: 50% auto auto 50%;
+	translate: -50% -50%;
+	width: calc(var(--game-width) * 0.6);
+	height: calc(var(--game-height) * 0.6);
 }
 
 .container:not(.open) {
@@ -142,7 +246,7 @@ canvas {
 }
 
 #keyBinds .key {
-	cursor: pointer;
+	cursor: var(--cursor-pointer);
 }
 
 #keyBinds .key:hover {
@@ -218,8 +322,6 @@ canvas {
 	position: absolute;
 	font-family: "Keyboard";
 	font-size: calc(var(--game-width) * 0.04);
-	/* background: linear-gradient(#00000050, #00000050) no-repeat;
-	background-size: calc(100% - 13px) calc(100% - 15px); */
 	line-height: 100%;
 	pointer-events: none;
 }
@@ -233,7 +335,6 @@ canvas {
 .keyboard::before {
 	content: "";
 	position: absolute;
-	/* inset: 0; */
 	inset: calc(var(--game-width) * 0.004) calc(var(--game-width) * 0.004) calc(var(--game-width) * 0.004)
 		calc(var(--game-width) * 0.003);
 	background-color: #00000050;
@@ -291,16 +392,109 @@ canvas {
 	gap: calc(var(--game-width) * 0.02);
 }
 
-/* .confirmation button {
-	padding: calc(var(--game-width) * 0.01) calc(var(--game-width) * 0.02);
-	min-width: 80px;
+.audio-options {
+	padding: 0 calc(var(--game-width) * 0.04);
 }
 
-.confirmation .cancel {
-	border: 1px solid lightblue;
+.audio-options > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
-.confirmation .affirm {
-	background-color: darkblue;
-	color: white;
-} */
+input[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	cursor: var(--cursor-pointer);
+	width: calc(var(--game-width) * 0.2);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+	/*  { */
+	background-color: var(--bg-color-btn-light);
+	height: calc(var(--game-width) * 0.02);
+	border-radius: calc(var(--game-width) * 0.0075);
+	border: calc(var(--game-width) * 0.003) solid var(--border-color-btn);
+}
+
+input[type="range"]::-moz-range-track {
+	background-color: var(--bg-color-btn-light);
+	height: calc(var(--game-width) * 0.02);
+	border-radius: calc(var(--game-width) * 0.0075);
+	outline: calc(var(--game-width) * 0.003) solid var(--border-color-btn);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: calc(var(--game-width) * 0.02);
+	height: calc(var(--game-width) * 0.03);
+	background-color: var(--bg-color-btn);
+	border-radius: calc(var(--game-width) * 0.0075);
+	outline: calc(var(--game-width) * 0.003) solid var(--border-color-btn);
+	margin-top: calc(calc(var(--game-width) * 0.01) - calc(var(--game-width) * 0.0175));
+}
+
+input[type="range"]::-moz-range-thumb {
+}
+
+input[type="checkbox"] {
+	position: relative;
+	appearance: none;
+	width: calc(var(--game-width) * 0.025);
+	height: calc(var(--game-width) * 0.025);
+	background-color: var(--bg-color-btn-light);
+	border-radius: calc(var(--game-width) * 0.0075);
+	outline: calc(var(--game-width) * 0.003) solid var(--border-color-btn);
+	cursor: var(--cursor-pointer);
+}
+
+input[type="checkbox"]:checked::after {
+	position: absolute;
+	inset: 0;
+	content: "";
+	background: url(app/assets/img/gui/check.png) center/80% no-repeat;
+}
+
+#game:has(#main-menu.open) #countdown span {
+	animation-play-state: paused;
+}
+
+#countdown {
+	font-size: 3em;
+	color: var(--bg-color-btn-light);
+	display: flex;
+	justify-content: center;
+}
+
+#countdown span {
+	position: relative;
+	line-height: 100%;
+	z-index: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-shadow: 1px 0 0 var(--border-color-btn), -1px 0 0 var(--border-color-btn), 0 1px 0 var(--border-color-btn),
+		0 -1px var(--border-color-btn);
+	opacity: 0;
+}
+
+#countdown span.active {
+	animation: count-down-zoom 900ms;
+}
+
+@keyframes count-down-zoom {
+	0% {
+		opacity: 1;
+	}
+	80% {
+		scale: 2;
+	}
+	99% {
+		opacity: 0;
+	}
+	100% {
+		display: none;
+	}
+}

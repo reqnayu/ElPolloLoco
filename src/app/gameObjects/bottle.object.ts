@@ -10,10 +10,10 @@ export class Bottle extends GameObject {
 		this.initialize()
 	}
 
-	protected initialize(): Promise<void> {
+	protected initialize(): void {
 		// console.log("background created!")
 		this.setBehaviours()
-		return super.initialize("app/assets/img/6_salsa_bottle/salsa_bottle.png")
+		return super.initialize("6_salsa_bottle/salsa_bottle.png")
 	}
 
 	protected setBehaviours(): void {

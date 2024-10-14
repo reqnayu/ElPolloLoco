@@ -1,23 +1,33 @@
+import "../.types/prototypes.js"
 import { MESSAGER } from "../../script.js"
-import { confirmation, delegateEvent } from "../util/general.util.js"
+import {
+	confirmation,
+	delegateEvent,
+	getAllElements,
+	getElement,
+	pointerEventIsLeftClick
+} from "../util/general.util.js"
 import { keyInputAction, inputMap, mouseInputAction } from "../.types/input.type.js"
 import { Timer } from "./timer.module.js"
+import { audioTypes } from "../managers/sound_manager.module.js"
 
 export class Input {
 	main
 	activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
 	activeClickInput: mouseInputAction | null = null
 	isBlocked = false
+	isKeyInputBlocked = true
 
 	keyMap: inputMap<"key"> = {
 		FULLSCREEN: {
-			press: () => this.toggleFullscreen()
+			release: () => this.toggleFullscreen()
 		},
 		PAUSE: {
-			press: () => this.main.togglePause()
+			release: () => this.togglePause()
 		},
 		JUMP: {
-			press: () => this.main.player.movementBehaviour?.jump()
+			press: () => (this.main.player.input.isJumping = true),
+			release: () => (this.main.player.input.isJumping = false)
 		},
 		MOVE_LEFT: {
 			press: () => this.startMove("left"),
@@ -28,26 +38,41 @@ export class Input {
 			release: () => this.stopMove()
 		},
 		THROW: {
-			press: () => this.throw()
+			release: () => this.throw()
 		}
 	}
 
 	clickTargetMap: inputMap<"mouse"> = {
 		...this.keyMap,
 		OPEN_SETTINGS: {
-			press: () => this.openWindow("settings")
+			release: () => this.openWindow("settings")
 		},
 		OPEN_KEYBIND_SETTINGS: {
-			press: () => this.openKeyBindSettings()
+			release: () => this.openKeyBindSettings()
+		},
+		OPEN_GAME_SETTINGS: {
+			release: () => this.openWindow("game-settings")
 		},
 		OPEN_SINGLE_KEYBIND: {
-			press: (e?: Event) => this.openSingleKeyBind(e)
+			release: (e?: Event) => this.openSingleKeyBind(e)
+		},
+		OPEN_AUDIO_SETTINGS: {
+			release: () => this.openAudioSettings()
 		},
 		CLOSE_CONTAINER: {
-			press: (e?: Event) => this.closeContainer(e)
+			release: (e?: Event) => this.closeContainer(e)
 		},
 		RESTART_GAME: {
-			press: () => this.restartGame()
+			release: () => this.restartGame()
+		},
+		TOGGLE_SNORE: {
+			release: () => this.toggleSnore()
+		},
+		NEW_GAME: {
+			release: () => this.newGame()
+		},
+		RESUME_GAME: {
+			release: () => this.togglePause()
 		}
 	}
 
@@ -62,24 +87,32 @@ export class Input {
 		window.addEventListener("pointerup", (e) => this.clickHandler(e))
 		window.addEventListener("keydown", (e) => this.keyHandler(e))
 		window.addEventListener("keyup", (e) => this.keyHandler(e))
+		getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
+			slider.addEventListener("input", (e) => {
+				const type = slider.id as keyof audioTypes
+				this.main.soundManager.setVolume(Number(slider.value) / 100, type)
+			})
+			slider.addEventListener("change", () => this.main.settings.saveSettings())
+		})
 		MESSAGER.elements.set("input", this)
 	}
 
 	clickHandler(e: Event): void {
-		if (!((e as PointerEvent).which === 1)) return
-		if (e.type === "pointerup" && !!this.activeClickInput)
-			return this.clickTargetMap[this.activeClickInput!].release?.()
-		Object.entries(this.clickTargetMap).forEach(([action, { press: callback }]) => {
-			if (!(e.target instanceof HTMLElement)) return
-			const attr = e.target.dataset.click
-			if (!attr || attr !== action) return
-			callback(e)
-			this.activeClickInput = action as mouseInputAction
-		})
+		if (!pointerEventIsLeftClick(e)) return
+		const action = ((e.target as HTMLElement).closest<HTMLElement>("[data-click]") || (e.target as HTMLElement))
+			?.dataset.click as mouseInputAction
+		if (!action) return
+		if (e.type === "pointerup" && action === this.activeClickInput && !!this.activeClickInput)
+			this.clickTargetMap[this.activeClickInput]?.release?.(e)
+		else if (e.type === "pointerdown") {
+			this.activeClickInput = action
+			this.clickTargetMap[action]?.press?.(e)
+		}
 	}
 
 	private keyHandler(e: KeyboardEvent): void {
-		console.log(e.code)
+		if (this.isKeyInputBlocked) return
+		// console.log(e.code)
 		const isKeyDown = e.type === "keydown"
 		const action = Object.entries(this.main.settings.keyBindings).find(
 			([, key]) => key === e.code
@@ -93,7 +126,7 @@ export class Input {
 	}
 
 	private pressKey(action: keyInputAction): void {
-		this.keyMap[action].press()
+		this.keyMap[action].press?.()
 	}
 
 	private releaseKey(action: keyInputAction): void {
@@ -118,7 +151,7 @@ export class Input {
 
 	private async toggleFullscreen(): Promise<void> {
 		await this.main.renderer.toggleFullscreen()
-		document.querySelector("button.fullscreen")!.classList.toggle("active")
+		getElement(".fullscreen").classList.toggle("active")
 	}
 
 	private throw(): void {
@@ -126,26 +159,26 @@ export class Input {
 	}
 
 	openWindow(id: string): void {
-		this.main.gameElement.querySelector(`#${id}`)!.classList.add("open")
+		getElement(`#${id}`).classList.add("open")
 	}
 
 	closeWindow(id: string): void {
-		const container = this.main.gameElement.querySelector(`#${id}`)!
+		const container = this.main.gameElement.getElement(`#${id}`)
 		container.classList.remove("open")
-		container.querySelectorAll(".open").forEach((el) => el.classList.remove("open"))
+		container.getAllElements(".open").forEach((el) => el.classList.remove("open"))
 	}
 
 	private closeContainer(e?: Event): void {
 		if (!e || !(e.target instanceof HTMLElement)) return
 		const id = e.target.closest(".container")!.id
 		this.closeWindow(id)
-		if (id === "pause-screen") this.main.togglePause()
+		if (id === "main-menu") this.resumeGame()
 	}
 
 	private openKeyBindSettings(): void {
 		const { keyBindings } = this.main.settings
 		Object.entries(keyBindings).forEach(([action, key]) => {
-			const keyElement = document.querySelector(`#${action} .key`)
+			const keyElement = getElement(`#${action} .key`)
 			if (!keyElement) return
 			keyElement.innerHTML = mapCodeToKey(key)
 		})
@@ -158,7 +191,15 @@ export class Input {
 		this.openWindow("keyBindModal")
 		this.isBlocked = true
 		const ac = new AbortController()
-		window.addEventListener("keydown", (event) => this.processKeyBind(event, action, ac), { signal: ac.signal })
+		// window.addEventListener("keydown", (event) => this.processKeyBind(event, action, ac), { signal: ac.signal })
+	}
+
+	private openAudioSettings(): void {
+		Object.entries(this.main.soundManager.volumes).forEach(
+			([type, volume]) => (getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
+		)
+		getElement<HTMLInputElement>("input#snore").checked = !this.main.settings.snoreDisabled
+		this.openWindow("audio-settings")
 	}
 
 	private async processKeyBind(
@@ -174,10 +215,13 @@ export class Input {
 	}
 
 	private cancelKeybind(ac: AbortController): void {
-		const timer = new Timer(() => {
-			this.closeWindow("keyBindModal")
-			ac.abort()
-		}, 1000).resume()
+		const timer = new Timer({
+			handler: () => {
+				this.closeWindow("keyBindModal")
+				ac.abort()
+			},
+			timeout: 1000
+		}).resume()
 		window.addEventListener(
 			"keyup",
 			() => {
@@ -187,14 +231,36 @@ export class Input {
 		)
 	}
 
+	private toggleSnore(): void {
+		this.main.settings.snoreDisabled = !this.main.settings.snoreDisabled
+		const isDisabled = this.main.settings.snoreDisabled
+		const snoreSound = MESSAGER.dispatch("soundManager").allAudioElements.get("Snore")!
+		isDisabled ? snoreSound.disable() : snoreSound.enable()
+		this.main.settings.saveSettings()
+	}
+
+	private togglePause(): void {
+		const mainMenuIsOpen = getElement("#main-menu").classList.contains("open")
+		mainMenuIsOpen ? this.resumeGame() : this.pauseGame()
+	}
+
 	pauseGame(): void {
-		this.openWindow("pause-screen")
-		document.querySelector("[data-click='PAUSE']")?.classList.add("active")
+		this.openWindow("main-menu")
+		getElement("[data-click='PAUSE']").classList.add("active")
+		this.main.pause()
 	}
 
 	resumeGame(): void {
-		this.closeWindow("pause-screen")
-		document.querySelector("[data-click='PAUSE']")?.classList.remove("active")
+		this.closeWindow("main-menu")
+		getElement("[data-click='PAUSE']").classList.remove("active")
+		this.main.resume()
+	}
+
+	newGame(): void {
+		getElement("#main-menu").classList.remove("start")
+		this.main.setupNewGame()
+		// this.main.startCountDown()
+		this.closeWindow("main-menu")
 	}
 
 	async restartGame(): Promise<void> {
@@ -203,18 +269,23 @@ export class Input {
 			affirmMessage: "Restart",
 			successCallback: () => {
 				console.log("restarting")
+				this.newGame()
 			}
 		})
 	}
 
 	private renderKeyboardKeys(): void {
-		document.querySelectorAll<HTMLElement>(".keyboard span").forEach((el) => {
+		getAllElements(".keyboard span").forEach((el) => {
 			const action = el.closest<HTMLElement>(".btn-input")!.dataset.click as keyInputAction
 			const key = this.main.settings.keyBindings[action]
 			const keyboardKey = mapCodeToKeyboardFont(key)
 			el.parentElement!.classList.toggle("space", key === "Space")
 			el.innerHTML = keyboardKey
 		})
+	}
+
+	private saveSettings(): void {
+		this.main.settings.saveSettings()
 	}
 }
 

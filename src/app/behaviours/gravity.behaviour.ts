@@ -4,7 +4,7 @@ import { GameObject } from "../gameObjects/gameObject.object.js"
 
 export class GravityBehaviour implements Updateable {
 	private gameObject!: GameObject
-	private gravity = new Vector(0, -6)
+	private gravity = new Vector(0, -0.002)
 	private floorHeight = 85
 
 	onAttach(gameObject: GameObject): this {
@@ -15,11 +15,29 @@ export class GravityBehaviour implements Updateable {
 	}
 
 	update(deltaTime: number): void {
-		const velocity = this.gameObject.movementBehaviour!.currentVelocity
-		velocity.y = this.canFall() ? velocity.y + this.gravity.y * deltaTime : 0
+		if (this.shouldLand()) return this.land()
+		if (!this.canFall()) return
+		this.fall(deltaTime)
 	}
 
 	canFall(): boolean {
 		return this.gameObject.position.y > this.floorHeight
+	}
+
+	private shouldLand(): boolean {
+		const vy = this.gameObject.movementBehaviour!.velocity.y
+		const posY = this.gameObject.position.y
+		// console.log(`vy: ${vy}, posY: ${posY}`)
+		return vy < 0 && posY <= this.floorHeight
+	}
+
+	private fall(deltaTime: number): void {
+		this.gameObject.movementBehaviour!.velocity.y += this.gravity.scale(deltaTime).y
+	}
+
+	private land(): void {
+		// this.gameObject.setState("idle")
+		this.gameObject.movementBehaviour!.velocity.y = 0
+		this.gameObject.position.y = this.floorHeight
 	}
 }

@@ -1,5 +1,6 @@
 import { MESSAGER } from "../../script.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
+import { Assets } from "../managers/asset_manager.module.js"
 import { GameObject } from "./gameObject.object.js"
 
 class BackgroundElement extends GameObject {
@@ -15,7 +16,7 @@ class BackgroundElement extends GameObject {
 	}
 
 	async initialize(imgSrc: string): Promise<void> {
-		await super.initialize(imgSrc)
+		super.initialize(imgSrc)
 		this.setBehaviours()
 		this.initializeDimensions()
 	}
@@ -43,13 +44,21 @@ class BackgroundElement extends GameObject {
 	}
 }
 
+@Assets({
+	img: [
+		"5_background/layers/3_third_layer/full.png",
+		"5_background/layers/2_second_layer/full.png",
+		"5_background/layers/1_first_layer/full.png",
+		"5_background/layers/air.png"
+	]
+})
 export class Background extends GameObject {
 	private elements: BackgroundElement[] = []
 	private isLoaded = false
 	private srcSet = [
-		"app/assets/img/5_background/layers/3_third_layer/full.png",
-		"app/assets/img/5_background/layers/2_second_layer/full.png",
-		"app/assets/img/5_background/layers/1_first_layer/full.png"
+		"5_background/layers/3_third_layer/full.png",
+		"5_background/layers/2_second_layer/full.png",
+		"5_background/layers/1_first_layer/full.png"
 	]
 	private cameraResolution
 
@@ -60,14 +69,14 @@ export class Background extends GameObject {
 		this.initialize()
 	}
 
-	protected async initialize(): Promise<void> {
+	protected initialize(): void {
 		this.srcSet.forEach((src, i) => {
 			const elementSet = [new BackgroundElement(i, false), new BackgroundElement(i, true)]
 			this.elements.push(...elementSet)
 		})
 		this.setBehaviours()
-		await Promise.all(this.elements.map((el, i) => el.initialize(this.srcSet[Math.floor(i / 2)])))
-		await super.initialize("./app/assets/img/5_background/layers/air.png")
+		this.elements.forEach((el, i) => el.initialize(this.srcSet[Math.floor(i / 2)]))
+		super.initialize("5_background/layers/air.png")
 		this.isLoaded = true
 	}
 

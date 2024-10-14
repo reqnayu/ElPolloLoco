@@ -1,4 +1,5 @@
 import { GameObject } from "../gameObjects/gameObject.object.js"
+import { SoundAsset } from "../modules/sound_asset.module.js"
 import { AnimationState } from "./animation.type.js"
 
 export interface Behaviour {
@@ -18,4 +19,6 @@ export interface Animatable extends Updateable {
 	setAnimation(animationName: AnimationState): void
 }
 
-export interface Audible {}
+export interface Audible {
+	sounds: Map<string, SoundAsset>
+}

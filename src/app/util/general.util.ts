@@ -1,13 +1,22 @@
-import { AnimationSet } from "../.types/animation.type.js"
+import "../.types/prototypes.js"
+
+export function getElement<T extends HTMLElement>(selector: string, thisArg: HTMLElement | Document = document): T {
+	return thisArg.querySelector(selector) as T
+}
+
+export function getAllElements<T extends HTMLElement>(
+	selector: string,
+	thisArg: HTMLElement | Document = document
+): T[] {
+	return Array.from(thisArg.querySelectorAll(selector)) as T[]
+}
 
 export function delegateEvent(
 	type: keyof DocumentEventMap,
 	callback: (event: Event) => any,
 	container: Element = document.documentElement
 ) {
-	container.addEventListener(type, (event) => {
-		callback(event)
-	})
+	container.addEventListener(type, callback)
 }
 
 export function throttle(cb: (...args: any[]) => any, delay = 1000) {
@@ -34,6 +43,10 @@ export function randomize(min: number, max: number): number {
 	return Math.random() * range + min
 }
 
+export function pointerEventIsLeftClick(e: Event): boolean {
+	return (e as PointerEvent).which === 1
+}
+
 type confirmationOptions = {
 	requestMessage: string
 	affirmMessage?: string
@@ -45,13 +58,13 @@ type confirmationOptions = {
 export async function confirmation(options: confirmationOptions): Promise<any> {
 	const template = confirmationTemplate(options)
 	return new Promise((resolve) => {
-		template.querySelector(".cancel")!.addEventListener("click", () => {
+		template.getElement(".cancel").addEventListener("click", () => {
 			resolve(cancelConfirmation(template, options.failCallback))
 		})
-		template.querySelector(".affirm")!.addEventListener("click", () => {
+		template.getElement(".affirm").addEventListener("click", () => {
 			resolve(affirmConfirmation(template, options.successCallback))
 		})
-		document.querySelector("#game")!.append(template)
+		getElement("#game").append(template)
 	})
 }
 
@@ -79,4 +92,12 @@ function cancelConfirmation<T extends any>(template: HTMLElement, failCallback?:
 function affirmConfirmation<T extends any>(template: HTMLElement, successCallback: () => T): T {
 	template.remove()
 	return successCallback() as T
+}
+
+export function sleep(timeout: number): Promise<void> {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve()
+		}, timeout)
+	})
 }
