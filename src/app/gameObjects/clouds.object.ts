@@ -8,7 +8,7 @@ import { GameObject } from "./gameObject.object.js"
 })
 export class Clouds extends GameObject {
 	direction: 1 | -1 = -1
-	private windSpeed = 0.5
+	private windSpeed = 0.1
 	private posX = 0
 	private cameraResolution
 
@@ -16,7 +16,7 @@ export class Clouds extends GameObject {
 		super("clouds")
 		this.cameraResolution = MESSAGER.dispatch("main").renderer.camera.baseResolution
 		this.initialize("5_background/layers/4_clouds/full.png")
-		console.log(`wind speed: ${this.windSpeed}`)
+		// console.log(`wind speed: ${this.windSpeed}`)
 	}
 
 	protected initialize(imgSrc: string): void {
@@ -27,23 +27,30 @@ export class Clouds extends GameObject {
 
 	protected setBehaviours(): void {
 		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
-		this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: 0.1 }).onAttach(this)
+		this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: this.windSpeed }).onAttach(this)
+		this.movementBehaviour.input.isMovingLeft = true
 	}
 
 	update(deltaTime: number): void {
-		return super.update(deltaTime)
+		super.update(deltaTime)
 		const { x } = MESSAGER.dispatch("main").renderer.camera.focus
 		const cameraOffset = x - this.position.x
 		if (cameraOffset > this.cameraResolution.x) {
-			this.posX += this.cameraResolution.x * 3
+			this.position.x += this.cameraResolution.x * 2
 		} else if (cameraOffset < -this.cameraResolution.x) {
-			this.posX -= this.cameraResolution.x * 3
+			this.position.x -= this.cameraResolution.x * 2
 		}
-		this.posX -= this.windSpeed
-
-		const focusOffset = x + this.posX
-		console.log(focusOffset)
+		const focusOffset = cameraOffset - this.position.x
+		// console.log(focusOffset)
+		return
+		console.log(this.position.x)
+		// const focusOffset = x + this.posX
 		const parallaxFactor = 2 / 3
-		this.position.x = focusOffset * parallaxFactor
+		this.position.x += focusOffset * parallaxFactor
+		// this.posX -= this.windSpeed
+
+		console.log(focusOffset)
+		super.update(deltaTime)
+		// this.position.x = (this.position.x * 2) / 3
 	}
 }

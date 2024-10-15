@@ -1,8 +1,9 @@
-import { State } from "../.types/state.type.js"
+import { State, stateMap } from "../.types/state.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Timer } from "../modules/timer.module.js"
 
 export class HurtState implements State {
+	type: keyof stateMap = "hurt"
 	timers: Timer[] = []
 	enter(gameObject: GameObject): void {
 		gameObject.animationBehaviour?.setAnimation("hurt")
@@ -14,11 +15,11 @@ export class HurtState implements State {
 		})
 		this.timers.push(hurtTimer)
 		hurtTimer.resume()
-		console.log("entering hurt state")
+		// console.log("entering hurt state")
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {
-		gameObject.movementBehaviour?.move()
+		// gameObject.movementBehaviour?.move()
 	}
 
 	exit(gameObject: GameObject): void {

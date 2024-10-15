@@ -26,8 +26,8 @@ export class Input {
 			release: () => this.togglePause()
 		},
 		JUMP: {
-			press: () => (this.main.player.input.isJumping = true),
-			release: () => (this.main.player.input.isJumping = false)
+			press: () => this.jump(true),
+			release: () => this.jump(false)
 		},
 		MOVE_LEFT: {
 			press: () => this.startMove("left"),
@@ -90,7 +90,7 @@ export class Input {
 		getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
 			slider.addEventListener("input", (e) => {
 				const type = slider.id as keyof audioTypes
-				this.main.soundManager.setVolume(Number(slider.value) / 100, type)
+				this.main.soundManager.setVolumeType(Number(slider.value) / 100, type)
 			})
 			slider.addEventListener("change", () => this.main.settings.saveSettings())
 		})
@@ -133,29 +133,40 @@ export class Input {
 		this.keyMap[action].release?.()
 	}
 
+	// Player Actions
+
 	private startMove(direction: "left" | "right"): void {
+		if (this.isBlocked) return
 		switch (direction) {
 			case "left":
-				this.main.player.input.isMovingLeft = true
+				this.main.player.movementBehaviour!.input.isMovingLeft = true
 				break
 			case "right":
-				this.main.player.input.isMovingRight = true
+				this.main.player.movementBehaviour!.input.isMovingRight = true
 				break
 		}
 	}
 
 	private stopMove(): void {
-		this.main.player.input.isMovingLeft = false
-		this.main.player.input.isMovingRight = false
+		if (this.isBlocked) return
+		this.main.player.movementBehaviour!.input.isMovingLeft = false
+		this.main.player.movementBehaviour!.input.isMovingRight = false
+	}
+
+	private jump(bool: boolean): void {
+		if (this.isBlocked) return
+		this.main.player.movementBehaviour!.input.isJumping = bool
+	}
+
+	private throw(): void {
+		if (this.isBlocked) return
+		console.log("throwing!")
+		this.main.player.throwBottle()
 	}
 
 	private async toggleFullscreen(): Promise<void> {
 		await this.main.renderer.toggleFullscreen()
 		getElement(".fullscreen").classList.toggle("active")
-	}
-
-	private throw(): void {
-		console.log("throwing!")
 	}
 
 	openWindow(id: string): void {

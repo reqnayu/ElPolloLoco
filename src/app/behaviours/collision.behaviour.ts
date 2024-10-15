@@ -1,5 +1,5 @@
 import { MESSAGER } from "../../script.js"
-import { CollisionParams } from "../.types/behaviour.type.js"
+import { collisionParams } from "../.types/behaviour.type.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Timer } from "../modules/timer.module.js"
@@ -9,8 +9,10 @@ export class CollisionBehaviour implements Updateable {
 	cooldown
 	cooldownTimer?: Timer
 	private damage
+	offsets
 
-	constructor({ damage, cooldown }: CollisionParams) {
+	constructor({ offsets, damage, cooldown }: collisionParams) {
+		this.offsets = offsets
 		this.damage = damage || 0
 		this.cooldown = cooldown || 0
 	}
@@ -42,5 +44,14 @@ export class CollisionBehaviour implements Updateable {
 		this.cooldownTimer.resume()
 		if (this.gameObject.name !== "player") return
 		// console.log(`collisionCooldown added to ${this.gameObject.name}!`)
+	}
+
+	get collider() {
+		const [top, right, bottom, left] = this.offsets || [0, 0, 0, 0]
+		const x = this.gameObject.position.x + left
+		const y = this.gameObject.position.y + bottom
+		const width = this.gameObject.dimensions.x - left - right
+		const height = this.gameObject.dimensions.y - bottom - top
+		return { x, y, width, height }
 	}
 }

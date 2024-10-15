@@ -1,12 +1,13 @@
+import { MESSAGER } from "../../script.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
-import { State, StateMap } from "../.types/state.type.js"
+import { State, stateMap } from "../.types/state.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { HealthBehaviour } from "../behaviours/health.behaviour.js"
-import { InventoryBehaviour } from "../behaviours/inventory.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { StateFactory } from "../factories/State.factory.js"
 import { getAsset } from "../managers/asset_manager.module.js"
@@ -20,16 +21,11 @@ export class GameObject {
 	isFriendly: boolean = false
 
 	direction: -1 | 1 = 1
-	input = {
-		isMovingRight: false,
-		isMovingLeft: false,
-		isJumping: false
-	}
 	protected walkSpeed: number = 0
 
-	private state?: State
-	states: (keyof StateMap)[] = []
-	protected defaultState!: keyof StateMap
+	state?: State
+	states: (keyof stateMap)[] = []
+	protected defaultState!: keyof stateMap
 
 	drawBehaviour?: DrawBehaviour
 	movementBehaviour?: MovementBehaviour
@@ -38,7 +34,7 @@ export class GameObject {
 	health?: HealthBehaviour
 	collisionBehaviour?: CollisionBehaviour
 	soundBehaviour?: SoundBehaviour
-	inventoryBehaviour?: InventoryBehaviour
+	resourceBehaviour?: ResourceBehaviour
 
 	focusOffset?: number
 	protected getFocus?(): Vector
@@ -51,12 +47,13 @@ export class GameObject {
 
 	protected initialize(imgSrc: string): void {
 		this.image = getAsset<"img">(imgSrc)
+		MESSAGER.dispatch("main").allObjects.push(this)
 	}
 
 	protected setBehaviours(): void {}
 
-	setState(stateType: keyof StateMap = this.defaultState): void {
-		if (!this.states.includes(stateType)) return
+	setState(stateType: keyof stateMap = this.defaultState): void {
+		if (!this.states.includes(stateType) || this.state?.type === stateType) return
 		this.state?.exit(this)
 		this.state = StateFactory.create(stateType)
 		this.state.enter(this)
@@ -81,13 +78,13 @@ export class GameObject {
 		return this.position.plus(this.dimensions.scale(0.5))
 	}
 
-	canMove(): boolean {
-		return true
-	}
+	// canMove(): boolean {
+	// 	return true
+	// }
 
-	canJump(): boolean {
-		return false
-	}
+	// canJump(): boolean {
+	// 	return false
+	// }
 }
 
 export function getImages(srcs: string[]): CanvasImageSource[]

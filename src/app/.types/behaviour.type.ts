@@ -3,56 +3,58 @@ import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { HealthBehaviour } from "../behaviours/health.behaviour.js"
-import { InventoryBehaviour } from "../behaviours/inventory.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { AnimationSet } from "./animation.type.js"
 
-export type AnimationParams = {
+export type behaviourParamMap = {
+	animation: animationParams
+	draw: drawParams
+	movement: movementParams
+	gravity: gravityParams
+	health: healthParams
+	collision: collisionParams
+	sound: soundParams
+	resource: resourceParams
+}
+
+export type animationParams = {
 	animationSet: Partial<AnimationSet>
 }
 
-export type BehaviourParamMap = {
-	animation: AnimationParams
-	draw: DrawParams
-	movement: MovementParams
-	gravity: GravityParams
-	health: HealthParams
-	collision: CollisionParams
-	sound: SoundParams
-	inventory: InventoryParams
-}
-
-export type DrawParams = {
+export type drawParams = {
 	isScaled: boolean
 }
 
-export type MovementParams = {
+export type movementParams = {
 	walkSpeed: number
 	jumpStrength?: number
 	clampToWorld?: boolean
 }
 
-export type GravityParams = {}
+export type gravityParams = {}
 
-export type HealthParams = {
+export type healthParams = {
 	maximum: number
 }
 
-export type CollisionParams = {
+export type collisionParams = {
+	offsets?: [number, number, number, number]
 	damage?: number
 	cooldown?: number
 }
 
-export type SoundParams = SoundAsset[]
+export type soundParams = SoundAsset[]
 
-export type InventoryParams = {
-	throwables?: number
-	healthPotions?: number
+export type resourceParams = {
+	healthPoints: number
+	bottles?: number
+	coins?: number
 }
 
-export type BehaviourMap = {
+export type behaviourMap = {
 	animation: AnimationBehaviour
 	draw: DrawBehaviour
 	movement: MovementBehaviour
@@ -60,5 +62,5 @@ export type BehaviourMap = {
 	health: HealthBehaviour
 	collision: CollisionBehaviour
 	sound: SoundBehaviour
-	inventory: InventoryBehaviour
+	resource: ResourceBehaviour
 }

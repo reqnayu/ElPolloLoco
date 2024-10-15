@@ -1,10 +1,11 @@
 import { AnimationSet, PlayerAnimationState } from "../.types/animation.type.js"
-import { StateMap } from "../.types/state.type.js"
+import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Vector } from "../modules/vector.module.js"
 import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { Assets } from "../managers/asset_manager.module.js"
+import { Bottle } from "./bottle.object.js"
 
 @Assets({
 	img: [
@@ -25,10 +26,10 @@ export class Player extends GameObject {
 
 	isFriendly: boolean = true
 
-	protected defaultState: keyof StateMap = "idle"
+	protected defaultState: keyof stateMap = "idle"
 
 	focusOffset = 400
-	states: (keyof StateMap)[] = ["idle", "walk", "jump", "hurt", "dead"]
+	states: (keyof stateMap)[] = ["idle", "walk", "jump", "hurt", "dead"]
 
 	protected getFocus(): Vector {
 		return this.getCenterPoint().plus(new Vector(this.focusOffset * this.direction, 0))
@@ -50,8 +51,8 @@ export class Player extends GameObject {
 	protected setBehaviours(): void {
 		const animationSet = this.getAnimationSet()
 		const { walkSpeed, jumpStrength, throwables, healthPotions } = this
-		this.image = animationSet.idle[0]
 
+		this.image = animationSet.idle[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
 		this.movementBehaviour = BehaviourFactory.create("movement", {
@@ -67,8 +68,11 @@ export class Player extends GameObject {
 			new SoundAsset("sfx", "player/Snore.mp3")
 		])
 		this.health = BehaviourFactory.create("health", { maximum: 200 }).onAttach(this)
-		this.collisionBehaviour = BehaviourFactory.create("collision", { cooldown: 2000 }).onAttach(this)
-		this.inventoryBehaviour = BehaviourFactory.create("inventory", { throwables, healthPotions })
+		this.collisionBehaviour = BehaviourFactory.create("collision", {
+			offsets: [200, 60, 20, 45],
+			cooldown: 1000
+		}).onAttach(this)
+		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: 200, bottles: 3 })
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {
@@ -82,11 +86,17 @@ export class Player extends GameObject {
 		}
 	}
 
-	canMove(): boolean {
-		return this.input.isMovingLeft || this.input.isMovingRight
+	throwBottle(): void {
+		if (!this.resourceBehaviour?.use("bottles", 1)) return
+		const spawnPosition = this.position
+		new Bottle({ position: spawnPosition, direction: this.direction })
 	}
 
-	canJump(): boolean {
-		return this.input.isJumping && !this.gravityBehavior?.canFall()
-	}
+	// canMove(): boolean {
+	// 	return this.input.isMovingLeft || this.input.isMovingRight
+	// }
+
+	// canJump(): boolean {
+	// 	return this.input.isJumping && !this.gravityBehavior?.canFall()
+	// }
 }

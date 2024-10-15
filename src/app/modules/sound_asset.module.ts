@@ -13,13 +13,16 @@ export class SoundAsset {
 		public src: string,
 		public isPausable: boolean = true
 	) {
-		this.name = src.match(/(?<=\/)\w+(?=\.)/g)![0]
-		const volume = MESSAGER.dispatch("main").soundManager.volumes[audioType]
-		this.audioElement = getAsset<"audio">(src)
-		this.audioElement.volume = volume
 		this.soundManager = MESSAGER.dispatch("soundManager")
+		this.name = src.match(/(?<=\/)\w+(?=\.)/g)![0]
+		this.audioElement = getAsset<"audio">(src)
 		this.soundManager.allAudioElements.set(this.name, this)
+		this.setVolume()
 		if (this.name === "Snore") this.disabled = MESSAGER.dispatch("main").settings.snoreDisabled
+	}
+
+	setVolume(): void {
+		this.audioElement.volume = this.soundManager.getVolume(this.audioType)
 	}
 
 	async playOnce(): Promise<void> {
@@ -74,12 +77,8 @@ export class SoundAsset {
 
 	enable(): void {
 		this.disabled = false
-		const typeVolume = this.soundManager.volumes[this.audioType]
-		this.soundManager.setVolume(typeVolume, this.audioType)
-	}
-
-	setVolume(): void {
-		this.audioElement.volume = this.soundManager.getVolume(this.audioType)
+		// const typeVolume = this.soundManager.volumes[this.audioType]
+		// this.soundManager.setVolumeType(typeVolume, this.audioType)
 	}
 
 	get isPaused(): boolean {

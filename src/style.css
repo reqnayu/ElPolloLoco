@@ -288,7 +288,7 @@ canvas {
 }
 
 #gui :is(header, footer) {
-	height: calc(var(--game-width) * 0.0865);
+	/* height: calc(var(--game-width) * 0.0865); */
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 calc(var(--game-width) * 0.01);
@@ -296,6 +296,7 @@ canvas {
 
 #gui header {
 	justify-content: space-between;
+	align-items: flex-start;
 }
 
 #gui .fullscreen:not(.active) img:last-of-type {
@@ -367,7 +368,7 @@ canvas {
 	scale: 0.5 1;
 }
 
-#gui img {
+#gui .btn-input img {
 	filter: invert(1);
 	width: 75%;
 	pointer-events: none;
@@ -462,10 +463,14 @@ input[type="checkbox"]:checked::after {
 }
 
 #countdown {
+	position: absolute;
+	inset: 0;
+	margin: auto;
 	font-size: 3em;
 	color: var(--bg-color-btn-light);
 	display: flex;
 	justify-content: center;
+	pointer-events: none;
 }
 
 #countdown span {
@@ -497,4 +502,27 @@ input[type="checkbox"]:checked::after {
 	100% {
 		display: none;
 	}
+}
+
+#mid-section {
+	flex-grow: 1;
+	/* background-color: black; */
+}
+
+#mid-section #statuses {
+	/* width: calc(var(--game-width) * 0.2); */
+	padding: 0 1%;
+	height: 100%;
+	/* background-color: red; */
+}
+
+#statuses img {
+	/* outline: 1px solid red; */
+	height: 100%;
+}
+
+#statuses > div {
+	height: fit-content;
+	height: calc(var(--game-width) * 0.07);
+	margin-bottom: calc(var(--game-width) * -0.02);
 }

@@ -1,61 +1,61 @@
 import {
-	AnimationParams,
-	BehaviourMap,
-	BehaviourParamMap,
-	CollisionParams,
-	DrawParams,
-	HealthParams,
-	InventoryParams,
-	MovementParams,
-	SoundParams
+	animationParams,
+	behaviourMap,
+	behaviourParamMap,
+	collisionParams,
+	drawParams,
+	healthParams,
+	movementParams,
+	resourceParams,
+	soundParams
 } from "../.types/behaviour.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { HealthBehaviour } from "../behaviours/health.behaviour.js"
-import { InventoryBehaviour } from "../behaviours/inventory.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
+import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 
 export class BehaviourFactory {
 	private constructor() {}
 
-	static create<T extends keyof BehaviourMap>(type: T, options?: BehaviourParamMap[T]): BehaviourMap[T] {
+	static create<T extends keyof behaviourMap>(type: T, options?: behaviourParamMap[T]): behaviourMap[T] {
 		switch (type) {
 			case "draw": {
-				const params = options as DrawParams
+				const params = options as drawParams
 				if (params && params.isScaled === undefined) throw Error(`DrawParams Invalid!`)
-				return new DrawBehaviour(params) as BehaviourMap[T]
+				return new DrawBehaviour(params) as behaviourMap[T]
 			}
 			case "animation": {
-				const params = options as AnimationParams
+				const params = options as animationParams
 				if (params && params.animationSet === undefined) throw Error(`AnimationParams Invalid!`)
 
-				return new AnimationBehaviour(params) as BehaviourMap[T]
+				return new AnimationBehaviour(params) as behaviourMap[T]
 			}
 			case "gravity":
-				return new GravityBehaviour() as BehaviourMap[T]
+				return new GravityBehaviour() as behaviourMap[T]
 			case "movement": {
-				const params = options as MovementParams
+				const params = options as movementParams
 				if (params && params.walkSpeed === undefined) throw Error(`AnimationParams Invalid!`)
-				return new MovementBehaviour(params) as BehaviourMap[T]
+				return new MovementBehaviour(params) as behaviourMap[T]
 			}
 			case "health": {
-				const params = options as HealthParams
+				const params = options as healthParams
 				if (params && params.maximum === undefined) throw Error(`HealthParams Invalid!`)
-				return new HealthBehaviour(params) as BehaviourMap[T]
+				return new HealthBehaviour(params) as behaviourMap[T]
 			}
 			case "collision": {
-				const params = options as CollisionParams
-				return new CollisionBehaviour(params) as BehaviourMap[T]
+				const params = options as collisionParams
+				return new CollisionBehaviour(params) as behaviourMap[T]
 			}
 			case "sound": {
-				return new SoundBehaviour() as BehaviourMap[T]
+				return new SoundBehaviour() as behaviourMap[T]
 			}
-			case "inventory": {
-				const params = options as InventoryParams
-				return new InventoryBehaviour(params) as BehaviourMap[T]
+			case "resource": {
+				const params = options as resourceParams
+				return new ResourceBehaviour(params) as behaviourMap[T]
 			}
 			default:
 				throw new Error(`behaviour of type '${type}' not found!`)

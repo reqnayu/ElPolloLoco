@@ -1,9 +1,13 @@
 import { Enemy } from "./enemy.object.js"
 
 export class ChickenNormal extends Enemy {
-	protected walkSpeed: number = 0.5
 	constructor() {
-		super("normal")
+		super({
+			size: "normal",
+			walkSpeed: 0.35,
+			colliderOffsets: [10, 10, 10, 10]
+		})
 		this.dimensions.toScaled(0.7)
+		console.log(this)
 	}
 }

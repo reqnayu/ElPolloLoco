@@ -17,23 +17,32 @@
 					<div class="progress-track border btn">
 						<div class="progress-thumb"></div>
 					</div>
-					<span>20%</span>
+					<span>0%</span>
 				</div>
 			</div>
 			<canvas></canvas>
 			<div id="gui">
 				<header class="mobile-1 row">
-					<button class="btn btn-primary btn-input" data-click="PAUSE">
-						<div class="keyboard dr"><span></span></div>
-						<img src="app/assets/img/gui/pause.png" alt="" />
-					</button>
-					<button class="btn btn-primary btn-input fullscreen" data-click="FULLSCREEN">
-						<div class="keyboard dl"><span></span></div>
-						<img src="app/assets/img/gui/enter-fullscreen.png" alt="" />
-						<img src="app/assets/img/gui/exit-fullscreen.png" alt="" />
-					</button>
+					<div id="statuses">
+						<div id="hp-bar"><img src="" alt=""></div>
+						<div id="bottle-bar"><img src="" alt=""></div>
+						<div id="coin-bar"><img src="" alt=""></div>
+					</div>
+					<div class="row gap-20" style="margin-left: auto;">
+						<button class="btn btn-primary btn-input" data-click="PAUSE">
+							<div class="keyboard dl"><span></span></div>
+							<img src="app/assets/img/gui/pause.png" alt="" />
+						</button>
+						<button class="btn btn-primary btn-input fullscreen" data-click="FULLSCREEN">
+							<div class="keyboard dl"><span></span></div>
+							<img src="app/assets/img/gui/enter-fullscreen.png" alt="" />
+							<img src="app/assets/img/gui/exit-fullscreen.png" alt="" />
+						</button>
+					</div>
 				</header>
-				<div id="countdown"><span>2</span></div>
+				<div id="mid-section" class="row">
+				</div>
+				<div id="countdown"><span>3</span></div>
 				<footer class="mobile-1 row">
 					<div class="row gap-20">
 						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_LEFT">

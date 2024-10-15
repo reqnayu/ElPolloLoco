@@ -1,5 +1,5 @@
 import { AnimationSet, EnemyAnimationState } from "../.types/animation.type.js"
-import { StateMap } from "../.types/state.type.js"
+import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Assets } from "../managers/asset_manager.module.js"
 import { randomize } from "../util/general.util.js"
@@ -15,12 +15,17 @@ import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.j
 })
 export class Enemy extends GameObject {
 	direction: 1 | -1 = -1
-	states: (keyof StateMap)[] = ["walk", "dead"]
+	states: (keyof stateMap)[] = ["walk", "dead"]
+	private size
+	private colliderOffsets
 
-	protected defaultState: keyof StateMap = "walk"
+	protected defaultState: keyof stateMap = "walk"
 
-	constructor(private size: "small" | "normal") {
+	constructor({ size, walkSpeed, colliderOffsets }: enemyParams) {
 		super("enemy")
+		this.size = size
+		this.walkSpeed = walkSpeed
+		this.colliderOffsets = colliderOffsets
 		this.dimensions.set(236, 210)
 		this.randomizeStartingPosition()
 		this.initialize()
@@ -33,17 +38,21 @@ export class Enemy extends GameObject {
 	}
 
 	protected setBehaviours(): void {
+		console.log(this.walkSpeed)
 		const animationSet = this.getAnimationSet()
 		this.image = animationSet.walk[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
 		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
 		this.movementBehaviour = BehaviourFactory.create("movement", {
-			walkSpeed: this.walkSpeed,
-			clampToWorld: true
+			walkSpeed: this.walkSpeed
 		}).onAttach(this)
+		this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.health = BehaviourFactory.create("health", { maximum: 50 }).onAttach(this)
-		this.collisionBehaviour = BehaviourFactory.create("collision", { damage: 20 }).onAttach(this)
+		this.collisionBehaviour = BehaviourFactory.create("collision", {
+			offsets: this.colliderOffsets,
+			damage: 20
+		}).onAttach(this)
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, EnemyAnimationState> {
@@ -57,4 +66,10 @@ export class Enemy extends GameObject {
 		const randomX = randomize(300, 1000)
 		this.position.x = randomX
 	}
+}
+
+type enemyParams = {
+	size: "small" | "normal"
+	walkSpeed: number
+	colliderOffsets: [number, number, number, number]
 }

@@ -4,6 +4,7 @@ import { Bottle } from "../gameObjects/bottle.object.js"
 import { ChickenNormal } from "../gameObjects/chicken_normal.object.js"
 import { ChickenSmall } from "../gameObjects/chicken_small.object.js"
 import { Clouds } from "../gameObjects/clouds.object.js"
+import { Endboss } from "../gameObjects/endboss.object.js"
 import { Player } from "../gameObjects/player.object.js"
 import { randomize, roundTo } from "../util/general.util.js"
 
@@ -23,7 +24,10 @@ export class GameObjectFactory {
 				return new Bottle(options) as GameObjectMap[T]
 			case "enemy": {
 				const randomInt = roundTo(randomize(0, 1))
-				return (randomInt === 1 ? new ChickenNormal() : new ChickenSmall()) as GameObjectMap[T]
+				return (randomInt === 0 ? new ChickenNormal() : new ChickenSmall()) as GameObjectMap[T]
+			}
+			case "endboss": {
+				return new Endboss() as GameObjectMap[T]
 			}
 			default:
 				throw Error(`Unknown gameObject type!`)

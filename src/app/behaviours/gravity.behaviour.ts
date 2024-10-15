@@ -36,7 +36,7 @@ export class GravityBehaviour implements Updateable {
 	}
 
 	private land(): void {
-		// this.gameObject.setState("idle")
+		if (this.gameObject.state?.type === "jump") this.gameObject.setState("idle")
 		this.gameObject.movementBehaviour!.velocity.y = 0
 		this.gameObject.position.y = this.floorHeight
 	}

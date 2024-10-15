@@ -17,6 +17,7 @@ import "../managers/asset_manager.module.js"
 import { loadAssets } from "../managers/asset_manager.module.js"
 import { CollisionManager } from "../managers/collision_managermodule.js"
 import { getElement, sleep } from "../util/general.util.js"
+import { Endboss } from "../gameObjects/endboss.object.js"
 
 export class Main {
 	ctx
@@ -38,11 +39,14 @@ export class Main {
 	background!: Background
 	clouds!: Clouds
 	enemies!: Enemy[]
+	endboss!: Endboss
 	// tstBottle
 
-	get allObjects(): GameObject[] {
-		return [this.background, this.clouds, ...this.enemies, this.player]
-	}
+	// get allObjects(): GameObject[] {
+	// 	return [this.background, this.clouds, ...this.enemies, this.endboss, this.player]
+	// }
+
+	allObjects: GameObject[] = []
 
 	constructor(public canvas: HTMLCanvasElement, public gameElement: HTMLElement) {
 		this.ctx = this.canvas.getContext("2d")!
@@ -71,8 +75,9 @@ export class Main {
 		this.enemies = [
 			// GameObjectFactory.create("enemy"),
 			// GameObjectFactory.create("enemy"),
-			GameObjectFactory.create("enemy")
+			// GameObjectFactory.create("enemy")
 		]
+		this.endboss = GameObjectFactory.create("endboss")
 		// this.tstBottle = GameObjectFactory.create("bottle", { position: new Vector(0, 200) })
 		this.renderer.camera._focus = new Vector(0, 0)
 		this.renderer.camera.focusObjects = [this.player]

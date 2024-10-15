@@ -2,7 +2,7 @@ import { MESSAGER } from "../../script.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { AnimationSet } from "../.types/animation.type.js"
-import { AnimationParams } from "../.types/behaviour.type.js"
+import { animationParams } from "../.types/behaviour.type.js"
 
 export class AnimationBehaviour implements Updateable {
 	private gameObject!: GameObject
@@ -11,14 +11,16 @@ export class AnimationBehaviour implements Updateable {
 	private currentFrameIndex = 0
 	private currentImage?: CanvasImageSource
 	private timeOfLastFrame = 0
+	private shouldLoop = true
 	animationSet
 
-	constructor({ animationSet }: AnimationParams) {
+	constructor({ animationSet }: animationParams) {
 		this.animationSet = animationSet
 	}
 
-	setAnimation(animationName: keyof AnimationSet): void {
+	setAnimation(animationName: keyof AnimationSet, shouldLoop = true): void {
 		if (!(animationName in this.animationSet)) return
+		this.shouldLoop = shouldLoop
 		this.currentAnimation = this.animationSet[animationName]!
 		this.currentFrameIndex = 0
 	}
@@ -43,6 +45,7 @@ export class AnimationBehaviour implements Updateable {
 
 	private advanceFrame() {
 		const isOnLastFrame = this.currentFrameIndex === this.currentAnimation.length - 1
+		if (isOnLastFrame && !this.shouldLoop) return
 		this.currentImage = this.currentAnimation[this.currentFrameIndex]
 		this.gameObject.image = this.currentImage
 		this.currentFrameIndex = isOnLastFrame ? 0 : this.currentFrameIndex + 1

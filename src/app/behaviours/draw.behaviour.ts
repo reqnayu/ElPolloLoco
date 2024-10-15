@@ -1,6 +1,6 @@
 import { Drawable } from "../.types/behaviours.interface.js"
 import { Frame } from "../.types/frame.type.js"
-import { DrawParams } from "../.types/behaviour.type.js"
+import { drawParams } from "../.types/behaviour.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { MESSAGER } from "../../script.js"
 
@@ -8,7 +8,7 @@ export class DrawBehaviour implements Drawable {
 	private gameObject!: GameObject
 	private renderer
 
-	constructor(options: DrawParams) {
+	constructor(options: drawParams) {
 		this.renderer = MESSAGER.dispatch("main").renderer
 	}
 
@@ -33,7 +33,13 @@ export class DrawBehaviour implements Drawable {
 		else ctx.translate(-(rawDx + dWidth), ctx.canvas.height / scale)
 		const dy = -rawDy - dHeight
 		ctx.drawImage(image, 0, dy, dWidth, dHeight)
+		if (this.gameObject.collisionBehaviour) this.drawCollider(ctx, 0, dy, dWidth, dHeight)
 		ctx.restore()
+	}
+
+	private drawCollider(ctx: CanvasRenderingContext2D, dx: number, dy: number, dWidth: number, dHeight: number): void {
+		const [top, right, bottom, left] = this.gameObject.collisionBehaviour?.offsets || [0, 0, 0, 0]
+		ctx.strokeRect(dx + left, dy + top, dWidth - left - right, dHeight - bottom - top)
 	}
 
 	private requestFrame(): Frame {

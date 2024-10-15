@@ -23,13 +23,13 @@ export function Assets({ img, audio }: assetsParams) {
 }
 
 export async function loadAssets(): Promise<void> {
-	console.log("loading started!")
+	// console.log("loading started!")
 	totalAssetCount = [...imagePaths, ...soundPahts].length
 	const timeOfLoadStart = Date.now()
 	const allPromises = [...imagePaths.map((src) => loadImage(src)), ...soundPahts.map((src) => loadAudio(src))]
 	await Promise.all(allPromises)
 	const timeOfLoadCompletion = Date.now()
-	console.log(`loading completed in ${(timeOfLoadCompletion - timeOfLoadStart) / 1000} seconds!`)
+	// console.log(`loading completed in ${(timeOfLoadCompletion - timeOfLoadStart) / 1000} seconds!`)
 }
 
 function loadImage(src: string): Promise<void> {

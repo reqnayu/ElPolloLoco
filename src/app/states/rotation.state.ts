@@ -1,13 +1,12 @@
+import { Updateable } from "../.types/behaviours.interface.js"
 import { State, stateMap } from "../.types/state.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Timer } from "../modules/timer.module.js"
 
-export class DeadState implements State {
-	type: keyof stateMap = "dead"
-	timers: Timer[] = []
+export class RotationState implements State {
+	type: keyof stateMap = "rotation"
 	enter(gameObject: GameObject): void {
-		// console.log(`${gameObject.name} entering dead state!`)
-		gameObject.animationBehaviour?.setAnimation("dead", false)
+		console.log(`${gameObject.name} entering rotation state!`)
+		gameObject.animationBehaviour?.setAnimation("rotation")
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {}
