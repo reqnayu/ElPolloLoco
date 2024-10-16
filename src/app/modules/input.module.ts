@@ -155,7 +155,7 @@ export class Input {
 
 	private throw(): void {
 		if (this.isBlocked) return
-		console.log("throwing!")
+		// console.log("throwing!")
 		this.main.player.throwBottle()
 	}
 
@@ -211,11 +211,6 @@ export class Input {
 			([type, volume]) => (getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
 		getElement<HTMLInputElement>("input#snore").checked = !this.main.settings.snoreDisabled
-		console.log(
-			"opening audio settings",
-			getElement<HTMLInputElement>("input#snore").checked,
-			this.main.settings.snoreDisabled
-		)
 		this.openWindow("audio-settings")
 	}
 
@@ -284,10 +279,7 @@ export class Input {
 		await confirmation({
 			requestMessage: "Do you want to restart? All Progress will be lost!",
 			affirmMessage: "Restart",
-			successCallback: () => {
-				console.log("restarting")
-				this.newGame()
-			}
+			successCallback: () => this.newGame()
 		})
 	}
 

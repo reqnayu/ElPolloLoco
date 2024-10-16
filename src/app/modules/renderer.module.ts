@@ -1,4 +1,5 @@
 import { MESSAGER } from "../../script.js"
+import { GameObjectType } from "../.types/gameObject.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Camera } from "./camera.module.js"
 import { Vector } from "./vector.module.js"
@@ -9,6 +10,7 @@ export class Renderer {
 	currentFrame = 0
 	private timeOfLastFrame = 0
 	private windowScale = 0.8
+	private orderOfObjects: GameObjectType[] = ["background", "clouds", "enemy", "endboss", "coin", "player", "bottle"]
 
 	constructor(private canvas: HTMLCanvasElement) {
 		this.main = MESSAGER.dispatch("main")
@@ -38,7 +40,6 @@ export class Renderer {
 	render() {
 		this.updateDimensions()
 		this.wipe()
-		const { allObjects } = this.main
 		let deltaTime = 0
 		const now = Date.now()
 
@@ -52,7 +53,7 @@ export class Renderer {
 			this.camera.updateFocus(deltaTime)
 			this.main.collisionManager.checkAll()
 		}
-		allObjects.forEach((gameObject) => this.renderObject(gameObject, deltaTime))
+		this.getSortedObjects().forEach((gameObject) => this.renderObject(gameObject, deltaTime))
 	}
 
 	private renderObject = (gameObject: GameObject, deltaTime: number) => {
@@ -73,5 +74,11 @@ export class Renderer {
 
 	private shouldUpdate(): boolean {
 		return this.main.hasStarted && !this.main.isPaused
+	}
+
+	private getSortedObjects(): GameObject[] {
+		return Array.from(this.main.allObjects)
+		 	.map(([id, obj]) => obj)
+			.sort((a, b) => this.orderOfObjects.indexOf(a.name)! - this.orderOfObjects.indexOf(b.name)!)
 	}
 }

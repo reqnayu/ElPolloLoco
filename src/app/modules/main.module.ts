@@ -18,6 +18,7 @@ import { loadAssets } from "../managers/asset_manager.module.js"
 import { CollisionManager } from "../managers/collision_managermodule.js"
 import { getElement, sleep } from "../util/general.util.js"
 import { Endboss } from "../gameObjects/endboss.object.js"
+import { Coin } from "../gameObjects/coin.object.js"
 
 export class Main {
 	ctx
@@ -75,6 +76,7 @@ export class Main {
 			// GameObjectFactory.create("enemy")
 		]
 		this.endboss = GameObjectFactory.create("endboss")
+		new Coin()
 	}
 
 	setupNewGame(): void {
