@@ -7,6 +7,7 @@ export interface Behaviour {
 }
 
 export interface Updateable extends Behaviour {
+	gameObject: GameObject
 	update(deltaTime: number): void
 }
 

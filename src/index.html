@@ -28,10 +28,11 @@
 						<div id="bottle-bar"><img src="" alt=""></div>
 						<div id="coin-bar"><img src="" alt=""></div>
 					</div>
-					<div class="row gap-20" style="margin-left: auto;">
+					<div id="endboss-hp-bar" style="width: 200px; background-color: red;"><img src="" alt=""></div>
+					<div class="row gap-20">
 						<button class="btn btn-primary btn-input" data-click="PAUSE">
 							<div class="keyboard dl"><span></span></div>
-							<img src="app/assets/img/gui/pause.png" alt="" />
+							<img src="app/assets/img/gui/settings.png" alt="" />
 						</button>
 						<button class="btn btn-primary btn-input fullscreen" data-click="FULLSCREEN">
 							<div class="keyboard dl"><span></span></div>
@@ -69,6 +70,7 @@
 			<div id="main-menu" class="container open start">
 				<div class="title">El Pollo Loco</div>
 				<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+				<div class="splash-screen">Press any button to start...</div>
 				<div class="menu-btns column">
 					<button class="btn btn-primary" data-click="NEW_GAME">New Game</button>
 					<button class="btn btn-primary" data-click="RESUME_GAME">Resume</button>
@@ -88,7 +90,7 @@
 								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 								<div>
 									<span>countdown</span>
-									<input data-click="TOGGLE_COUNTDOWN" type="checkbox" name="" id="snore" />
+									<!-- <input data-click="TOGGLE_COUNTDOWN" type="checkbox" name="" id="snore" /> -->
 								</div>
 							</div>
 							</div>

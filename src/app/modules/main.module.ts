@@ -46,7 +46,7 @@ export class Main {
 	// 	return [this.background, this.clouds, ...this.enemies, this.endboss, this.player]
 	// }
 
-	allObjects: GameObject[] = []
+	allObjects: Map<number, GameObject> = new Map()
 
 	constructor(public canvas: HTMLCanvasElement, public gameElement: HTMLElement) {
 		this.ctx = this.canvas.getContext("2d")!
@@ -62,13 +62,10 @@ export class Main {
 		this.collisionManager = new CollisionManager()
 		this.settings = new Settings()
 		this.gui = new Gui()
+		this.setUpObjects()
 	}
 
-	setupNewGame(): void {
-		MESSAGER.dispatch("input").isKeyInputBlocked = false
-		this.collisionManager.allObjects.length = 0
-		this.hasStarted = false
-		this.countdownTimer?.kill()
+	private setUpObjects(): void {
 		this.background = GameObjectFactory.create("background")
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
@@ -78,9 +75,18 @@ export class Main {
 			// GameObjectFactory.create("enemy")
 		]
 		this.endboss = GameObjectFactory.create("endboss")
+	}
+
+	setupNewGame(): void {
+		MESSAGER.dispatch("input").isKeyInputBlocked = false
+		this.collisionManager.allObjects.length = 0
+		this.setUpObjects()
+		this.hasStarted = false
+		this.countdownTimer?.kill()
 		// this.tstBottle = GameObjectFactory.create("bottle", { position: new Vector(0, 200) })
 		this.renderer.camera._focus = new Vector(0, 0)
 		this.renderer.camera.focusObjects = [this.player]
+		this.gui.initialize()
 		this.update()
 		this.startCountDown()
 	}
@@ -117,7 +123,7 @@ export class Main {
 		})
 	}
 
-	startCountDown(secondsLeft = 1): void {
+	startCountDown(secondsLeft = 3): void {
 		this.gui.updateCountDown(secondsLeft)
 		if (secondsLeft === 0) {
 			this.hasStarted = true

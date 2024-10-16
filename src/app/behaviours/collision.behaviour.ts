@@ -5,7 +5,7 @@ import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Timer } from "../modules/timer.module.js"
 
 export class CollisionBehaviour implements Updateable {
-	private gameObject!: GameObject
+	gameObject!: GameObject
 	cooldown
 	cooldownTimer?: Timer
 	private damage
@@ -29,7 +29,9 @@ export class CollisionBehaviour implements Updateable {
 	collide(target: GameObject): void {
 		// console.log(`collision detected between ${this.gameObject.name} and ${target.name}.`)
 		if (this.cooldown) this.addCollisionCooldown()
-		this.gameObject.health?.recieveDamage(target.collisionBehaviour!.damage)
+
+		this.gameObject.collisionCallback(target)
+		// this.gameObject.health?.recieveDamage(target.collisionBehaviour!.damage)
 	}
 
 	private addCollisionCooldown(): void {

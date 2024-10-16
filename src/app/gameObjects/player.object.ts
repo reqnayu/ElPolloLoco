@@ -6,6 +6,7 @@ import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.j
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { Assets } from "../managers/asset_manager.module.js"
 import { Bottle } from "./bottle.object.js"
+import { MESSAGER } from "../../script.js"
 
 @Assets({
 	img: [
@@ -45,7 +46,7 @@ export class Player extends GameObject {
 	protected initialize(): void {
 		this.setBehaviours()
 		super.initialize("2_character_pepe/1_idle/idle/I-1.png")
-		this.setState()
+		// this.setState()
 	}
 
 	protected setBehaviours(): void {
@@ -67,12 +68,11 @@ export class Player extends GameObject {
 			new SoundAsset("sfx", "player/Walk.mp3"),
 			new SoundAsset("sfx", "player/Snore.mp3")
 		])
-		this.health = BehaviourFactory.create("health", { maximum: 200 }).onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			offsets: [200, 60, 20, 45],
 			cooldown: 1000
 		}).onAttach(this)
-		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: 200, bottles: 3 })
+		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: 200, bottles: 5 }).onAttach(this)
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {
@@ -89,7 +89,12 @@ export class Player extends GameObject {
 	throwBottle(): void {
 		if (!this.resourceBehaviour?.use("bottles", 1)) return
 		const spawnPosition = this.position
-		new Bottle({ position: spawnPosition, direction: this.direction })
+		new Bottle({ position: spawnPosition, velocity: this.movementBehaviour!.velocity, direction: this.direction })
+	}
+
+	collisionCallback(target: GameObject): void {
+		console.log(`player collided with ${target.name}`)
+		this.resourceBehaviour?.receiveDamage(80)
 	}
 
 	// canMove(): boolean {

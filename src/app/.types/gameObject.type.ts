@@ -20,6 +20,7 @@ export type GameObjectMap = {
 
 export type BottleParams = {
 	position: Vector
+	velocity: Vector
 	direction: 1 | -1
 }
 

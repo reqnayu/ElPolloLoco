@@ -50,6 +50,14 @@ canvas {
 	margin: auto;
 }
 
+#game:fullscreen .fullscreen img:first-of-type {
+	display: none;
+}
+
+#game:not(:fullscreen) .fullscreen img:last-of-type {
+	display: none;
+}
+
 #main-menu.start {
 	inset: 0;
 	translate: unset;
@@ -82,8 +90,34 @@ canvas {
 }
 
 #main-menu.start .title {
+	text-align: center;
 	font-size: 3em;
 	color: var(--bg-color-container);
+	text-shadow: 1px 0 0 var(--border-color-btn), -1px 0 0 var(--border-color-btn), 0 1px 0 var(--border-color-btn),
+		0 -1px var(--border-color-btn);
+}
+
+#main-menu.start .splash-screen {
+	font-size: calc(var(--game-width) * 0.04);
+	text-align: center;
+	animation: splash-screen 500ms infinite alternate ease-in-out;
+}
+
+#main-menu.start .splash-screen + div {
+	display: none;
+}
+
+@keyframes splash-screen {
+	0% {
+		color: var(--txt-color-light);
+	}
+	100% {
+		color: var(--bg-color-btn-light);
+	}
+}
+
+#main-menu.start {
+	color: var(--txt-color-light);
 	text-shadow: 1px 0 0 var(--border-color-btn), -1px 0 0 var(--border-color-btn), 0 1px 0 var(--border-color-btn),
 		0 -1px var(--border-color-btn);
 }
@@ -161,6 +195,8 @@ canvas {
 
 .btn-primary {
 	background-color: var(--bg-color-btn);
+	color: var(--txt-color-light);
+	text-shadow: none;
 }
 
 @media (hover: hover) {
@@ -299,13 +335,13 @@ canvas {
 	align-items: flex-start;
 }
 
-#gui .fullscreen:not(.active) img:last-of-type {
+/* #gui .fullscreen:not(.active) img:last-of-type {
 	display: none;
 }
 
 #gui .fullscreen.active img:first-of-type {
 	display: none;
-}
+} */
 
 .btn-input {
 	--size: calc(var(--game-width) * 0.08);
@@ -458,7 +494,7 @@ input[type="checkbox"]:checked::after {
 	background: url(app/assets/img/gui/check.png) center/80% no-repeat;
 }
 
-#game:has(#main-menu.open) #countdown span {
+#game:has(#main-menu.open) #gui * {
 	animation-play-state: paused;
 }
 
@@ -525,4 +561,22 @@ input[type="checkbox"]:checked::after {
 	height: fit-content;
 	height: calc(var(--game-width) * 0.07);
 	margin-bottom: calc(var(--game-width) * -0.02);
+}
+
+#statuses > div.error {
+	animation: error 350ms;
+	--shadow-blur: calc(var(--game-width) * 0.01);
+	filter: drop-shadow(0 0 var(--shadow-blur) red);
+}
+
+@keyframes error {
+	10%,
+	50%,
+	90% {
+		translate: calc(var(--game-width) * -0.01);
+	}
+	30%,
+	70% {
+		translate: calc(var(--game-width) * 0.01);
+	}
 }

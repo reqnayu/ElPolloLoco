@@ -5,7 +5,6 @@ import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
-import { HealthBehaviour } from "../behaviours/health.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
 import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
@@ -14,6 +13,7 @@ import { getAsset } from "../managers/asset_manager.module.js"
 import { Vector } from "../modules/vector.module.js"
 
 export class GameObject {
+	protected id = GameObject.generateId()
 	dimensions = new Vector(0, 0)
 	position = new Vector(0, 0)
 	image?: CanvasImageSource
@@ -31,7 +31,6 @@ export class GameObject {
 	movementBehaviour?: MovementBehaviour
 	gravityBehavior?: GravityBehaviour
 	animationBehaviour?: AnimationBehaviour
-	health?: HealthBehaviour
 	collisionBehaviour?: CollisionBehaviour
 	soundBehaviour?: SoundBehaviour
 	resourceBehaviour?: ResourceBehaviour
@@ -45,9 +44,15 @@ export class GameObject {
 
 	constructor(public name: GameObjectType) {}
 
+	private static counter = 0
+
+	private static generateId(): number {
+		return ++this.counter
+	}
+
 	protected initialize(imgSrc: string): void {
 		this.image = getAsset<"img">(imgSrc)
-		MESSAGER.dispatch("main").allObjects.push(this)
+		MESSAGER.dispatch("main").allObjects.set(this.id, this)
 	}
 
 	protected setBehaviours(): void {}
@@ -64,7 +69,6 @@ export class GameObject {
 		this.animationBehaviour?.update(deltaTime)
 		this.gravityBehavior?.update(deltaTime)
 		this.movementBehaviour?.update(deltaTime)
-		this.health?.update(deltaTime)
 		this.collisionBehaviour?.update(deltaTime)
 
 		this.state?.update(this, deltaTime)
@@ -85,6 +89,8 @@ export class GameObject {
 	// canJump(): boolean {
 	// 	return false
 	// }
+
+	collisionCallback(target: GameObject): void {}
 }
 
 export function getImages(srcs: string[]): CanvasImageSource[]

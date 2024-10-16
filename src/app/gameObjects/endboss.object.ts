@@ -23,7 +23,7 @@ export class Endboss extends GameObject {
 	constructor() {
 		super("endboss")
 		this.dimensions.set(1045, 1217).toScaled(0.5)
-		this.position.set(300, 100)
+		this.position.set(700, 100)
 		this.initialize()
 	}
 
@@ -42,6 +42,7 @@ export class Endboss extends GameObject {
 			damage: 40,
 			offsets: [100, 10, 20, 10]
 		}).onAttach(this)
+		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: 200 })
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, EndbossAnimationState> {

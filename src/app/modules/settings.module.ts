@@ -41,6 +41,7 @@ export class Settings {
 		const settingsString = localStorage.getItem("settings")
 		if (!settingsString) return this.saveSettings()
 		const settings = JSON.parse(settingsString) as savedSettings
+		console.log("loading settings", settings)
 		this.keyBindings = settings.keyBindings
 		this.main.soundManager.volumes = settings.volumes
 		this.snoreDisabled = settings.snoreDisabled

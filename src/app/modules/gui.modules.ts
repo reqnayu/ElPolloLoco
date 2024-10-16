@@ -2,7 +2,13 @@ import { MESSAGER } from "../../script.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Assets, getAsset } from "../managers/asset_manager.module.js"
-import { getAllElements, getElement, pointerEventIsLeftClick, roundTo } from "../util/general.util.js"
+import {
+	addAnimationClass,
+	getAllElements,
+	getElement,
+	pointerEventIsLeftClick,
+	roundTo
+} from "../util/general.util.js"
 import { SoundAsset } from "./sound_asset.module.js"
 
 @Assets({
@@ -26,7 +32,14 @@ import { SoundAsset } from "./sound_asset.module.js"
 		"7_statusbars/1_statusbar/3_statusbar_bottle/orange/80.png",
 		"7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png"
 	],
-	audio: ["gui/ButtonDown.mp3", "gui/ButtonUp.mp3", "gui/Countdown.mp3", "gui/Countdown_go.mp3"]
+	audio: [
+		"gui/ButtonDown.mp3",
+		"gui/ButtonUp.mp3",
+		"gui/Countdown.mp3",
+		"gui/Countdown_go.mp3",
+		"gui/Menu.mp3",
+		"gui/Game.mp3"
+	]
 })
 export class Gui {
 	soundBehaviour: SoundBehaviour
@@ -38,32 +51,39 @@ export class Gui {
 			new SoundAsset("menu", "gui/ButtonDown.mp3", false),
 			new SoundAsset("menu", "gui/ButtonUp.mp3", false),
 			new SoundAsset("menu", "gui/Countdown.mp3"),
-			new SoundAsset("menu", "gui/Countdown_go.mp3")
+			new SoundAsset("menu", "gui/Countdown_go.mp3"),
+			new SoundAsset("music", "gui/Menu.mp3", false),
+			new SoundAsset("music", "gui/Game.mp3", false)
 		])
 		this.statusBars = {
 			hp: getElement("#hp-bar"),
 			coin: getElement("#coin-bar"),
 			bottle: getElement("#bottle-bar")
 		}
-		this.setUpStatusBars()
 		this.getButtons()
 		this.attachSounds()
 	}
 
+	async initialize(): Promise<void> {
+		this.setUpStatusBars()
+		await this.soundBehaviour.sounds.get("Menu")?.fadeOut(1000)
+		this.soundBehaviour.playLooped("Game")
+	}
+
 	private setUpStatusBars(): void {
 		Object.keys(this.statusBars).forEach((type) =>
-			this.updateStatusBar(type as keyof statusBars, type === "coin" ? 0 : 100)
+			this.updateStatusBar(type as keyof statusBars, type === "coin" ? 0 : 1)
 		)
 	}
 
-	updateStatusBar(type: keyof statusBars, percent: number): void {
+	updateStatusBar(type: keyof statusBars, fraction: number): void {
 		const typeSrc =
 			type === "hp"
 				? "2_statusbar_health/green"
 				: type === "coin"
 				? "1_statusbar_coin/blue"
 				: "3_statusbar_bottle/orange"
-		const roundedPercent = roundTo(percent / 5) * 5
+		const roundedPercent = roundTo((fraction * 100) / 5) * 5
 		this.statusBars[type]
 			.getElement<HTMLImageElement>("img")
 			.replaceWith(getAsset(`7_statusbars/1_statusbar/${typeSrc}/${roundedPercent}.png`))
@@ -98,13 +118,14 @@ export class Gui {
 	updateCountDown(secondsLeft: number): void {
 		const countDownElement = getElement("#countdown span")
 		const text = secondsLeft > 0 ? secondsLeft.toString() : "GO!"
-		countDownElement.classList.add("active")
+		addAnimationClass(countDownElement, "active")
 		countDownElement.innerText = text
-		countDownElement.addEventListener("animationend", () => countDownElement.classList.remove("active"), {
-			once: true
-		})
 		const countDownSound = secondsLeft > 0 ? "Countdown" : "Countdown_go"
 		MESSAGER.dispatch("soundManager").allAudioElements.get(countDownSound)?.playOnce()
+	}
+
+	statusBarError(type: keyof statusBars): void {
+		addAnimationClass(this.statusBars[type], "error")
 	}
 }
 

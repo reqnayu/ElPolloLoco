@@ -1,6 +1,7 @@
 import { MESSAGER } from "../../script.js"
 import { getAsset } from "../managers/asset_manager.module.js"
 import { audioTypes } from "../managers/sound_manager.module.js"
+import { Interval } from "./interval.module.js"
 
 export class SoundAsset {
 	private soundManager
@@ -70,6 +71,28 @@ export class SoundAsset {
 		this.audioElement.dispatchEvent(stopEvent)
 	}
 
+	fadeOut(duration: number): Promise<void> {
+		return new Promise((resolve) => {
+			if (this.audioElement.paused) return resolve()
+			const startVolume = this.audioElement.volume
+			const frequency = 50
+			const stepSize = (startVolume / duration) * frequency
+			new Interval({
+				handler: () => {
+					this.audioElement.volume = Math.max(0, this.audioElement.volume - stepSize)
+				},
+				stopConditionCallback: () => this.audioElement.volume === 0,
+				stopCallback: () => {
+					this.stop()
+					this.audioElement.volume = startVolume
+					resolve()
+				},
+				timeout: frequency,
+				isPausable: false
+			}).resume()
+		})
+	}
+
 	disable(): void {
 		this.disabled = true
 		this.audioElement.volume = 0
@@ -77,7 +100,8 @@ export class SoundAsset {
 
 	enable(): void {
 		this.disabled = false
-		// const typeVolume = this.soundManager.volumes[this.audioType]
+		const typeVolume = this.soundManager.volumes[this.audioType]
+		this.audioElement.volume = typeVolume
 		// this.soundManager.setVolumeType(typeVolume, this.audioType)
 	}
 

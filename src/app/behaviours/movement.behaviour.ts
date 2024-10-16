@@ -6,7 +6,7 @@ import { Vector } from "../modules/vector.module.js"
 import { clamp } from "../util/general.util.js"
 
 export class MovementBehaviour implements Updateable {
-	private gameObject!: GameObject
+	gameObject!: GameObject
 	maxSpeed: Vector
 	velocity = new Vector(0, 0)
 	private maxPosX

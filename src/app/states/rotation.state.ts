@@ -5,7 +5,7 @@ import { GameObject } from "../gameObjects/gameObject.object.js"
 export class RotationState implements State {
 	type: keyof stateMap = "rotation"
 	enter(gameObject: GameObject): void {
-		console.log(`${gameObject.name} entering rotation state!`)
+		// console.log(`${gameObject.name} entering rotation state!`)
 		gameObject.animationBehaviour?.setAnimation("rotation")
 	}
 

@@ -101,3 +101,11 @@ export function sleep(timeout: number): Promise<void> {
 		}, timeout)
 	})
 }
+
+/**
+ * adds a class to an element and removes it when its applied animation has finished
+ */
+export function addAnimationClass(element: HTMLElement, className: string): void {
+	element.addEventListener("animationend", () => element.classList.remove(className), { once: true })
+	element.classList.add(className)
+}

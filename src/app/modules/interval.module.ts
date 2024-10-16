@@ -10,14 +10,23 @@ export class Interval implements intervalParams {
 	private timerToNextExecution?: Timer
 	private abortController = new AbortController()
 	stopCallback?(): void
+	stopConditionCallback?(): boolean
 	pauseCallback?(): void
 	isPausable
 
-	constructor({ handler, timeout, pauseCallback, stopCallback, isPausable = true }: intervalParams) {
+	constructor({
+		handler,
+		timeout,
+		pauseCallback,
+		stopCallback,
+		stopConditionCallback,
+		isPausable = true
+	}: intervalParams) {
 		this.handler = handler
 		this.timeout = timeout
 		this.pauseCallback = pauseCallback
 		this.stopCallback = stopCallback
+		this.stopConditionCallback = stopConditionCallback
 		this.isPausable = isPausable
 		this.timeToNextExecution = timeout
 		window.addEventListener("error", () => this.dispose())
@@ -30,6 +39,7 @@ export class Interval implements intervalParams {
 		this.intervalId = setInterval(() => {
 			this.timeOfLastExecution = Date.now()
 			this.handler()
+			if (this.stopConditionCallback?.()) this.dispose()
 		}, this.timeout)
 		return this
 	}
@@ -78,5 +88,6 @@ export class Interval implements intervalParams {
 type intervalParams = timerOrIntervalParams & {
 	pauseOnGamePause?: boolean
 	stopCallback?(): void
+	stopConditionCallback?(): boolean
 	pauseCallback?(): void
 }

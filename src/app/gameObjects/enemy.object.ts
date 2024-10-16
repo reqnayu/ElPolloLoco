@@ -48,7 +48,6 @@ export class Enemy extends GameObject {
 		}).onAttach(this)
 		this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
-		this.health = BehaviourFactory.create("health", { maximum: 50 }).onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			offsets: this.colliderOffsets,
 			damage: 20

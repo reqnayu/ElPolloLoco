@@ -79,7 +79,6 @@ export class Input {
 	constructor() {
 		this.main = MESSAGER.dispatch("main")
 		this.initialize()
-		this.renderKeyboardKeys()
 	}
 
 	initialize(): void {
@@ -87,13 +86,9 @@ export class Input {
 		window.addEventListener("pointerup", (e) => this.clickHandler(e))
 		window.addEventListener("keydown", (e) => this.keyHandler(e))
 		window.addEventListener("keyup", (e) => this.keyHandler(e))
-		getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
-			slider.addEventListener("input", (e) => {
-				const type = slider.id as keyof audioTypes
-				this.main.soundManager.setVolumeType(Number(slider.value) / 100, type)
-			})
-			slider.addEventListener("change", () => this.main.settings.saveSettings())
-		})
+		this.addVolumeSliderFunctionality()
+		this.addSplashScreenFunctionality()
+		this.renderKeyboardKeys()
 		MESSAGER.elements.set("input", this)
 	}
 
@@ -164,9 +159,15 @@ export class Input {
 		this.main.player.throwBottle()
 	}
 
+	// gui actions
+
+	private enterMainMenu(): void {
+		getElement(".splash-screen").remove()
+		this.main.gui.soundBehaviour.playLooped("Menu")
+	}
+
 	private async toggleFullscreen(): Promise<void> {
 		await this.main.renderer.toggleFullscreen()
-		getElement(".fullscreen").classList.toggle("active")
 	}
 
 	openWindow(id: string): void {
@@ -210,6 +211,11 @@ export class Input {
 			([type, volume]) => (getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
 		getElement<HTMLInputElement>("input#snore").checked = !this.main.settings.snoreDisabled
+		console.log(
+			"opening audio settings",
+			getElement<HTMLInputElement>("input#snore").checked,
+			this.main.settings.snoreDisabled
+		)
 		this.openWindow("audio-settings")
 	}
 
@@ -293,6 +299,26 @@ export class Input {
 			el.parentElement!.classList.toggle("space", key === "Space")
 			el.innerHTML = keyboardKey
 		})
+	}
+
+	private addVolumeSliderFunctionality(): void {
+		getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
+			slider.addEventListener("input", (e) => {
+				const type = slider.id as keyof audioTypes
+				this.main.soundManager.setVolumeType(Number(slider.value) / 100, type)
+			})
+			slider.addEventListener("change", () => this.main.settings.saveSettings())
+		})
+	}
+
+	private addSplashScreenFunctionality(): void {
+		const ac = new AbortController()
+		const splashScreenFunc = () => {
+			this.enterMainMenu()
+			ac.abort()
+		}
+		const eventTypes = ["click", "touchend", "keyup"]
+		eventTypes.forEach((type) => window.addEventListener(type, splashScreenFunc, { signal: ac.signal }))
 	}
 
 	private saveSettings(): void {

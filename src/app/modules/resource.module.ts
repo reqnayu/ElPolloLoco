@@ -1,13 +1,19 @@
+import { MESSAGER } from "../../script.js"
+
 export class Resource {
-	private currentAmount
-	private maxAmount
+	protected gui
+	protected currentAmount
+	protected maxAmount
 
 	constructor({ maxAmount, currentAmount = maxAmount }: resourceParams) {
+		this.gui = MESSAGER.dispatch("main").gui
+		console.log(this.gui)
 		this.maxAmount = maxAmount
 		this.currentAmount = currentAmount
 	}
 
 	use(amount: number, emptyUseCallback?: () => void): boolean {
+		return true
 		if (this.currentAmount === 0) {
 			emptyUseCallback?.()
 			return false
@@ -23,7 +29,7 @@ export class Resource {
 	emptyUse(): void {}
 }
 
-type resourceParams = {
+export type resourceParams = {
 	maxAmount: number
 	currentAmount?: number
 }

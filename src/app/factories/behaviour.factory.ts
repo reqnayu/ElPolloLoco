@@ -4,7 +4,6 @@ import {
 	behaviourParamMap,
 	collisionParams,
 	drawParams,
-	healthParams,
 	movementParams,
 	resourceParams,
 	soundParams
@@ -13,7 +12,6 @@ import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
 import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
-import { HealthBehaviour } from "../behaviours/health.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
 import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
@@ -40,11 +38,6 @@ export class BehaviourFactory {
 				const params = options as movementParams
 				if (params && params.walkSpeed === undefined) throw Error(`AnimationParams Invalid!`)
 				return new MovementBehaviour(params) as behaviourMap[T]
-			}
-			case "health": {
-				const params = options as healthParams
-				if (params && params.maximum === undefined) throw Error(`HealthParams Invalid!`)
-				return new HealthBehaviour(params) as behaviourMap[T]
 			}
 			case "collision": {
 				const params = options as collisionParams
