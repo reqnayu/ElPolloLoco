@@ -16,7 +16,6 @@ import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.j
 export class Endboss extends GameObject {
 	direction: 1 | -1 = 1
 	states: (keyof stateMap)[] = ["walk", "alert", "attack", "hurt", "dead"]
-	isFriendly: boolean = false
 
 	protected defaultState: keyof stateMap = "alert"
 
@@ -40,6 +39,7 @@ export class Endboss extends GameObject {
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			damage: 40,
+			targets: ["player", "bottle"],
 			offsets: [100, 10, 20, 10]
 		}).onAttach(this)
 		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: 200 })

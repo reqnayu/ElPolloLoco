@@ -12,6 +12,7 @@ export class BottleResource extends Resource {
 	add(): void {
 		console.log("picking up bottle!")
 		super.add(1)
+		this.gui.updateStatusBar("bottle", this.currentAmount / this.maxAmount)
 	}
 
 	emptyUse(): void {

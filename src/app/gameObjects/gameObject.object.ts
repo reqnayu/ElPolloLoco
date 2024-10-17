@@ -13,12 +13,10 @@ import { getAsset } from "../managers/asset_manager.module.js"
 import { Vector } from "../modules/vector.module.js"
 
 export class GameObject {
-	protected id = GameObject.generateId()
+	id = GameObject.generateId()
 	dimensions = new Vector(0, 0)
 	position = new Vector(0, 0)
 	image?: CanvasImageSource
-
-	isFriendly: boolean = false
 
 	direction: -1 | 1 = 1
 	protected walkSpeed: number = 0
@@ -80,6 +78,11 @@ export class GameObject {
 
 	getCenterPoint(): Vector {
 		return this.position.plus(this.dimensions.scale(0.5))
+	}
+
+	delete(): void {
+		MESSAGER.dispatch("main").allObjects.delete(this.id)
+		MESSAGER.dispatch("collisionManager").allObjects.delete(this.id)
 	}
 
 	// canMove(): boolean {

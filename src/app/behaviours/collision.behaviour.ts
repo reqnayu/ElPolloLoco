@@ -1,6 +1,7 @@
 import { MESSAGER } from "../../script.js"
 import { collisionParams } from "../.types/behaviour.type.js"
 import { Updateable } from "../.types/behaviours.interface.js"
+import { GameObjectType } from "../.types/gameObject.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Timer } from "../modules/timer.module.js"
 
@@ -9,9 +10,11 @@ export class CollisionBehaviour implements Updateable {
 	cooldown
 	cooldownTimer?: Timer
 	private damage
+	targets: GameObjectType[]
 	offsets
 
-	constructor({ offsets, damage, cooldown }: collisionParams) {
+	constructor({ targets, offsets, damage, cooldown }: collisionParams) {
+		this.targets = targets || []
 		this.offsets = offsets
 		this.damage = damage || 0
 		this.cooldown = cooldown || 0
@@ -20,7 +23,7 @@ export class CollisionBehaviour implements Updateable {
 	onAttach(gameObject: GameObject): this {
 		// console.log(`attatching collisionBehaviour to ${gameObject.name}`)
 		this.gameObject = gameObject
-		MESSAGER.dispatch("collisionManager").allObjects.push(gameObject)
+		MESSAGER.dispatch("collisionManager").allObjects.set(gameObject.id, gameObject)
 		return this
 	}
 

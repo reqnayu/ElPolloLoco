@@ -13,7 +13,7 @@ export class Resource {
 	}
 
 	use(amount: number, emptyUseCallback?: () => void): boolean {
-		return true
+		// return true
 		if (this.currentAmount === 0) {
 			emptyUseCallback?.()
 			return false

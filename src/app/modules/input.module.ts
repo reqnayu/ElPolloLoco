@@ -31,11 +31,11 @@ export class Input {
 		},
 		MOVE_LEFT: {
 			press: () => this.startMove("left"),
-			release: () => this.stopMove()
+			release: () => this.stopMove("left")
 		},
 		MOVE_RIGHT: {
 			press: () => this.startMove("right"),
-			release: () => this.stopMove()
+			release: () => this.stopMove("right")
 		},
 		THROW: {
 			release: () => this.throw()
@@ -142,10 +142,10 @@ export class Input {
 		}
 	}
 
-	private stopMove(): void {
+	private stopMove(direction: "left" | "right"): void {
 		if (this.isBlocked) return
-		this.main.player.movementBehaviour!.input.isMovingLeft = false
-		this.main.player.movementBehaviour!.input.isMovingRight = false
+		if (direction === "left") this.main.player.movementBehaviour!.input.isMovingLeft = false
+		else if (direction === "right") this.main.player.movementBehaviour!.input.isMovingRight = false
 	}
 
 	private jump(bool: boolean): void {
@@ -246,7 +246,7 @@ export class Input {
 	private toggleSnore(): void {
 		this.main.settings.snoreDisabled = !this.main.settings.snoreDisabled
 		const isDisabled = this.main.settings.snoreDisabled
-		const snoreSound = MESSAGER.dispatch("soundManager").allAudioElements.get("Snore")!
+		const snoreSound = MESSAGER.dispatch("soundManager").allAudioElements.get("player/Snore")!
 		isDisabled ? snoreSound.disable() : snoreSound.enable()
 		this.main.settings.saveSettings()
 	}

@@ -78,7 +78,7 @@ export class Renderer {
 
 	private getSortedObjects(): GameObject[] {
 		return Array.from(this.main.allObjects)
-		 	.map(([id, obj]) => obj)
+			.map(([id, obj]) => obj)
 			.sort((a, b) => this.orderOfObjects.indexOf(a.name)! - this.orderOfObjects.indexOf(b.name)!)
 	}
 }

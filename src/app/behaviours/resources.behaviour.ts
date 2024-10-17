@@ -27,6 +27,10 @@ export class ResourceBehaviour implements Updateable {
 		return this[type]?.use(amount) || false
 	}
 
+	add(type: keyof resourceParams, amount: number): void {
+		return this[type]?.add(amount)
+	}
+
 	receiveDamage(amount: number): void {
 		if (this.use("healthPoints", amount)) {
 			this.gameObject.setState("hurt")

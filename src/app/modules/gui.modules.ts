@@ -47,14 +47,17 @@ export class Gui {
 	private statusBars: statusBars
 
 	constructor() {
-		this.soundBehaviour = BehaviourFactory.create("sound", [
-			new SoundAsset("menu", "gui/ButtonDown.mp3", false),
-			new SoundAsset("menu", "gui/ButtonUp.mp3", false),
-			new SoundAsset("menu", "gui/Countdown.mp3"),
-			new SoundAsset("menu", "gui/Countdown_go.mp3"),
-			new SoundAsset("music", "gui/Menu.mp3", false),
-			new SoundAsset("music", "gui/Game.mp3", false)
-		])
+		this.soundBehaviour = BehaviourFactory.create("sound", {
+			soundType: "gui",
+			assets: [
+				"music/ButtonDown.mp3/false",
+				"music/ButtonUp.mp3/false",
+				"music/Countdown.mp3",
+				"music/Countdown_go.mp3",
+				"music/Menu.mp3/false",
+				"music/Game.mp3/false"
+			]
+		})
 		this.statusBars = {
 			hp: getElement("#hp-bar"),
 			coin: getElement("#coin-bar"),
@@ -66,7 +69,7 @@ export class Gui {
 
 	async initialize(): Promise<void> {
 		this.setUpStatusBars()
-		await this.soundBehaviour.sounds.get("Menu")?.fadeOut(1000)
+		await this.soundBehaviour.fadeOut("Menu", 1000)
 		this.soundBehaviour.playLooped("Game")
 	}
 

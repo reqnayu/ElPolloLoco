@@ -4,6 +4,7 @@ import {
 	behaviourParamMap,
 	collisionParams,
 	drawParams,
+	gravityParams,
 	movementParams,
 	resourceParams,
 	soundParams
@@ -33,7 +34,8 @@ export class BehaviourFactory {
 				return new AnimationBehaviour(params) as behaviourMap[T]
 			}
 			case "gravity":
-				return new GravityBehaviour() as behaviourMap[T]
+				const params = options as gravityParams
+				return new GravityBehaviour(params) as behaviourMap[T]
 			case "movement": {
 				const params = options as movementParams
 				if (params && params.walkSpeed === undefined) throw Error(`AnimationParams Invalid!`)
@@ -44,7 +46,8 @@ export class BehaviourFactory {
 				return new CollisionBehaviour(params) as behaviourMap[T]
 			}
 			case "sound": {
-				return new SoundBehaviour() as behaviourMap[T]
+				const params = options as soundParams
+				return new SoundBehaviour(params) as behaviourMap[T]
 			}
 			case "resource": {
 				const params = options as resourceParams

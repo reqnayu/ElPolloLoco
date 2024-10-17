@@ -1,11 +1,17 @@
 import { Vector } from "../modules/vector.module.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
+import { gravityParams } from "../.types/behaviour.type.js"
 
 export class GravityBehaviour implements Updateable {
 	gameObject!: GameObject
 	private gravity = new Vector(0, -0.002)
 	private floorHeight = 85
+	private landCallback
+
+	constructor({ landCallback }: gravityParams = {}) {
+		this.landCallback = landCallback
+	}
 
 	onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
@@ -39,5 +45,6 @@ export class GravityBehaviour implements Updateable {
 		if (this.gameObject.state?.type === "jump") this.gameObject.setState("idle")
 		this.gameObject.movementBehaviour!.velocity.y = 0
 		this.gameObject.position.y = this.floorHeight
+		this.landCallback?.()
 	}
 }

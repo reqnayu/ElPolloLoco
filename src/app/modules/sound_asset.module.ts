@@ -15,11 +15,12 @@ export class SoundAsset {
 		public isPausable: boolean = true
 	) {
 		this.soundManager = MESSAGER.dispatch("soundManager")
-		this.name = src.match(/(?<=\/)\w+(?=\.)/g)![0]
+		// this.name = src.match(/(?<=\/)\w+(?=\.)/g)![0]
+		this.name = src.split(".")[0]
 		this.audioElement = getAsset<"audio">(src)
 		this.soundManager.allAudioElements.set(this.name, this)
 		this.setVolume()
-		if (this.name === "Snore") this.disabled = MESSAGER.dispatch("main").settings.snoreDisabled
+		if (this.name === "player/Snore") this.disabled = MESSAGER.dispatch("main").settings.snoreDisabled
 	}
 
 	setVolume(): void {

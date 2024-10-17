@@ -19,6 +19,7 @@ import { CollisionManager } from "../managers/collision_managermodule.js"
 import { getElement, sleep } from "../util/general.util.js"
 import { Endboss } from "../gameObjects/endboss.object.js"
 import { Coin } from "../gameObjects/coin.object.js"
+import { runOnce } from "../util/devtools.util.js"
 
 export class Main {
 	ctx
@@ -63,7 +64,7 @@ export class Main {
 		this.collisionManager = new CollisionManager()
 		this.settings = new Settings()
 		this.gui = new Gui()
-		this.setUpObjects()
+		// this.setUpObjects()
 	}
 
 	private setUpObjects(): void {
@@ -81,7 +82,8 @@ export class Main {
 
 	setupNewGame(): void {
 		MESSAGER.dispatch("input").isKeyInputBlocked = false
-		this.collisionManager.allObjects.length = 0
+		this.allObjects = new Map()
+		this.collisionManager.allObjects = new Map()
 		this.setUpObjects()
 		this.hasStarted = false
 		this.countdownTimer?.kill()
@@ -114,6 +116,9 @@ export class Main {
 	}
 
 	private update() {
+		runOnce(() => {
+			console.log()
+		})
 		this.renderer.render()
 		requestAnimationFrame(() => this.update())
 	}
@@ -125,7 +130,7 @@ export class Main {
 		})
 	}
 
-	startCountDown(secondsLeft = 3): void {
+	startCountDown(secondsLeft = 0): void {
 		this.gui.updateCountDown(secondsLeft)
 		if (secondsLeft === 0) {
 			this.hasStarted = true

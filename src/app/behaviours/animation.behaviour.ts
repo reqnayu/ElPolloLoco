@@ -12,6 +12,7 @@ export class AnimationBehaviour implements Updateable {
 	private currentImage?: CanvasImageSource
 	private timeOfLastFrame = 0
 	private shouldLoop = true
+	private shouldAlternate = false
 	animationSet
 	endOfAnimationCallback?: () => void
 	private isPlaying = true
@@ -20,10 +21,16 @@ export class AnimationBehaviour implements Updateable {
 		this.animationSet = animationSet
 	}
 
-	setAnimation(animationName: keyof AnimationSet, shouldLoop = true, endOfAnimationCallback?: () => void): void {
+	setAnimation(
+		animationName: keyof AnimationSet,
+		shouldLoop = true,
+		endOfAnimationCallback?: () => void,
+		shouldAlternate = false
+	): void {
 		if (!(animationName in this.animationSet)) return
 		this.shouldLoop = shouldLoop
 		this.endOfAnimationCallback = endOfAnimationCallback
+		this.shouldAlternate = shouldAlternate
 		this.currentAnimation = this.animationSet[animationName]!
 		this.currentFrameIndex = 0
 		this.isPlaying = true
@@ -58,5 +65,6 @@ export class AnimationBehaviour implements Updateable {
 		this.currentImage = this.currentAnimation[this.currentFrameIndex]
 		this.gameObject.image = this.currentImage
 		this.currentFrameIndex = isOnLastFrame ? 0 : this.currentFrameIndex + 1
+		if (isOnLastFrame && this.shouldAlternate) this.currentAnimation.reverse()
 	}
 }

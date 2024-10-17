@@ -4,10 +4,11 @@ import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
 import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
 import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
-import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
+import { SoundBehaviour, soundType } from "../behaviours/sound.behaviour.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { AnimationSet } from "./animation.type.js"
+import { GameObjectType } from "./gameObject.type.js"
 
 export type behaviourParamMap = {
 	animation: animationParams
@@ -34,20 +35,26 @@ export type movementParams = {
 	clampToWorld?: boolean
 }
 
-export type gravityParams = {}
+export type gravityParams = {
+	landCallback?(): void
+}
 
 export type healthParams = {
 	maximum: number
 }
 
 export type collisionParams = {
+	targets?: GameObjectType[]
 	offsets?: [number, number, number, number]
 	damage?: number
 	cooldown?: number
 	collisionCallback?(target: GameObject): void
 }
 
-export type soundParams = SoundAsset[]
+export type soundParams = {
+	assets: string[]
+	soundType: soundType
+}
 
 export type resourceParams = {
 	healthPoints: number

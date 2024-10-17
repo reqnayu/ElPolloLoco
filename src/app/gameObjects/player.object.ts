@@ -25,8 +25,6 @@ export class Player extends GameObject {
 	private throwables = 5
 	private healthPotions = 3
 
-	isFriendly: boolean = true
-
 	protected defaultState: keyof stateMap = "idle"
 
 	focusOffset = 400
@@ -62,13 +60,12 @@ export class Player extends GameObject {
 			clampToWorld: true
 		}).onAttach(this)
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
-		this.soundBehaviour = BehaviourFactory.create("sound", [
-			new SoundAsset("sfx", "player/Jump.mp3"),
-			new SoundAsset("sfx", "player/Landing.mp3"),
-			new SoundAsset("sfx", "player/Walk.mp3"),
-			new SoundAsset("sfx", "player/Snore.mp3")
-		])
+		this.soundBehaviour = BehaviourFactory.create("sound", {
+			soundType: this.name,
+			assets: ["sfx/Jump.mp3", "sfx/Landing.mp3", "sfx/Walk.mp3", "sfx/Snore.mp3"]
+		})
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
+			targets: ["enemy", "endboss", "coin", "bottle"],
 			offsets: [200, 60, 20, 45],
 			cooldown: 1000
 		}).onAttach(this)
@@ -94,8 +91,16 @@ export class Player extends GameObject {
 
 	collisionCallback(target: GameObject): void {
 		console.log(`player collided with ${target.name}`)
-		this.resourceBehaviour?.receiveDamage(80)
+		switch (target.name) {
+			case "coin":
+				return this.resourceBehaviour?.add("coins", 1)
+			case "bottle":
+				return this.resourceBehaviour?.add("bottles", 1)
+		}
+		// this.resourceBehaviour?.receiveDamage(80)
 	}
+
+	private collectBottle(): void {}
 
 	// canMove(): boolean {
 	// 	return this.input.isMovingLeft || this.input.isMovingRight

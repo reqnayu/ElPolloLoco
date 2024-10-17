@@ -85,8 +85,8 @@ export class Background extends GameObject {
 	}
 
 	draw(ctx: CanvasRenderingContext2D): void {
-		super.draw(ctx)
-		this.elements.forEach((el) => el.draw(ctx))
+		this.drawBehaviour?.draw(ctx)
+		this.elements.forEach((el) => el.drawBehaviour?.draw(ctx))
 	}
 
 	update(deltaTime: number): void {
