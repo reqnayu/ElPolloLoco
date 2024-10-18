@@ -90,23 +90,24 @@ export class Player extends GameObject {
 	}
 
 	collisionCallback(target: GameObject): void {
-		console.log(`player collided with ${target.name}`)
+		// console.log(`player collided with ${target.name}`)
 		switch (target.name) {
 			case "coin":
 				return this.resourceBehaviour?.add("coins", 1)
 			case "bottle":
 				return this.resourceBehaviour?.add("bottles", 1)
+			case "enemy":
+			case "endboss":
+				return this.collideWithEnemy(target)
 		}
 		// this.resourceBehaviour?.receiveDamage(80)
 	}
 
-	private collectBottle(): void {}
-
-	// canMove(): boolean {
-	// 	return this.input.isMovingLeft || this.input.isMovingRight
-	// }
-
-	// canJump(): boolean {
-	// 	return this.input.isJumping && !this.gravityBehavior?.canFall()
-	// }
+	private collideWithEnemy(target: GameObject): void {
+		const damage = target.name === "enemy" ? 40 : 80
+		this.resourceBehaviour?.receiveDamage(damage)
+		if (damage === 80) target.animationBehaviour?.setAnimation("attack", false, () => {
+			// target.animationBehaviour?.setAnimation("alert")
+		})
+	}
 }

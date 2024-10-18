@@ -35,7 +35,7 @@ export class Bottle extends GameObject {
 		super("bottle")
 		this.dimensions.set(400, 400).toScaled(0.5)
 		this.position.setToVector(position)
-		this.startingVelocity.add(velocity)
+		// this.startingVelocity.add(velocity)
 		this.direction = direction
 		this.initialize()
 	}

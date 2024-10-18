@@ -50,8 +50,9 @@ export class SoundBehaviour implements Audible {
 		return `${this.soundType}/${name}`
 	}
 
-	private getSound(name: string): SoundAsset | undefined {
-		return this.sounds.get(this.getFullName(name))
+	getSound(name: string): SoundAsset | undefined {
+		const sound = this.sounds.get(this.getFullName(name))
+		return sound
 	}
 }
 

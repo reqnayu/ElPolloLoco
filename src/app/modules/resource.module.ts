@@ -7,7 +7,6 @@ export class Resource {
 
 	constructor({ maxAmount, currentAmount = maxAmount }: resourceParams) {
 		this.gui = MESSAGER.dispatch("main").gui
-		console.log(this.gui)
 		this.maxAmount = maxAmount
 		this.currentAmount = currentAmount
 	}

@@ -50,10 +50,10 @@ export class Gui {
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: "gui",
 			assets: [
-				"music/ButtonDown.mp3/false",
-				"music/ButtonUp.mp3/false",
-				"music/Countdown.mp3",
-				"music/Countdown_go.mp3",
+				"sfx/ButtonDown.mp3/false",
+				"sfx/ButtonUp.mp3/false",
+				"sfx/Countdown.mp3",
+				"sfx/Countdown_go.mp3",
 				"music/Menu.mp3/false",
 				"music/Game.mp3/false"
 			]
@@ -98,8 +98,8 @@ export class Gui {
 
 	private attachSounds(): void {
 		const soundManager = MESSAGER.dispatch("soundManager")
-		const buttonDownSound = soundManager.allAudioElements.get("ButtonDown")
-		const buttonUpSound = soundManager.allAudioElements.get("ButtonUp")
+		const buttonDownSound = this.soundBehaviour.getSound("ButtonDown")
+		const buttonUpSound = this.soundBehaviour.getSound("ButtonUp")
 		this.buttons
 			.filter((btn) => !btn.classList.contains("no-sound"))
 			.forEach((btn) => {

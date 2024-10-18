@@ -18,7 +18,6 @@ export class Coin extends GameObject {
 	}
 
 	protected initialize(): void {
-		// this.image = getAsset<"img">("8_coin/1_idle/I-1.png")
 		this.setBehaviours()
 		super.initialize("8_coin/1_idle/I-1.png")
 		this.animationBehaviour?.setAnimation("idle", true, undefined, true)
