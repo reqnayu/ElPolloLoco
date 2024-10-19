@@ -2,8 +2,12 @@ import { MESSAGER } from "../../script.js"
 
 export class Resource {
 	protected gui
-	protected currentAmount
-	protected maxAmount
+	currentAmount
+	maxAmount
+
+	get fraction(): number {
+		return this.currentAmount > 0 ? this.currentAmount / this.maxAmount : 0
+	}
 
 	constructor({ maxAmount, currentAmount = maxAmount }: resourceParams) {
 		this.gui = MESSAGER.dispatch("main").gui

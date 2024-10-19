@@ -1,6 +1,7 @@
 import { MESSAGER } from "../../script.js"
 import { keyInputAction } from "../.types/input.type.js"
 import { audioTypes } from "../managers/sound_manager.module.js"
+import { statusBars } from "./gui.modules.js"
 
 export class Settings {
 	private main
@@ -14,18 +15,18 @@ export class Settings {
 	}
 	snoreDisabled = true
 	countdownDisabled = false
+	readonly resources: Record<keyof statusBars | string, number> = {
+		hp: 200,
+		bottle: 5,
+		coin: 10,
+		endbossHp: 400,
+		enemySmallHp: 50,
+		enemyNormalHp: 100
+	}
 
 	constructor() {
 		this.main = MESSAGER.dispatch("main")
 		this.loadSettings()
-	}
-
-	async setKeyBind(action: keyof typeof this.keyBindings, key: string): Promise<void> {
-		this.keyBindings[action] = key
-	}
-
-	keyBindExists(key: string): boolean {
-		return this.keyBindings.hasOwnProperty(key)
 	}
 
 	saveSettings(): void {

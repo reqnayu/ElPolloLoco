@@ -21,6 +21,29 @@
 *::after {
 	box-sizing: border-box;
 }
+::-webkit-scrollbar {
+	--size: calc(var(--game-width) * 0.02);
+	width: var(--size);
+}
+
+::-webkit-scrollbar-thumb {
+	--size: calc(var(--game-width) * 0.006);
+	background-color: var(--bg-color-btn);
+	border: var(--size) solid transparent;
+	border-radius: 999px;
+	background-clip: content-box;
+}
+
+::-webkit-scrollbar-button:single-button {
+	display: none;
+	background-size: 10px;
+	background-repeat: no-repeat;
+}
+
+::-webkit-scrollbar-button:single-button:vertical:decrement,
+::-webkit-scrollbar-button:single-button:vertical:increment {
+	display: none;
+}
 
 button {
 	all: unset;

@@ -7,9 +7,9 @@ import { GameObject } from "../gameObjects/gameObject.object.js"
 
 export class ResourceBehaviour implements Updateable {
 	gameObject!: GameObject
-	private healthPoints
-	private bottles?
-	private coins?
+	healthPoints
+	bottles?
+	coins?
 	constructor({ healthPoints, bottles, coins }: resourceParams) {
 		this.healthPoints = new HealthResource({ maxAmount: healthPoints })
 		if (bottles) this.bottles = new BottleResource({ maxAmount: bottles })
@@ -33,9 +33,10 @@ export class ResourceBehaviour implements Updateable {
 
 	receiveDamage(amount: number): void {
 		if (this.use("healthPoints", amount)) {
-			this.gameObject.setState("hurt")
+			// this.gameObject.setState("hurt")
 		} else {
-			this.gameObject.setState("dead")
+			// this.gameObject.setState("dead")
 		}
+		// console.log(`${this.gameObject.name} took ${amount} damage! current hp: ${this.healthPoints.currentAmount}`)
 	}
 }

@@ -16,10 +16,10 @@ import { Timer } from "./timer.module.js"
 import "../managers/asset_manager.module.js"
 import { loadAssets } from "../managers/asset_manager.module.js"
 import { CollisionManager } from "../managers/collision_managermodule.js"
-import { getElement, sleep } from "../util/general.util.js"
 import { Endboss } from "../gameObjects/endboss.object.js"
 import { Coin } from "../gameObjects/coin.object.js"
-import { runOnce } from "../util/devtools.util.js"
+import { formatTime, roundTo } from "../util/general.util.js"
+import { SpawnManager } from "../managers/spawn_manager.module.js"
 
 export class Main {
 	ctx
@@ -29,6 +29,7 @@ export class Main {
 
 	hasStarted = false
 	countdownTimer?: Timer
+	totalTime = 0
 
 	renderer!: Renderer
 	soundManager!: SoundManager
@@ -42,11 +43,6 @@ export class Main {
 	clouds!: Clouds
 	enemies!: Enemy[]
 	endboss!: Endboss
-	// tstBottle
-
-	// get allObjects(): GameObject[] {
-	// 	return [this.background, this.clouds, ...this.enemies, this.endboss, this.player]
-	// }
 
 	allObjects: Map<number, GameObject> = new Map()
 
@@ -57,14 +53,13 @@ export class Main {
 
 	async initialize(): Promise<void> {
 		this.initializeGamePauseOnVisibilityChange()
-		this.renderer = new Renderer(this.canvas)
-		await loadAssets()
 		this.soundManager = new SoundManager()
 		this.timerManager = new TimerManager()
+		this.renderer = new Renderer(this.canvas)
+		await loadAssets()
 		this.collisionManager = new CollisionManager()
 		this.settings = new Settings()
 		this.gui = new Gui()
-		// this.setUpObjects()
 	}
 
 	private setUpObjects(): void {
@@ -72,22 +67,24 @@ export class Main {
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
 		this.enemies = [
-			// GameObjectFactory.create("enemy"),
+			// GameObjectFactory.create("enemy")
 			// GameObjectFactory.create("enemy"),
 			// GameObjectFactory.create("enemy")
 		]
-		this.endboss = GameObjectFactory.create("endboss")
-		new Coin()
+		// this.endboss = GameObjectFactory.create("endboss")
+		SpawnManager.square("coin", new Vector(1200, 100), 100, Math.PI / 4)
+		SpawnManager.arch("coin", new Vector(2000, 180), 200, 5)
+		SpawnManager.line("coin", new Vector(400, 0), 400, 5, Math.PI / 8)
 	}
 
 	setupNewGame(): void {
+		this.totalTime = 0
 		MESSAGER.dispatch("input").isKeyInputBlocked = false
 		this.allObjects = new Map()
 		this.collisionManager.allObjects = new Map()
 		this.setUpObjects()
 		this.hasStarted = false
 		this.countdownTimer?.kill()
-		// this.tstBottle = GameObjectFactory.create("bottle", { position: new Vector(0, 200) })
 		this.renderer.camera._focus = new Vector(0, 0)
 		this.renderer.camera.focusObjects = [this.player]
 		this.gui.initialize()
@@ -96,6 +93,7 @@ export class Main {
 	}
 
 	async startGame(): Promise<void> {
+		MESSAGER.dispatch("input").isBlocked = false
 		this.resume()
 		this.player.setState("idle")
 	}
@@ -116,9 +114,6 @@ export class Main {
 	}
 
 	private update() {
-		runOnce(() => {
-			console.log()
-		})
 		this.renderer.render()
 		requestAnimationFrame(() => this.update())
 	}
@@ -144,5 +139,19 @@ export class Main {
 			timeout: 1000,
 			isPausable: false
 		}).resume()
+	}
+
+	winGame(): void {
+		console.log("Game Won!")
+		this.endGame("won")
+	}
+
+	looseGame(): void {
+		console.log("Game Over!")
+		this.endGame("lost")
+	}
+
+	private endGame(state: "won" | "lost"): void {
+		console.log(`${state} in ${formatTime(this.totalTime)}!`)
 	}
 }

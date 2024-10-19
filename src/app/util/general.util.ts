@@ -30,8 +30,8 @@ export function throttle(cb: (...args: any[]) => any, delay = 1000) {
 }
 
 export function roundTo(number: number, digits?: number): number {
-	const _digits = digits || 1
-	return Math.round(number * _digits) / _digits
+	const magnitude = !!digits ? 10 ** digits : 1
+	return Math.round(number * magnitude) / magnitude
 }
 
 export function clamp(number: number, min: number, max: number): number {
@@ -51,20 +51,22 @@ type confirmationOptions = {
 	requestMessage: string
 	affirmMessage?: string
 	cancelMessage?: string
-	successCallback: () => any
-	failCallback?: () => any
+	// successCallback: () => any
+	// failCallback?: () => any
 }
 
-export async function confirmation(options: confirmationOptions): Promise<any> {
+export async function confirmation(options: confirmationOptions): Promise<boolean> {
 	const template = confirmationTemplate(options)
 	return new Promise((resolve) => {
 		template.getElement(".cancel").addEventListener("click", () => {
-			resolve(cancelConfirmation(template, options.failCallback))
+			template.remove()
+			resolve(false)
 		})
 		template.getElement(".affirm").addEventListener("click", () => {
-			resolve(affirmConfirmation(template, options.successCallback))
+			template.remove()
+			resolve(true)
 		})
-		getElement("#game").append(template)
+		getElement("body").append(template)
 	})
 }
 
@@ -84,16 +86,6 @@ function confirmationTemplate(options: confirmationOptions): HTMLElement {
 	return template
 }
 
-function cancelConfirmation<T extends any>(template: HTMLElement, failCallback?: () => T): T {
-	template.remove()
-	return failCallback?.() as T
-}
-
-function affirmConfirmation<T extends any>(template: HTMLElement, successCallback: () => T): T {
-	template.remove()
-	return successCallback() as T
-}
-
 export function sleep(timeout: number): Promise<void> {
 	return new Promise((resolve) => {
 		setTimeout(() => {
@@ -108,4 +100,42 @@ export function sleep(timeout: number): Promise<void> {
 export function addAnimationClass(element: HTMLElement, className: string): void {
 	element.addEventListener("animationend", () => element.classList.remove(className), { once: true })
 	element.classList.add(className)
+}
+
+export function xOr(bool1: boolean, bool2: boolean): boolean {
+	return (bool1 || bool2) && !(bool1 && bool2)
+}
+
+export function capitalizeFirstLetter(word: string): string {
+	const [firstLetter, ...rest] = word.toLowerCase()
+
+	return `${firstLetter.toUpperCase()}${rest.reduce((a, c) => `${a}${c}`, "")}`
+}
+
+export function getTime(totalMilliseconds: number): {
+	hours: number
+	minutes: number
+	seconds: number
+	milliseconds: number
+} {
+	let rest = totalMilliseconds
+	const oneHour = 1000 * 60 * 60
+	const oneMinute = oneHour / 60
+	const oneSecond = oneMinute / 60
+
+	const hours = Math.floor(rest / oneHour)
+	rest -= hours * oneHour
+	const minutes = Math.floor(rest / oneMinute)
+	rest -= minutes * oneMinute
+	const seconds = Math.floor(rest / oneSecond)
+	rest -= seconds * oneSecond
+	return { hours, minutes, seconds, milliseconds: rest }
+}
+
+export function formatTime(totalMilliseconds: number): string {
+	const { hours, minutes, seconds, milliseconds } = getTime(totalMilliseconds)
+	const [hr, min, sec] = [hours, minutes, seconds].map((n) => n.toString().padStart(2, "0"))
+	return `${hr}:${min}:${sec}.${roundTo(milliseconds / 1000, 2)
+		.toString()
+		.slice(2)}`
 }

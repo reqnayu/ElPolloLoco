@@ -9,7 +9,6 @@ export class JumpState implements State {
 		gameObject.animationBehaviour?.setAnimation("jump")
 		gameObject.movementBehaviour?.jump()
 		gameObject.soundBehaviour?.playOnce("Jump")
-		gameObject.focusOffset = 400
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {

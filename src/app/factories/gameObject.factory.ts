@@ -1,4 +1,4 @@
-import { GameObjectMap, GameObjectParams, GameObjectType } from "../.types/gameObject.type.js"
+import { bottleParams, coinParams, GameObjectMap, GameObjectParams, GameObjectType } from "../.types/gameObject.type.js"
 import { Background } from "../gameObjects/background.object.js"
 import { Bottle } from "../gameObjects/bottle.object.js"
 import { ChickenNormal } from "../gameObjects/chicken_normal.object.js"
@@ -12,7 +12,7 @@ import { randomize, roundTo } from "../util/general.util.js"
 export class GameObjectFactory {
 	private constructor() {}
 
-	static create<T extends GameObjectType>(type: T, options?: GameObjectParams): GameObjectMap[T] {
+	static create<T extends GameObjectType>(type: T, options?: GameObjectParams[T]): GameObjectMap[T] {
 		switch (type) {
 			case "player":
 				return new Player() as GameObjectMap[T]
@@ -21,8 +21,7 @@ export class GameObjectFactory {
 			case "clouds":
 				return new Clouds() as GameObjectMap[T]
 			case "bottle":
-				if (!options) throw Error(`BottleParams Invalid!`)
-				return new Bottle(options) as GameObjectMap[T]
+				return new Bottle(options as bottleParams) as GameObjectMap[T]
 			case "enemy": {
 				const randomInt = roundTo(randomize(0, 1))
 				return (randomInt === 0 ? new ChickenNormal() : new ChickenSmall()) as GameObjectMap[T]
@@ -31,7 +30,8 @@ export class GameObjectFactory {
 				return new Endboss() as GameObjectMap[T]
 			}
 			case "coin": {
-				return new Coin() as GameObjectMap[T]
+				const params = options as coinParams
+				return new Coin(params) as GameObjectMap[T]
 			}
 			default:
 				throw Error(`Unknown gameObject type!`)

@@ -1,7 +1,7 @@
 import { MESSAGER } from "../../script.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets, getAsset } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset_manager.module.js"
 import {
 	addAnimationClass,
 	getAllElements,
@@ -9,7 +9,6 @@ import {
 	pointerEventIsLeftClick,
 	roundTo
 } from "../util/general.util.js"
-import { SoundAsset } from "./sound_asset.module.js"
 
 @Assets({
 	img: [
@@ -61,10 +60,12 @@ export class Gui {
 		this.statusBars = {
 			hp: getElement("#hp-bar"),
 			coin: getElement("#coin-bar"),
-			bottle: getElement("#bottle-bar")
+			bottle: getElement("#bottle-bar"),
+			endbossHp: getElement("#endboss-hp-bar")
 		}
 		this.getButtons()
 		this.attachSounds()
+		MESSAGER.elements.set("gui", this)
 	}
 
 	async initialize(): Promise<void> {
@@ -74,22 +75,23 @@ export class Gui {
 	}
 
 	private setUpStatusBars(): void {
-		Object.keys(this.statusBars).forEach((type) =>
-			this.updateStatusBar(type as keyof statusBars, type === "coin" ? 0 : 1)
-		)
+		Object.keys(this.statusBars).forEach((type) => {
+			const maxAmount = MESSAGER.dispatch("main").settings.resources[type as keyof statusBars]
+			this.updateStatusBar(type as keyof statusBars, type === "coin" ? 0 : maxAmount, maxAmount)
+		})
 	}
 
-	updateStatusBar(type: keyof statusBars, fraction: number): void {
-		const typeSrc =
-			type === "hp"
-				? "2_statusbar_health/green"
-				: type === "coin"
-				? "1_statusbar_coin/blue"
-				: "3_statusbar_bottle/orange"
-		const roundedPercent = roundTo((fraction * 100) / 5) * 5
-		this.statusBars[type]
-			.getElement<HTMLImageElement>("img")
-			.replaceWith(getAsset(`7_statusbars/1_statusbar/${typeSrc}/${roundedPercent}.png`))
+	updateStatusBar(type: keyof statusBars, currentAmount: number, maxAmount: number): void {
+		const roundedPercent = roundTo(currentAmount / maxAmount, 2)
+		this.statusBars[type].style.setProperty("--value", roundedPercent.toString())
+		this.statusBars[type].getElement(".current-amount").innerHTML = currentAmount.toString()
+		this.statusBars[type].getElement(".max-amount").innerHTML = maxAmount.toString()
+		if (currentAmount === maxAmount) return
+		switch (type) {
+			case "hp":
+			case "endbossHp":
+				this.statusBarError(type)
+		}
 	}
 
 	private getButtons(): void {
@@ -132,8 +134,9 @@ export class Gui {
 	}
 }
 
-type statusBars = {
+export type statusBars = {
 	hp: HTMLElement
 	coin: HTMLElement
 	bottle: HTMLElement
+	endbossHp: HTMLElement
 }

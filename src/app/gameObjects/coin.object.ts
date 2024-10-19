@@ -1,8 +1,10 @@
 import { AnimationSet, AnimationState, CoinAnimationState } from "../.types/animation.type.js"
+import { coinParams } from "../.types/gameObject.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Assets } from "../managers/asset_manager.module.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { Timer } from "../modules/timer.module.js"
+import { Vector } from "../modules/vector.module.js"
 import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
 
 @Assets({
@@ -10,17 +12,20 @@ import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.j
 	audio: ["coin/Collect.mp3"]
 })
 export class Coin extends GameObject {
-	constructor() {
+	private startFrame
+	constructor({ spawnPosition, startFrame }: coinParams) {
 		super("coin")
+		this.startFrame = startFrame
 		this.dimensions.set(300, 301).scale(0.3)
-		this.position.set(300, 0)
+		this.position.setToVector(spawnPosition)
 		this.initialize()
 	}
 
 	protected initialize(): void {
 		this.setBehaviours()
 		super.initialize("8_coin/1_idle/I-1.png")
-		this.animationBehaviour?.setAnimation("idle", true, undefined, true)
+		this.animationBehaviour!.setAnimation("idle", true, undefined, true)
+		if (this.startFrame) this.animationBehaviour!.currentFrameIndex = this.startFrame
 	}
 
 	protected setBehaviours(): void {
@@ -45,7 +50,7 @@ export class Coin extends GameObject {
 	}
 
 	collisionCallback(target: GameObject): void {
-		console.log("coin collected!")
+		// console.log("coin collected!")
 		switch (target.name) {
 			case "player":
 				this.collect()

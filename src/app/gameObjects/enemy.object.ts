@@ -1,74 +1,81 @@
-import { AnimationSet, EnemyAnimationState } from "../.types/animation.type.js"
+import { MESSAGER } from "../../script.js"
+import { GameObjectType } from "../.types/gameObject.type.js"
 import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
 import { randomize } from "../util/general.util.js"
-import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
+import { GameObject } from "./gameObject.object.js"
 
-@Assets({
-	img: [
-		...getSingleAnimation(`3_enemies_chicken/chicken_normal/1_walk`, 1, 3),
-		...getSingleAnimation(`3_enemies_chicken/chicken_small/1_walk`, 1, 3),
-		...getSingleAnimation(`3_enemies_chicken/chicken_normal/2_dead`, 1),
-		...getSingleAnimation(`3_enemies_chicken/chicken_small/2_dead`, 1)
-	]
-})
 export class Enemy extends GameObject {
 	direction: 1 | -1 = -1
 	states: (keyof stateMap)[] = ["walk", "dead"]
-	private size
 	private colliderOffsets
+	private healthPoints
 
 	protected defaultState: keyof stateMap = "walk"
 
-	constructor({ size, walkSpeed, colliderOffsets }: enemyParams) {
-		super("enemy")
-		this.size = size
+	constructor({ type, walkSpeed, colliderOffsets, healthPoints }: enemyParams) {
+		super(type)
 		this.walkSpeed = walkSpeed
 		this.colliderOffsets = colliderOffsets
+		this.healthPoints = healthPoints
 		this.dimensions.set(236, 210)
 		this.randomizeStartingPosition()
-		this.initialize()
 	}
 
 	protected initialize(): void {
-		this.setBehaviours()
-		super.initialize(`3_enemies_chicken/chicken_${this.size}/1_walk/W-1.png`)
+		super.initialize()
+		this.position.y = this.gravityBehavior!.floorHeight
 		this.setState()
 	}
 
 	protected setBehaviours(): void {
-		console.log(this.walkSpeed)
-		const animationSet = this.getAnimationSet()
-		this.image = animationSet.walk[0]
-		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
 		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
 		this.movementBehaviour = BehaviourFactory.create("movement", {
-			walkSpeed: this.walkSpeed
+			walkSpeed: this.walkSpeed,
+			jumpStrength: 0.7
 		}).onAttach(this)
-		this.movementBehaviour.input.isMovingLeft = true
+		// this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			offsets: this.colliderOffsets,
+			targets: ["bottle", "player"],
 			damage: 20
 		}).onAttach(this)
-	}
-
-	protected getAnimationSet(): Pick<AnimationSet, EnemyAnimationState> {
-		return {
-			walk: getImages(getSingleAnimation(`3_enemies_chicken/chicken_${this.size}/1_walk`, 1, 3)),
-			dead: getImages(getSingleAnimation(`3_enemies_chicken/chicken_${this.size}/2_dead`, 1))
-		}
+		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: this.healthPoints }).onAttach(this)
 	}
 
 	protected randomizeStartingPosition(): void {
 		const randomX = randomize(300, 1000)
 		this.position.x = randomX
 	}
+
+	collisionCallback(target: GameObject): void {
+		switch (target.name) {
+			case "bottle": {
+				// console.log("bottle hit")
+				this.resourceBehaviour?.receiveDamage(target.collisionBehaviour!.damage)
+				if (this.resourceBehaviour?.healthPoints.currentAmount === 0) {
+					// console.log("dying")
+					this.die()
+				}
+				return
+			}
+		}
+	}
+
+	protected die(): void {
+		this.collisionBehaviour!.targets = []
+		this.setState("dead")
+		// this.animationBehaviour!.setAnimation("dead", false, () => {
+		// 	this.delete()
+		// })
+		MESSAGER.dispatch("main").winGame()
+	}
 }
 
 type enemyParams = {
-	size: "small" | "normal"
+	type: Extract<GameObjectType, "enemy" | "endboss">
 	walkSpeed: number
 	colliderOffsets: [number, number, number, number]
+	healthPoints: number
 }

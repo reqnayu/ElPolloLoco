@@ -8,6 +8,9 @@ export class DeadState implements State {
 	enter(gameObject: GameObject): void {
 		// console.log(`${gameObject.name} entering dead state!`)
 		gameObject.animationBehaviour?.setAnimation("dead", false)
+		gameObject.collisionBehaviour = undefined
+		gameObject.movementBehaviour!.jump()
+		gameObject.gravityBehavior!.canFallThroughFloor = true
 	}
 
 	update(gameObject: GameObject, deltaTime: number): void {}

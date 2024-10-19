@@ -56,4 +56,10 @@ export class Vector {
 	normalize(): Vector {
 		return this.scale(1 / this.magnitude)
 	}
+
+	static fromAngleAndRadius(angle: number, radius: number): Vector {
+		const x = roundTo(Math.cos(angle) * radius)
+		const y = roundTo(Math.sin(angle) * radius)
+		return new Vector(x, y)
+	}
 }

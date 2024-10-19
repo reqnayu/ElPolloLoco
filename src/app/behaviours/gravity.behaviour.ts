@@ -6,7 +6,8 @@ import { gravityParams } from "../.types/behaviour.type.js"
 export class GravityBehaviour implements Updateable {
 	gameObject!: GameObject
 	private gravity = new Vector(0, -0.002)
-	private floorHeight = 85
+	floorHeight = 85
+	canFallThroughFloor = false
 	private landCallback
 
 	constructor({ landCallback }: gravityParams = {}) {
@@ -31,6 +32,7 @@ export class GravityBehaviour implements Updateable {
 	}
 
 	private shouldLand(): boolean {
+		if (this.canFallThroughFloor === true) return false
 		const vy = this.gameObject.movementBehaviour!.velocity.y
 		const posY = this.gameObject.position.y
 		// console.log(`vy: ${vy}, posY: ${posY}`)

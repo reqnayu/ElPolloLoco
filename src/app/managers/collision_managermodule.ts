@@ -36,7 +36,7 @@ export class CollisionManager {
 		if (collider1.x + collider1.width < collider2.x || collider1.x > collider2.x + collider2.width) return false
 		// check y axis overlap
 		if (collider1.y + collider1.height < collider2.y || collider1.y > collider2.y + collider2.height) return false
-		console.log(`${obj1.name} is colliding with ${obj2.name}`)
+		// console.log(`${obj1.name} is colliding with ${obj2.name}`)
 		return true
 	}
 }

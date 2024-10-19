@@ -1,6 +1,6 @@
 import { MESSAGER } from "../../script.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
+import { Assets, getAsset } from "../managers/asset_manager.module.js"
 import { GameObject } from "./gameObject.object.js"
 
 class BackgroundElement extends GameObject {

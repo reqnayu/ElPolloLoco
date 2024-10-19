@@ -20,10 +20,23 @@ export type GameObjectMap = {
 	coin: Coin
 }
 
-export type BottleParams = {
+export type bottleParams = {
 	position: Vector
 	velocity: Vector
 	direction: 1 | -1
 }
 
-export type GameObjectParams = BottleParams
+export type coinParams = {
+	spawnPosition: Vector
+	startFrame?: number
+}
+
+export type GameObjectParams = {
+	player: undefined
+	bottle: bottleParams
+	clouds: undefined
+	enemy: undefined
+	endboss: undefined
+	background: undefined
+	coin: coinParams
+}

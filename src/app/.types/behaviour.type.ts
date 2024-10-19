@@ -44,7 +44,7 @@ export type healthParams = {
 }
 
 export type collisionParams = {
-	targets?: GameObjectType[]
+	targets: GameObjectType[]
 	offsets?: [number, number, number, number]
 	damage?: number
 	cooldown?: number

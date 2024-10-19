@@ -5,6 +5,7 @@ import { Camera } from "./camera.module.js"
 import { Vector } from "./vector.module.js"
 
 export class Renderer {
+	shouldUpdateStatically = true
 	main
 	camera
 	currentFrame = 0
@@ -16,7 +17,8 @@ export class Renderer {
 		this.main = MESSAGER.dispatch("main")
 
 		this.camera = new Camera()
-		this.updateDimensions()
+		// this.updateDimensions()
+		this.staticDimensionUpdate()
 	}
 
 	updateDimensions(): void {
@@ -49,6 +51,7 @@ export class Renderer {
 		// }
 
 		if (this.shouldUpdate()) {
+			this.main.totalTime += deltaTime
 			this.currentFrame++
 			this.camera.updateFocus(deltaTime)
 			this.main.collisionManager.checkAll()
@@ -80,5 +83,11 @@ export class Renderer {
 		return Array.from(this.main.allObjects)
 			.map(([id, obj]) => obj)
 			.sort((a, b) => this.orderOfObjects.indexOf(a.name)! - this.orderOfObjects.indexOf(b.name)!)
+	}
+
+	private staticDimensionUpdate(): void {
+		if (this.shouldUpdateStatically === false) return
+		this.updateDimensions()
+		requestAnimationFrame(() => this.staticDimensionUpdate())
 	}
 }

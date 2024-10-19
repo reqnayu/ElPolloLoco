@@ -8,8 +8,8 @@ import {
 	pointerEventIsLeftClick
 } from "../util/general.util.js"
 import { keyInputAction, inputMap, mouseInputAction } from "../.types/input.type.js"
-import { Timer } from "./timer.module.js"
 import { audioTypes } from "../managers/sound_manager.module.js"
+import { KeyBindManager } from "../managers/keybind_manager.module.js"
 
 export class Input {
 	main
@@ -17,6 +17,7 @@ export class Input {
 	activeClickInput: mouseInputAction | null = null
 	isBlocked = false
 	isKeyInputBlocked = true
+	private keyBindManager
 
 	keyMap: inputMap<"key"> = {
 		FULLSCREEN: {
@@ -48,13 +49,13 @@ export class Input {
 			release: () => this.openWindow("settings")
 		},
 		OPEN_KEYBIND_SETTINGS: {
-			release: () => this.openKeyBindSettings()
+			release: () => this.openWindow("keyBindSettings")
 		},
 		OPEN_GAME_SETTINGS: {
 			release: () => this.openWindow("game-settings")
 		},
 		OPEN_SINGLE_KEYBIND: {
-			release: (e?: Event) => this.openSingleKeyBind(e)
+			release: (e?: Event) => this.keyBindManager.openSingleKeyBind(e as Event)
 		},
 		OPEN_AUDIO_SETTINGS: {
 			release: () => this.openAudioSettings()
@@ -78,6 +79,7 @@ export class Input {
 
 	constructor() {
 		this.main = MESSAGER.dispatch("main")
+		this.keyBindManager = new KeyBindManager(this)
 		this.initialize()
 	}
 
@@ -88,7 +90,6 @@ export class Input {
 		window.addEventListener("keyup", (e) => this.keyHandler(e))
 		this.addVolumeSliderFunctionality()
 		this.addSplashScreenFunctionality()
-		this.renderKeyboardKeys()
 		MESSAGER.elements.set("input", this)
 	}
 
@@ -175,7 +176,7 @@ export class Input {
 	}
 
 	closeWindow(id: string): void {
-		const container = this.main.gameElement.getElement(`#${id}`)
+		const container = getElement(`#${id}`)
 		container.classList.remove("open")
 		container.getAllElements(".open").forEach((el) => el.classList.remove("open"))
 	}
@@ -187,60 +188,12 @@ export class Input {
 		if (id === "main-menu") this.resumeGame()
 	}
 
-	private openKeyBindSettings(): void {
-		const { keyBindings } = this.main.settings
-		Object.entries(keyBindings).forEach(([action, key]) => {
-			const keyElement = getElement(`#${action} .key`)
-			if (!keyElement) return
-			keyElement.innerHTML = mapCodeToKey(key)
-		})
-		this.openWindow("keyBindSettings")
-	}
-
-	private openSingleKeyBind(e?: Event): void {
-		const target = e!.target as HTMLElement
-		const action = target.parentElement!.id as keyInputAction
-		this.openWindow("keyBindModal")
-		this.isBlocked = true
-		const ac = new AbortController()
-		// window.addEventListener("keydown", (event) => this.processKeyBind(event, action, ac), { signal: ac.signal })
-	}
-
 	private openAudioSettings(): void {
 		Object.entries(this.main.soundManager.volumes).forEach(
 			([type, volume]) => (getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
 		getElement<HTMLInputElement>("input#snore").checked = !this.main.settings.snoreDisabled
 		this.openWindow("audio-settings")
-	}
-
-	private async processKeyBind(
-		e: KeyboardEvent,
-		action: keyInputAction,
-		AbortController: AbortController
-	): Promise<void> {
-		if (e.code === "Escape") return this.cancelKeybind(AbortController)
-		this.main.settings.setKeyBind(action, e.code)
-		this.closeWindow("keyBindModal")
-		this.openKeyBindSettings()
-		AbortController.abort()
-	}
-
-	private cancelKeybind(ac: AbortController): void {
-		const timer = new Timer({
-			handler: () => {
-				this.closeWindow("keyBindModal")
-				ac.abort()
-			},
-			timeout: 1000
-		}).resume()
-		window.addEventListener(
-			"keyup",
-			() => {
-				timer.kill()
-			},
-			{ once: true, signal: ac.signal }
-		)
 	}
 
 	private toggleSnore(): void {
@@ -271,26 +224,16 @@ export class Input {
 	newGame(): void {
 		getElement("#main-menu").classList.remove("start")
 		this.main.setupNewGame()
-		// this.main.startCountDown()
+		this.main.renderer.shouldUpdateStatically = false
 		this.closeWindow("main-menu")
 	}
 
 	async restartGame(): Promise<void> {
-		await confirmation({
+		const restartConfirmed = await confirmation({
 			requestMessage: "Do you want to restart? All Progress will be lost!",
-			affirmMessage: "Restart",
-			successCallback: () => this.newGame()
+			affirmMessage: "Restart"
 		})
-	}
-
-	private renderKeyboardKeys(): void {
-		getAllElements(".keyboard span").forEach((el) => {
-			const action = el.closest<HTMLElement>(".btn-input")!.dataset.click as keyInputAction
-			const key = this.main.settings.keyBindings[action]
-			const keyboardKey = mapCodeToKeyboardFont(key)
-			el.parentElement!.classList.toggle("space", key === "Space")
-			el.innerHTML = keyboardKey
-		})
+		if (restartConfirmed) this.newGame()
 	}
 
 	private addVolumeSliderFunctionality(): void {
@@ -305,65 +248,15 @@ export class Input {
 
 	private addSplashScreenFunctionality(): void {
 		const ac = new AbortController()
-		const splashScreenFunc = () => {
+		const splashScreenFunc = (e: Event) => {
+			const keyboardEvent = e as KeyboardEvent
+			e.preventDefault()
+			const falseKeys = ["ShiftLeft", "ShiftRight", "AltLeft", "AltRight", "ControlLeft", "ControlRight"]
+			if (falseKeys.includes(keyboardEvent.code)) return
 			this.enterMainMenu()
 			ac.abort()
 		}
-		const eventTypes = ["click", "touchend", "keyup"]
+		const eventTypes: (keyof WindowEventMap)[] = ["click", "touchend", "keyup"]
 		eventTypes.forEach((type) => window.addEventListener(type, splashScreenFunc, { signal: ac.signal }))
 	}
-
-	private saveSettings(): void {
-		this.main.settings.saveSettings()
-	}
-}
-
-function mapCodeToKey(code: string): string {
-	if (code.startsWith("Key")) return code.slice(-1)
-	if (code === "Escape") return "Esc"
-	return code
-}
-
-function mapCodeToKeyboardFont(code: string): string {
-	const keyboardFontMap: Record<string, string> = {
-		Tab: "C",
-		Space: "S",
-		Escape: "Q",
-		NumPad0: "?",
-		NumPad1: "!",
-		NumPad2: '"',
-		NumPad3: "#",
-		NumPad4: "$",
-		NumPad5: "%",
-		NumPad6: "&",
-		NumPad7: "'",
-		NumPad8: "(",
-		NumPad9: ")",
-		NumPadAdd: "*",
-		ShiftLeft: "A",
-		">": "<",
-		ControlLeft: "D",
-		ControlRight: "E",
-		AltLeft: "F",
-		AltRight: "G",
-		ArrowLeft: "H",
-		ArrowRight: "I",
-		ArrowDown: "J",
-		ArrowUp: "K",
-		Enter: "L",
-		F1: "É",
-		F2: "È",
-		F3: "Ê",
-		F4: "Á",
-		F5: "À",
-		F6: "Â",
-		F7: "Ú",
-		F8: "Ù",
-		F9: "Û",
-		F10: "Ó",
-		F11: "Ò",
-		F12: "Ô"
-	}
-	if (code.startsWith("Key")) return code.slice(3).toLowerCase()
-	return keyboardFontMap[code] || code
 }

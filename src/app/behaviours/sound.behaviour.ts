@@ -4,13 +4,13 @@ import { Audible } from "../.types/behaviours.interface.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
 import { audioTypes } from "../managers/sound_manager.module.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
+import { randomize, roundTo } from "../util/general.util.js"
 
 export class SoundBehaviour implements Audible {
 	sounds: Map<string, SoundAsset>
 	private soundType: soundType
 	private soundManager = MESSAGER.dispatch("soundManager")
 	constructor({ soundType, assets }: soundParams) {
-		console.log("creating soundBehaviour")
 		this.soundType = soundType
 		this.createSounds(assets)
 		this.sounds = this.soundManager.allAudioElements.filter(([name]) => name.startsWith(soundType))
@@ -34,16 +34,20 @@ export class SoundBehaviour implements Audible {
 		this.getSound(name)?.playOnce()
 	}
 
+	playRandom(names: string[]): void {
+		this.getRandomSound(names)?.playOnce()
+	}
+
 	playLooped(name: string): void {
-		this.getSound(name)?.playLooped()
+		this.getSound(name)!.playLooped()
 	}
 
 	stop(name: string): void {
 		this.getSound(name)?.stop()
 	}
 
-	fadeOut(name: string, duration: number): void {
-		this.getSound(name)?.fadeOut(duration)
+	fadeOut(name: string, duration: number): Promise<void> {
+		return this.getSound(name)!.fadeOut(duration)
 	}
 
 	private getFullName(name: string): string {
@@ -53,6 +57,12 @@ export class SoundBehaviour implements Audible {
 	getSound(name: string): SoundAsset | undefined {
 		const sound = this.sounds.get(this.getFullName(name))
 		return sound
+	}
+
+	getRandomSound(names: string[]): SoundAsset | undefined {
+		const randomIndex = roundTo(randomize(0, names.length - 1))
+		const randomSoundName = names[randomIndex]
+		return this.getSound(randomSoundName)
 	}
 }
 

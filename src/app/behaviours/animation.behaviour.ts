@@ -8,7 +8,7 @@ export class AnimationBehaviour implements Updateable {
 	gameObject!: GameObject
 	private frameDuration = 1000 / 8
 	private currentAnimation: CanvasImageSource[] = []
-	private currentFrameIndex = 0
+	currentFrameIndex = 0
 	private currentImage?: CanvasImageSource
 	private timeOfLastFrame = 0
 	private shouldLoop = true
@@ -58,8 +58,8 @@ export class AnimationBehaviour implements Updateable {
 	private advanceFrame() {
 		const isOnLastFrame = this.currentFrameIndex === this.currentAnimation.length - 1
 		if (isOnLastFrame && !this.shouldLoop) {
-			this.endOfAnimationCallback?.()
 			this.isPlaying = false
+			this.endOfAnimationCallback?.()
 			return
 		}
 		this.currentImage = this.currentAnimation[this.currentFrameIndex]

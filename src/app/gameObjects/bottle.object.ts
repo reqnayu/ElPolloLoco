@@ -1,6 +1,6 @@
 import { MESSAGER } from "../../script.js"
 import { AnimationSet, BottleAnimationState } from "../.types/animation.type.js"
-import { BottleParams } from "../.types/gameObject.type.js"
+import { GameObjectParams } from "../.types/gameObject.type.js"
 import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Assets, getAsset } from "../managers/asset_manager.module.js"
@@ -24,20 +24,21 @@ import { GameObject } from "./gameObject.object.js"
 		"6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png",
 		"6_salsa_bottle/2_salsa_bottle_on_ground.png"
 	],
-	audio: ["bottle/Splash.mp3"]
+	audio: ["bottle/Splash.mp3", "bottle/Throw_1.mp3", "bottle/Throw_2.mp3"]
 })
 export class Bottle extends GameObject {
 	states: (keyof stateMap)[] = ["rotation"]
 	protected defaultState: keyof stateMap = "rotation"
 	private startingVelocity = new Vector(0, 0)
 
-	constructor({ position, velocity, direction }: BottleParams) {
+	constructor({ position, velocity, direction }: GameObjectParams["bottle"]) {
 		super("bottle")
 		this.dimensions.set(400, 400).toScaled(0.5)
 		this.position.setToVector(position)
 		// this.startingVelocity.add(velocity)
 		this.direction = direction
 		this.initialize()
+		this.soundBehaviour!.playRandom(["Throw_1", "Throw_2"])
 	}
 
 	protected initialize(): void {
@@ -75,11 +76,12 @@ export class Bottle extends GameObject {
 		this.gravityBehavior = BehaviourFactory.create("gravity", { landCallback: () => this.land() }).onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			targets: ["enemy", "endboss"],
-			offsets: [30, 30, 30, 30]
+			offsets: [30, 30, 30, 30],
+			damage: 100
 		}).onAttach(this)
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: "bottle",
-			assets: ["sfx/Splash.mp3"]
+			assets: ["sfx/Splash.mp3", "sfx/Throw_1.mp3", "sfx/Throw_2.mp3"]
 		})
 	}
 

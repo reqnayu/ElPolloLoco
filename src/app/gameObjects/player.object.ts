@@ -3,10 +3,10 @@ import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Vector } from "../modules/vector.module.js"
 import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
-import { SoundAsset } from "../modules/sound_asset.module.js"
 import { Assets } from "../managers/asset_manager.module.js"
 import { Bottle } from "./bottle.object.js"
 import { MESSAGER } from "../../script.js"
+import { Timer } from "../modules/timer.module.js"
 
 @Assets({
 	img: [
@@ -17,13 +17,20 @@ import { MESSAGER } from "../../script.js"
 		...getSingleAnimation("2_character_pepe/4_hurt", 41, 43),
 		...getSingleAnimation("2_character_pepe/5_dead", 51, 57)
 	],
-	audio: ["player/Jump.mp3", "player/Landing.mp3", "player/Walk.mp3", "player/Snore.mp3"]
+	audio: [
+		"player/Jump.mp3",
+		"player/Landing.mp3",
+		"player/Walk.mp3",
+		"player/Snore.mp3",
+		"player/Death.mp3",
+		"player/Hurt_1.mp3",
+		"player/Hurt_2.mp3",
+		"player/Hurt_3.mp3"
+	]
 })
 export class Player extends GameObject {
 	protected walkSpeed = 0.4
 	private jumpStrength = 1
-	private throwables = 5
-	private healthPotions = 3
 
 	protected defaultState: keyof stateMap = "idle"
 
@@ -43,13 +50,14 @@ export class Player extends GameObject {
 
 	protected initialize(): void {
 		this.setBehaviours()
+		this.position.y = this.gravityBehavior!.floorHeight
 		super.initialize("2_character_pepe/1_idle/idle/I-1.png")
 		// this.setState()
 	}
 
 	protected setBehaviours(): void {
 		const animationSet = this.getAnimationSet()
-		const { walkSpeed, jumpStrength, throwables, healthPotions } = this
+		const { walkSpeed, jumpStrength } = this
 
 		this.image = animationSet.idle[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
@@ -62,14 +70,24 @@ export class Player extends GameObject {
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: this.name,
-			assets: ["sfx/Jump.mp3", "sfx/Landing.mp3", "sfx/Walk.mp3", "sfx/Snore.mp3"]
+			assets: [
+				"sfx/Jump.mp3",
+				"sfx/Landing.mp3",
+				"sfx/Walk.mp3",
+				"sfx/Snore.mp3",
+				"sfx/Death.mp3",
+				"sfx/Hurt_1.mp3",
+				"sfx/Hurt_2.mp3",
+				"sfx/Hurt_3.mp3"
+			]
 		})
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			targets: ["enemy", "endboss", "coin", "bottle"],
 			offsets: [200, 60, 20, 45],
 			cooldown: 1000
 		}).onAttach(this)
-		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: 200, bottles: 5 }).onAttach(this)
+		const { hp: healthPoints, bottle: bottles, coin: coins } = MESSAGER.dispatch("main").settings.resources
+		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints, bottles, coins }).onAttach(this)
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {
@@ -97,17 +115,34 @@ export class Player extends GameObject {
 			case "bottle":
 				return this.resourceBehaviour?.add("bottles", 1)
 			case "enemy":
-			case "endboss":
+			case "endboss": {
 				return this.collideWithEnemy(target)
+			}
 		}
 		// this.resourceBehaviour?.receiveDamage(80)
 	}
 
 	private collideWithEnemy(target: GameObject): void {
+		this.collisionBehaviour!.addCollisionCooldown("enemy", "endboss")
 		const damage = target.name === "enemy" ? 40 : 80
-		this.resourceBehaviour?.receiveDamage(damage)
-		if (damage === 80) target.animationBehaviour?.setAnimation("attack", false, () => {
-			// target.animationBehaviour?.setAnimation("alert")
-		})
+		this.resourceBehaviour!.receiveDamage(damage)
+		const { currentAmount, maxAmount } = this.resourceBehaviour!.healthPoints
+		MESSAGER.dispatch("gui").updateStatusBar("hp", currentAmount, maxAmount)
+		if (this.resourceBehaviour!.healthPoints.currentAmount === 0) return this.die()
+		this.setState("hurt")
+		this.soundBehaviour!.playRandom(["Hurt_1", "Hurt_2", "Hurt_3"])
+	}
+
+	private die(): void {
+		MESSAGER.dispatch("input").isBlocked = true
+		this.setState("dead")
+		this.soundBehaviour?.playOnce("Death")
+		new Timer({
+			handler: () => {
+				this.movementBehaviour = undefined
+				MESSAGER.dispatch("main").looseGame()
+			},
+			timeout: 1500
+		}).resume()
 	}
 }

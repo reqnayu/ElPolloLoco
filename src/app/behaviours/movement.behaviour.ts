@@ -3,7 +3,7 @@ import { movementParams } from "../.types/behaviour.type.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { Vector } from "../modules/vector.module.js"
-import { clamp } from "../util/general.util.js"
+import { clamp, xOr } from "../util/general.util.js"
 
 export class MovementBehaviour implements Updateable {
 	gameObject!: GameObject
@@ -59,9 +59,10 @@ export class MovementBehaviour implements Updateable {
 	move(): void {
 		const canMove = this.canMove()
 		const isStationary = this.velocity.x === 0
-		if (canMove && isStationary) {
-			if (this.input.isMovingRight) this.gameObject.direction = 1
-			else if (this.input.isMovingLeft) this.gameObject.direction = -1
+		const { isMovingLeft, isMovingRight } = this.input
+		if (xOr(isMovingLeft, isMovingRight)) {
+			if (isMovingRight) this.gameObject.direction = 1
+			else if (isMovingLeft) this.gameObject.direction = -1
 			this.startWalking()
 		} else if (!canMove && !isStationary) this.stopWalking()
 	}

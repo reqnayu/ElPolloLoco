@@ -17,10 +17,6 @@ export class SoundManager {
 		window.addEventListener("resumegame", () => this.resumeAll())
 	}
 
-	setVolumes(volumes: typeof this.volumes): void {
-		console.log(this.allAudioElements)
-	}
-
 	setVolumeType(volume: number, type: keyof audioTypes): void {
 		this.volumes[type] = volume
 

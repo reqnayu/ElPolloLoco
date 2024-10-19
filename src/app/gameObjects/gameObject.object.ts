@@ -48,8 +48,8 @@ export class GameObject {
 		return ++this.counter
 	}
 
-	protected initialize(imgSrc: string): void {
-		this.image = getAsset<"img">(imgSrc)
+	protected initialize(imgSrc?: string): void {
+		if (imgSrc) this.image = getAsset<"img">(imgSrc)
 		MESSAGER.dispatch("main").allObjects.set(this.id, this)
 	}
 

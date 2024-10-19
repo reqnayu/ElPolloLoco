@@ -9,7 +9,7 @@ export class CollisionBehaviour implements Updateable {
 	gameObject!: GameObject
 	cooldown
 	cooldownTimer?: Timer
-	private damage
+	damage
 	targets: GameObjectType[]
 	offsets
 
@@ -31,23 +31,22 @@ export class CollisionBehaviour implements Updateable {
 
 	collide(target: GameObject): void {
 		// console.log(`collision detected between ${this.gameObject.name} and ${target.name}.`)
-		if (this.cooldown) this.addCollisionCooldown()
 
 		this.gameObject.collisionCallback(target)
 		// this.gameObject.health?.recieveDamage(target.collisionBehaviour!.damage)
 	}
 
-	private addCollisionCooldown(): void {
+	addCollisionCooldown(...types: GameObjectType[]): void {
 		this.cooldownTimer?.reset()
+		types.forEach((type) => this.targets.remove(type))
 		this.cooldownTimer = new Timer({
 			handler: () => {
+				this.targets.push(...types)
 				this.cooldownTimer = undefined
 				// console.log(`collisionCooldown removed from ${this.gameObject.name}!`)
 			},
 			timeout: this.cooldown
-		})
-		this.cooldownTimer.resume()
-		if (this.gameObject.name !== "player") return
+		}).resume()
 		// console.log(`collisionCooldown added to ${this.gameObject.name}!`)
 	}
 
