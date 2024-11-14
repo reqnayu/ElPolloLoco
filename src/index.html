@@ -5,12 +5,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
 		<link rel="stylesheet" href="fonts.css" />
-		<link rel="stylesheet" href="cssLib.css" />
-		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="cssLib.css?v=1.2" />
+		<link rel="stylesheet" href="style.css?v=1.2" />
 		<script type="module" src="../dist/script.js"></script>
 	</head>
 	<body>
 		<div id="game" class="txt-normal">
+			<div id="display"></div>
+			<div id="fps-counter"></div>
 			<div class="loading column">
 				<span>LOADING...</span>
 				<div class="row gap-20">
@@ -30,25 +32,25 @@
 						<div id="bottle-bar" class="status-bar bottle" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
-						<div id="potion-bar" class="status-bar potion" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
+						<!-- <div id="potion-bar" class="status-bar potion" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
-						</div>
+						</div> -->
 						<div id="coin-bar" class="status-bar coin" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_coin.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
 					</div>
 					<div class="status-container column">
-						<div id="endboss-hp-bar" class="status-bar health" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health_endboss.png)">
+						<div id="endboss-hp-bar" class="status-bar health d-none" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health_endboss.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
 					</div>
 					<div class="row gap-20">
 						<button class="btn btn-primary btn-input" data-click="PAUSE">
-							<div class="keyboard dl"><span></span></div>
+							<div class="keyboard dl" data-keyboard=""></div>
 							<img src="app/assets/img/gui/settings.png" alt="" />
 						</button>
 						<button class="btn btn-primary btn-input fullscreen" data-click="FULLSCREEN">
-							<div class="keyboard dl"><span></span></div>
+							<div class="keyboard dl" data-keyboard=""></div>
 							<img src="app/assets/img/gui/enter-fullscreen.png" alt="" />
 							<img src="app/assets/img/gui/exit-fullscreen.png" alt="" />
 						</button>
@@ -60,21 +62,21 @@
 				<footer class="mobile-1 row">
 					<div class="row gap-20">
 						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_LEFT">
-							<div class="keyboard ur"><span></span></div>
+							<div class="keyboard ur" data-keyboard=""></div>
 							&lt;
 						</button>
 						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_RIGHT">
-							<div class="keyboard ur"><span></span></div>
+							<div class="keyboard ur" data-keyboard=""></div>
 							&gt;
 						</button>
 					</div>
 					<div class="row gap-20">
 						<button class="btn btn-primary btn-input no-sound" data-click="THROW">
-							<div class="keyboard ul"><span></span></div>
+							<div class="keyboard ul" data-keyboard=""></div>
 							<img src="app/assets/img/gui/throw.png" alt="" />
 						</button>
 						<button class="btn btn-primary btn-input no-sound" data-click="JUMP">
-							<div class="keyboard ul"><span></span></div>
+							<div class="keyboard ul" data-keyboard=""></div>
 							<img src="app/assets/img/gui/jump.png" alt="" />
 						</button>
 					</div>
@@ -109,38 +111,7 @@
 							</div>
 							<div id="keyBindSettings" class="container">
 								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
-								<div id="keyBinds">
-									<div class="row" id="MOVE_LEFT">
-										<div class="action">Move Left</div>
-										<div class="key btn btn-primary" data-click="OPEN_SINGLE_KEYBIND">
-											<span>abcde</span>
-										</div>
-									</div>
-									<div class="row" id="MOVE_RIGHT">
-										<div class="action">Move Right</div>
-										<div class="key btn btn-primary" data-click="OPEN_SINGLE_KEYBIND">
-											<span>abcde</span>
-										</div>
-									</div>
-									<div class="row" id="JUMP">
-										<div class="action">Jump</div>
-										<div class="key btn btn-primary" data-click="OPEN_SINGLE_KEYBIND">
-											<span>abcde</span>
-										</div>
-									</div>
-									<div class="row" id="THROW">
-										<div class="action">Throw</div>
-										<div class="key btn btn-primary" data-click="OPEN_SINGLE_KEYBIND">
-											<span>abcde</span>
-										</div>
-									</div>
-									<div class="row" id="PAUSE">
-										<div class="action">Pause Game</div>
-										<div class="key btn btn-primary" data-click="OPEN_SINGLE_KEYBIND">
-											<span>abcde</span>
-										</div>
-									</div>
-								</div>
+								<div id="keybinds"></div>
 								<div id="singleKeyBind" class="container">Single KeyBind!</div>
 							</div>
 							<div id="audio-settings" class="container">
@@ -172,11 +143,14 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-		<div id="keyBindModal">
-			<div class="confirmation column">
-				<span>Press a key to bind or hold "Esc" to cancel</span>
+				<div id="keyBindModal" class="txt-normal">
+					<div class="confirmation column">
+						<span>Press a key to bind or hold "Esc" to cancel</span>
+						<div class="button-progress">
+							<button class="btn btn-primary keyboard" data-click="CANCEL_KEYBIND" data-keyboard="Escape">Cancel</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>

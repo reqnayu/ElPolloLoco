@@ -1,6 +1,7 @@
 body {
 	margin: 0;
 	height: 100vh;
+	height: 100dvh;
 	width: 100vw;
 	display: grid;
 	place-items: center;
@@ -22,7 +23,7 @@ body {
 	cursor: var(--cursor-normal);
 }
 
-#game:has(#main-menu.open) > :not(:is(#main-menu, .confirmation-container, .loading)) {
+#game:has(#main-menu.open) > :not(:is(#main-menu, .confirmation-container, .loading, #keyBindModal)) {
 	filter: blur(1px);
 }
 
@@ -35,7 +36,7 @@ body {
 	position: absolute;
 	inset: 0;
 	inset: calc(var(--game-width) * -0.07) calc(var(--game-width) * -0.075);
-	z-index: 1;
+	z-index: 999;
 	background: url(app/assets/img/gui/frame.png) center no-repeat;
 	background-size: 100% 100%;
 	pointer-events: none;
@@ -270,7 +271,7 @@ canvas {
 	inset: var(--inset-size) var(--inset-size) auto auto;
 }
 
-#keyBinds {
+#keybinds {
 	transform: translateZ(0);
 	display: flex;
 	flex-direction: column;
@@ -294,32 +295,26 @@ canvas {
 	background-attachment: local, local, scroll, scroll;
 }
 
-#keyBinds .row {
+#keybinds .row {
 	overflow: hidden;
 	min-height: calc(var(--game-width) * 0.06);
 	justify-content: space-between;
 }
 
-#keyBinds .action {
+#keybinds .action {
 	white-space: nowrap;
 }
 
-#keyBinds .key {
-	--size: calc(var(--game-width) * 0.05);
-	font-family: "Keyboard";
-	font-size: var(--size);
-	line-height: 100%;
-	cursor: var(--cursor-pointer);
+#keybinds .keyboard {
 	padding: 0.04em 0.4em;
 }
 
-#keyBinds .key span {
+#keybinds .key span {
 	--size: inherit;
 	translate: 0 calc(var(--size) * 0.5);
-	pointer-events: none;
 }
 
-#keyBinds .key:hover {
+#keybinds .key:hover {
 	background-color: var(--bg-color-btn-hover);
 }
 
@@ -333,6 +328,44 @@ canvas {
 	display: grid;
 	place-items: center;
 	background-color: #00000030;
+}
+
+#keyBindModal .confirmation {
+	position: relative;
+}
+
+#keyBindModal button {
+	width: fit-content;
+	padding: 0;
+}
+
+@property --progress {
+	syntax: "<number>";
+	initial-value: 0;
+	inherits: false;
+}
+
+#keyBindModal .button-progress {
+	--inset-size: calc(var(--game-width) * 0.02);
+	position: absolute;
+	inset: auto var(--inset-size) var(--inset-size) auto;
+	padding: calc(var(--game-width) * 0.01);
+	border-radius: 999px;
+	outline: 1px solid var(--border-color-btn);
+	background: conic-gradient(
+		var(--bg-color-btn) 0 calc(var(--progress) * 100%),
+		var(--bg-color-btn-light) calc(var(--progress) * 100%)
+	);
+}
+
+#keyBindModal .button-progress.active {
+	animation: _progress 800ms forwards;
+}
+
+@keyframes _progress {
+	to {
+		--progress: 1;
+	}
 }
 
 .confirmation .key {
@@ -364,8 +397,8 @@ canvas {
 }
 
 #keyBindModal > div {
-	width: 30%;
-	height: 15%;
+	width: calc(var(--game-width) * 0.5);
+	height: calc(var(--game-width) * 0.3);
 }
 
 #gui :is(header, footer) {
@@ -380,14 +413,6 @@ canvas {
 	align-items: flex-start;
 }
 
-/* #gui .fullscreen:not(.active) img:last-of-type {
-	display: none;
-}
-
-#gui .fullscreen.active img:first-of-type {
-	display: none;
-} */
-
 .btn-input {
 	--size: calc(var(--game-width) * 0.08);
 	border-radius: 999px;
@@ -400,21 +425,17 @@ canvas {
 	position: relative;
 }
 
-.btn-input .keyboard {
-	position: absolute;
+.keyboard {
 	font-family: "Keyboard";
 	font-size: calc(var(--game-width) * 0.04);
 	line-height: 100%;
-	pointer-events: none;
 }
 
-@media (hover: none) {
-	.btn-input .keyboard {
-		display: none;
-	}
+.btn-input .keyboard {
+	position: absolute;
 }
 
-.keyboard::before {
+.btn-input .keyboard::before {
 	content: "";
 	position: absolute;
 	inset: calc(var(--game-width) * 0.004) calc(var(--game-width) * 0.004) calc(var(--game-width) * 0.004)
@@ -444,7 +465,7 @@ canvas {
 	inset: auto -20% -20% auto;
 }
 
-.keyboard.space {
+#gui .keyboard.space {
 	translate: -40% 0;
 	scale: 0.5 1;
 }
@@ -677,4 +698,37 @@ input[type="checkbox"]:checked::after {
 	position: absolute;
 	left: 0;
 	translate: -50% 0;
+}
+
+#fps-counter {
+	position: absolute;
+	color: yellow;
+	text-shadow: 0 0 1px solid black;
+	inset: 0 0 auto auto;
+	padding: 5px;
+	z-index: 900;
+	font-size: 0.5em;
+}
+
+/* DISPLAY */
+
+#display:empty {
+	padding: 0;
+}
+
+#display {
+	position: absolute;
+	inset: 0 0 auto auto;
+	z-index: 990;
+	padding: 10px;
+	font-size: 0.8em;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	background-color: cadetblue;
+}
+
+#display .row {
+	gap: 20px;
+	justify-content: space-between;
 }

@@ -17,9 +17,9 @@ import "../managers/asset_manager.module.js"
 import { loadAssets } from "../managers/asset_manager.module.js"
 import { CollisionManager } from "../managers/collision_managermodule.js"
 import { Endboss } from "../gameObjects/endboss.object.js"
-import { Coin } from "../gameObjects/coin.object.js"
-import { formatTime, roundTo } from "../util/general.util.js"
+import { formatTime } from "../util/general.util.js"
 import { SpawnManager } from "../managers/spawn_manager.module.js"
+import { TriggerManager } from "../managers/trigger_manager.module.js"
 
 export class Main {
 	ctx
@@ -35,6 +35,7 @@ export class Main {
 	soundManager!: SoundManager
 	timerManager!: TimerManager
 	collisionManager!: CollisionManager
+	triggerManager!: TriggerManager
 	settings!: Settings
 	gui!: Gui
 
@@ -52,9 +53,9 @@ export class Main {
 	}
 
 	async initialize(): Promise<void> {
-		this.initializeGamePauseOnVisibilityChange()
 		this.soundManager = new SoundManager()
 		this.timerManager = new TimerManager()
+		this.triggerManager = new TriggerManager()
 		this.renderer = new Renderer(this.canvas)
 		await loadAssets()
 		this.collisionManager = new CollisionManager()
@@ -67,14 +68,14 @@ export class Main {
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
 		this.enemies = [
-			// GameObjectFactory.create("enemy")
+			// GameObjectFactory.create("enemy"),
 			// GameObjectFactory.create("enemy"),
 			// GameObjectFactory.create("enemy")
 		]
-		// this.endboss = GameObjectFactory.create("endboss")
-		SpawnManager.square("coin", new Vector(1200, 100), 100, Math.PI / 4)
-		SpawnManager.arch("coin", new Vector(2000, 180), 200, 5)
-		SpawnManager.line("coin", new Vector(400, 0), 400, 5, Math.PI / 8)
+		this.endboss = GameObjectFactory.create("endboss")
+		SpawnManager.square("coin", new Vector(2000, 100), 100, Math.PI / 4)
+		SpawnManager.arch("coin", new Vector(3000, 180), 200, 5)
+		SpawnManager.line("coin", new Vector(1000, 80), 400, 5)
 	}
 
 	setupNewGame(): void {
@@ -106,23 +107,32 @@ export class Main {
 	pause() {
 		window.dispatchEvent(new CustomEvent("pausegame"))
 		this.isPaused = true
+		console.log("pause")
 	}
 
 	resume() {
+		this.initializeGamePauseOnVisibilityChange()
 		window.dispatchEvent(new CustomEvent("resumegame"))
 		this.isPaused = false
+		console.log("resume")
 	}
 
 	private update() {
 		this.renderer.render()
+		this.triggerManager.check()
 		requestAnimationFrame(() => this.update())
 	}
 
 	private initializeGamePauseOnVisibilityChange(): void {
-		document.addEventListener("visibilitychange", (e) => {
-			if (document.visibilityState === "visible") return
-			this.pause()
-		})
+		const input = MESSAGER.dispatch("input")
+		document.addEventListener(
+			"visibilitychange",
+			(e) => {
+				if (document.visibilityState === "visible") return
+				input.pauseGame()
+			},
+			{ once: true }
+		)
 	}
 
 	startCountDown(secondsLeft = 0): void {
@@ -153,5 +163,10 @@ export class Main {
 
 	private endGame(state: "won" | "lost"): void {
 		console.log(`${state} in ${formatTime(this.totalTime)}!`)
+	}
+
+	spawnEndboss(): void {
+		console.log("spawning endboss")
+		this.endboss.spawn()
 	}
 }

@@ -1,6 +1,7 @@
 import { MESSAGER } from "../../script.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
+import { getElement, roundTo } from "../util/general.util.js"
 import { Camera } from "./camera.module.js"
 import { Vector } from "./vector.module.js"
 
@@ -12,6 +13,25 @@ export class Renderer {
 	private timeOfLastFrame = 0
 	private windowScale = 0.8
 	private orderOfObjects: GameObjectType[] = ["background", "clouds", "enemy", "endboss", "coin", "player", "bottle"]
+
+	private lastTime = 0
+	private fps = 0
+	private frameTimes: number[] = []
+	private numFramesToAverage = 30
+
+	private calculateFps(deltaTime: number): void {
+		const currentTime = Date.now()
+		const frameTime = currentTime - this.lastTime
+		this.lastTime = currentTime
+
+		this.frameTimes.push(frameTime)
+		if (this.frameTimes.length > this.numFramesToAverage) {
+			this.frameTimes.shift()
+		}
+
+		const averageFrameTime = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length
+		this.fps = 1000 / averageFrameTime
+	}
 
 	constructor(private canvas: HTMLCanvasElement) {
 		this.main = MESSAGER.dispatch("main")
@@ -40,23 +60,30 @@ export class Renderer {
 	private readonly frameDuration = 1000 / this.desiredFps
 
 	render() {
+		const now = Date.now()
+		let deltaTime = 0
+		// if (now - this.timeOfLastFrame >= this.frameDuration) {
 		this.updateDimensions()
 		this.wipe()
-		let deltaTime = 0
-		const now = Date.now()
 
-		// if (now - this.timeOfLastFrame >= this.frameDuration) {
 		deltaTime = now - this.timeOfLastFrame
 		this.timeOfLastFrame = now
-		// }
 
 		if (this.shouldUpdate()) {
 			this.main.totalTime += deltaTime
 			this.currentFrame++
-			this.camera.updateFocus(deltaTime)
+			this.camera.update(deltaTime)
 			this.main.collisionManager.checkAll()
 		}
 		this.getSortedObjects().forEach((gameObject) => this.renderObject(gameObject, deltaTime))
+
+		this.calculateFps(deltaTime)
+		this.displayPerformanceMetrics()
+		// }
+	}
+
+	private displayPerformanceMetrics(): void {
+		getElement("#fps-counter").innerHTML = roundTo(this.fps).toString()
 	}
 
 	private renderObject = (gameObject: GameObject, deltaTime: number) => {

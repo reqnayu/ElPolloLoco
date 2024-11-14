@@ -5,7 +5,9 @@ import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
 import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour, soundType } from "../behaviours/sound.behaviour.js"
+import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
+import { trigger } from "../managers/trigger_manager.module.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { AnimationSet } from "./animation.type.js"
 import { GameObjectType } from "./gameObject.type.js"
@@ -19,6 +21,7 @@ export type behaviourParamMap = {
 	collision: collisionParams
 	sound: soundParams
 	resource: resourceParams
+	trigger: triggerParams
 }
 
 export type animationParams = {
@@ -62,6 +65,8 @@ export type resourceParams = {
 	coins?: number
 }
 
+export type triggerParams = trigger[]
+
 export type behaviourMap = {
 	animation: AnimationBehaviour
 	draw: DrawBehaviour
@@ -70,4 +75,5 @@ export type behaviourMap = {
 	collision: CollisionBehaviour
 	sound: SoundBehaviour
 	resource: ResourceBehaviour
+	trigger: TriggerBehaviour
 }

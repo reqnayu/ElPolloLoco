@@ -14,7 +14,7 @@ export class SpawnManager {
 
 	static square(type: "coin", centerPoint: Vector, sideLength: number, rotation: number = 0): void {
 		const radius = Math.sqrt(2) * sideLength
-		console.log(sideLength, radius)
+		// console.log(sideLength, radius)
 		const positions = this.newForm(4, (i) => {
 			const angle = Math.PI / 4 + rotation + (i * Math.PI) / 2
 			return centerPoint.plus(Vector.fromAngleAndRadius(angle, radius))
@@ -33,7 +33,7 @@ export class SpawnManager {
 
 	private static spawn(type: "coin", positions: Vector[]): void {
 		positions.forEach((pos, i) => {
-			console.log(pos, pos.magnitude)
+			// console.log(pos, pos.magnitude)
 			GameObjectFactory.create(type, { spawnPosition: pos, startFrame: i % 8 })
 		})
 	}

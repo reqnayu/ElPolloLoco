@@ -17,11 +17,14 @@ export class Settings {
 	countdownDisabled = false
 	readonly resources: Record<keyof statusBars | string, number> = {
 		hp: 200,
-		bottle: 5,
-		coin: 10,
+		bottle: 8,
+		coin: 20,
 		endbossHp: 400,
 		enemySmallHp: 50,
-		enemyNormalHp: 100
+		enemyNormalHp: 100,
+		potionHealing: 100,
+		potionCost: 10,
+		bottleCost: 3
 	}
 
 	constructor() {

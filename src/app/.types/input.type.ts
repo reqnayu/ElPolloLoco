@@ -1,8 +1,8 @@
 export type inputMap<T extends "key" | "mouse"> = Record<
 	T extends "key" ? keyInputAction : mouseInputAction,
 	{
-		press?: (e?: Event) => any
-		release?: (e?: Event) => any
+		press?: (target: HTMLElement) => any
+		release?: (target: HTMLElement) => any
 	}
 >
 

@@ -49,6 +49,10 @@ button {
 	all: unset;
 }
 
+html {
+	user-select: none;
+}
+
 body {
 	font-family: "Spicy Rice";
 	user-select: none;
@@ -112,12 +116,19 @@ button {
 
 @media (hover: hover) {
 	.mobile {
-		display: none;
+		display: none !important;
 	}
 }
 
 @media (hover: none) {
 	.desktop {
-		display: none;
+		display: none !important;
+	}
+}
+
+@media (hover: none) {
+	.keyboard,
+	#keybinds {
+		display: none !important;
 	}
 }

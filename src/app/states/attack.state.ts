@@ -6,7 +6,11 @@ export class AttackState implements State {
 	type: keyof stateMap = "attack"
 	timers: Timer[] = []
 
-	enter(gameObject: GameObject): void {}
+	enter(gameObject: GameObject): void {
+		gameObject.animationBehaviour?.setAnimation(this.type, false, () => {
+			gameObject.setState("alert")
+		})
+	}
 
 	update(gameObject: GameObject, deltaTime: number): void {}
 

@@ -37,6 +37,7 @@ export class Enemy extends GameObject {
 		// this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
+			cooldown: 500,
 			offsets: this.colliderOffsets,
 			targets: ["bottle", "player"],
 			damage: 20
@@ -45,31 +46,34 @@ export class Enemy extends GameObject {
 	}
 
 	protected randomizeStartingPosition(): void {
-		const randomX = randomize(300, 1000)
+		const minX = 1000
+		const maxX = 2000
+		const randomX = randomize(minX, maxX)
 		this.position.x = randomX
 	}
 
 	collisionCallback(target: GameObject): void {
 		switch (target.name) {
 			case "bottle": {
+				this.getHitByBottle(target)
 				// console.log("bottle hit")
-				this.resourceBehaviour?.receiveDamage(target.collisionBehaviour!.damage)
-				if (this.resourceBehaviour?.healthPoints.currentAmount === 0) {
-					// console.log("dying")
-					this.die()
-				}
 				return
 			}
+		}
+	}
+
+	protected getHitByBottle(bottle: GameObject): void {
+		this.resourceBehaviour?.receiveDamage(bottle.collisionBehaviour!.damage)
+		if (this.resourceBehaviour?.healthPoints.currentAmount === 0) {
+			// console.log("dying")
+			this.die()
 		}
 	}
 
 	protected die(): void {
 		this.collisionBehaviour!.targets = []
 		this.setState("dead")
-		// this.animationBehaviour!.setAnimation("dead", false, () => {
-		// 	this.delete()
-		// })
-		MESSAGER.dispatch("main").winGame()
+		this.movementBehaviour?.stopMoving()
 	}
 }
 

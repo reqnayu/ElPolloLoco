@@ -7,7 +7,8 @@ import {
 	gravityParams,
 	movementParams,
 	resourceParams,
-	soundParams
+	soundParams,
+	triggerParams
 } from "../.types/behaviour.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
 import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
@@ -16,6 +17,7 @@ import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
 import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
+import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
 
 export class BehaviourFactory {
 	private constructor() {}
@@ -52,6 +54,10 @@ export class BehaviourFactory {
 			case "resource": {
 				const params = options as resourceParams
 				return new ResourceBehaviour(params) as behaviourMap[T]
+			}
+			case "trigger": {
+				const triggers = options as triggerParams
+				return new TriggerBehaviour(triggers) as behaviourMap[T]
 			}
 			default:
 				throw new Error(`behaviour of type '${type}' not found!`)

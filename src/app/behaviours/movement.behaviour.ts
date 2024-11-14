@@ -74,6 +74,11 @@ export class MovementBehaviour implements Updateable {
 	canJump(): boolean {
 		return this.input.isJumping || false
 	}
+
+	stopMoving(): void {
+		this.input.isMovingLeft = false
+		this.input.isMovingRight = false
+	}
 }
 
 export type inputMap = {

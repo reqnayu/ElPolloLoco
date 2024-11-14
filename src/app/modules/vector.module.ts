@@ -17,6 +17,10 @@ export class Vector {
 		return this.set(x, y)
 	}
 
+	copy(): Vector {
+		return new Vector(this.x, this.y)
+	}
+
 	/**
 	 * modifies instance
 	 */

@@ -6,59 +6,93 @@ import { capitalizeFirstLetter, confirmation, getAllElements, getElement } from 
 
 export class KeyBindManager {
 	private settings
+	private keyboardFontObserver = new MutationObserver((records) => this.renderKeyboardKeysOnChange(records))
+
 	constructor(private input: Input) {
 		this.settings = MESSAGER.dispatch("main").settings
 		this.PreventArrowScrollingBehaviour()
-		this.renderKeyBindings()
-		this.renderKeyboardKeys()
+		this.renderKeybinds()
+		this.renderInputKeys()
+		// this.renderKeyBindings()
 	}
 
-	openSingleKeyBind(e: Event): void {
-		const target = e.target as HTMLElement
+	openSingleKeyBind(target: HTMLElement): void {
 		const action = target.parentElement!.id as keyInputAction
 		this.input.openWindow("keyBindModal")
 		this.input.isBlocked = true
-		window.addReusableEventListener("keydown", (e, reuse) => this.attemptKeyBind(e, action, reuse))
+		window.addReusableEventListener("keydown", (e, reuse) => this.attemptKeyBindPress(e, target, action, reuse))
 	}
 
-	private attemptKeyBind(keyDownEvent: KeyboardEvent, action: keyInputAction, reuse: () => void): void {
-		console.log(`${keyDownEvent.key} pressed!`)
+	private attemptKeyBindPress(
+		keyDownEvent: KeyboardEvent,
+		keyElement: HTMLElement,
+		action: keyInputAction,
+		reuse: () => void
+	): void {
+		// console.log(`${keyDownEvent.key} pressed!`)
 		const ac = new AbortController()
 		let timer: Timer | undefined = this.cancelKeyBindTimer(ac)
-		if (keyDownEvent.key === "Escape") timer.resume()
+		if (keyDownEvent.key === "Escape") {
+			getElement("#keyBindModal .button-progress").classList.add("active")
+			timer.resume()
+		}
 		window.addEventListener(
 			"keyup",
-			(keyUpEvent) => {
-				if (keyUpEvent.key !== keyDownEvent.key) return
-				this.processKeyBind(keyUpEvent.code, action, reuse)
-				timer?.kill()
-				timer = undefined
-				ac.abort()
-			},
+			(e) => this.attemptKeyBindRelease(e, keyDownEvent, timer, action, keyElement, reuse, ac),
 			{ signal: ac.signal }
 		)
 	}
 
-	private async processKeyBind(key: string, action: keyInputAction, reuse: () => void): Promise<void> {
-		console.log(`attempting to bind ${key} to ${action}!`)
+	private attemptKeyBindRelease(
+		keyUpEvent: KeyboardEvent,
+		keyDownEvent: KeyboardEvent,
+		timer: Timer | undefined,
+		action: keyInputAction,
+		keyElement: HTMLElement,
+		reuse: () => void,
+		ac: AbortController
+	): void {
+		if (keyUpEvent.key !== keyDownEvent.key) return
+		getElement("#keyBindModal .button-progress").classList.remove("active")
+		this.processKeyBind(keyUpEvent.code, action, keyElement, reuse)
+		timer?.kill()
+		timer = undefined
+		ac.abort()
+	}
+
+	private async processKeyBind(
+		key: string,
+		action: keyInputAction,
+		keyElement: HTMLElement,
+		reuse: () => void
+	): Promise<void> {
+		// console.log(`attempting to bind ${key} to ${action}!`)
 		const [alreadyBoundAction, alreadyBoundKey] = this.alreadyBound(key)
 		let canBind = true
 		if (alreadyBoundAction) {
 			const shouldOverWrite = await confirmation({
-				requestMessage: /*html*/ `<span class="key">${mapCodeToKeyboardFont(
-					key
-				)}</span> is already bound to <span class="action">${mapActionToReadable(
-					alreadyBoundAction
-				)}</span>. Do you want to overwrite it?`
+				requestMessage: this.keyBindOverWriteTemplate(key, alreadyBoundAction)
 			})
 			if (!shouldOverWrite) {
 				canBind = false
 				reuse()
 			} else {
-				this.setKeyBind(this.settings.keyBindings[action], alreadyBoundAction)
+				this.setKeyBind(
+					this.settings.keyBindings[action],
+					alreadyBoundAction,
+					getElement(`[data-keyboard=${alreadyBoundKey}]`)
+				)
 			}
 		}
-		if (canBind) this.setKeyBind(key, action)
+		if (canBind) this.setKeyBind(key, action, keyElement)
+	}
+
+	private keyBindOverWriteTemplate(key: string, alreadyBoundAction: keyInputAction): string {
+		const keyInFont = mapCodeToKeyboardFont(key)
+		const readableAction = mapActionToReadable(alreadyBoundAction)
+		return /*html*/ `
+			<span class="key">${keyInFont}</span> is already bound to <span class="action">${readableAction}</span>. Do you want to overwrite it?
+		`
 	}
 
 	private alreadyBound(inputKey: string): [keyInputAction, string] | [] {
@@ -69,12 +103,12 @@ export class KeyBindManager {
 		else return []
 	}
 
-	private setKeyBind(key: string, action: keyInputAction): void {
-		console.log(`binding ${key} to ${action} successfull!`)
+	private setKeyBind(key: string, action: keyInputAction, keyElement: HTMLElement): void {
+		// console.log(`binding ${key} to ${action} successfull!`)
 		this.settings.keyBindings[action] = key
+		keyElement.dataset.keyboard = key
+		this.renderInputKeys()
 		this.settings.saveSettings()
-		this.renderKeyBindings()
-		this.renderKeyboardKeys()
 		this.cancelKeybind()
 	}
 
@@ -83,33 +117,66 @@ export class KeyBindManager {
 			handler: () => {
 				ac.abort()
 				this.cancelKeybind()
+				getElement("#keyBindModal .button-progress").classList.remove("active")
 			},
-			timeout: 1000
+			timeout: 800
 		})
 	}
 
-	private cancelKeybind(): void {
+	cancelKeybind(): void {
 		this.input.closeWindow("keyBindModal")
 		this.input.isBlocked = false
 	}
 
-	private renderKeyBindings(): void {
-		const { keyBindings } = this.settings
-		Object.entries(keyBindings).forEach(([action, key]) => {
-			const keyElement = getElement(`#${action} .key span`)
-			if (!keyElement) return
-			keyElement.innerHTML = mapCodeToKeyboardFont(key)
+	private renderKeyboardKey(target: HTMLElement): void {
+		const code = target.dataset.keyboard!
+		target.classList.toggle("space", code === "Space")
+		const fontKey = mapCodeToKeyboardFont(code)
+		target.innerHTML = /*html*/ `
+			<span>${fontKey}</span>
+		`
+	}
+
+	private updateKeyboardFontObserver(): void {
+		getAllElements("[data-keyboard]").forEach((el) => this.keyboardFontObserver.observe(el, { attributes: true }))
+	}
+
+	private renderKeyboardKeysOnChange(records: MutationRecord[]): void {
+		// console.log(records.map(({ target }) => target))
+		records.forEach((record) => {
+			this.renderKeyboardKey(record.target as HTMLElement)
 		})
 	}
 
-	private renderKeyboardKeys(): void {
-		getAllElements(".keyboard span").forEach((el) => {
-			const action = el.closest<HTMLElement>(".btn-input")!.dataset.click as keyInputAction
-			const key = this.settings.keyBindings[action]
-			const keyboardKey = mapCodeToKeyboardFont(key)
-			el.parentElement?.classList.toggle("space", key === "Space")
-			el.innerHTML = keyboardKey
+	private renderKeybinds(): void {
+		this.renderKeybindSettings()
+		getAllElements(".keyboard").forEach((el) => {
+			const key = el.dataset.keyboard
+			if (!key) return
+			this.renderKeyboardKey(el)
 		})
+	}
+
+	private renderKeybindSettings(): void {
+		const template = (key: string, action: string) => /*html*/ `
+			<div class="row" id="${action}">
+				<div class="action">${mapActionToReadable(action as keyInputAction)}</div>
+				<div class="keyboard btn btn-primary" data-click="OPEN_SINGLE_KEYBIND" data-keyboard="${key}"></div>
+			</div>
+		`
+		const { keyBindings } = MESSAGER.dispatch("main").settings
+		const container = getElement("#keybinds")
+		container.innerHTML = ""
+		Object.entries(keyBindings).forEach(([action, key]) => (container.innerHTML += template(key, action)))
+		this.updateKeyboardFontObserver()
+	}
+
+	private renderInputKeys(): void {
+		getAllElements(".btn-input").forEach(
+			(el) =>
+				(el.getElement(".keyboard").dataset.keyboard =
+					this.settings.keyBindings[el.dataset.click as keyInputAction])
+		)
 	}
 
 	private PreventArrowScrollingBehaviour(): void {

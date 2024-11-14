@@ -1,18 +1,20 @@
 import { MESSAGER } from "../../script.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets, getAsset } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset_manager.module.js"
+import { Display } from "../util/devtools.util.js"
+import { modPos } from "../util/general.util.js"
 import { GameObject } from "./gameObject.object.js"
 
 class BackgroundElement extends GameObject {
-	private totalWidth
-	private cameraResolution
-	private xOffset
+	private camera
 
-	constructor(public layerNumber: number, xOffset: boolean) {
+	get totalWidth(): number {
+		return this.dimensions.x * (this.camera.resolution.x / this.camera.zoom)
+	}
+
+	constructor(public layerNumber: number) {
 		super("background")
-		this.cameraResolution = MESSAGER.dispatch("main").renderer.camera.baseResolution
-		this.totalWidth = this.cameraResolution.x * 2
-		this.xOffset = xOffset ? this.totalWidth - 1 : 0
+		this.camera = MESSAGER.dispatch("main").renderer.camera
 	}
 
 	async initialize(imgSrc: string): Promise<void> {
@@ -22,25 +24,26 @@ class BackgroundElement extends GameObject {
 	}
 
 	private initializeDimensions(): void {
-		const { width: imgWidth, height: imgHeight } = this.image as HTMLImageElement
-		const aspectRatio = imgWidth / imgHeight
-		this.position.x = this.xOffset
-		this.dimensions.set(this.totalWidth, this.totalWidth / aspectRatio)
+		this.position.x = 0
+		this.dimensions.set(this.camera._baseResolution.x * 2, this.camera._baseResolution.y)
 	}
 
 	protected setBehaviours(): void {
 		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
 	}
 
-	updateBackground(focusX: number): void {
-		const parallaxFactor = (2 - this.layerNumber) / 3
-		this.position.x = focusX * parallaxFactor + this.xOffset
-		const offset = focusX - this.position.x
-		if (offset > this.totalWidth) {
-			this.position.x += this.totalWidth * 2 - 2
-		} else if (offset < -this.totalWidth) {
-			this.position.x -= this.totalWidth * 2 - 2
+	private parallaxFactor = (2 - this.layerNumber) / 3
+
+	draw(ctx: CanvasRenderingContext2D): void {
+		const baseOffsetX = this.camera._focus.x * this.parallaxFactor
+		const loopOffsetX = Math.floor((this.camera.focus.x - baseOffsetX) / this.dimensions.x) * this.dimensions.x
+
+		const numRepeats = Math.ceil(this.camera.resolution.x / this.dimensions.x) + 1
+		for (let i = 0; i < numRepeats; i++) {
+			this.position.x = baseOffsetX + loopOffsetX + (this.dimensions.x - 1) * i
+			super.draw(ctx)
 		}
+		this.position.x = baseOffsetX
 	}
 }
 
@@ -49,7 +52,7 @@ class BackgroundElement extends GameObject {
 		"5_background/layers/3_third_layer/full.png",
 		"5_background/layers/2_second_layer/full.png",
 		"5_background/layers/1_first_layer/full.png",
-		"5_background/layers/air.png"
+		"5_background/layers/sky.png"
 	]
 })
 export class Background extends GameObject {
@@ -60,40 +63,39 @@ export class Background extends GameObject {
 		"5_background/layers/2_second_layer/full.png",
 		"5_background/layers/1_first_layer/full.png"
 	]
-	private cameraResolution
+	private camera
 
 	constructor() {
 		super("background")
-		this.cameraResolution = MESSAGER.dispatch("main").renderer.camera.baseResolution
-		this.dimensions.setToVector(this.cameraResolution.scale(1.05))
+		this.camera = MESSAGER.dispatch("main").renderer.camera
+		this.dimensions.setToVector(this.camera.resolution.scale(this.camera.maxZoom / this.camera.zoom))
+		this.setBehaviours()
 		this.initialize()
 	}
 
 	protected initialize(): void {
 		this.srcSet.forEach((src, i) => {
-			const elementSet = [new BackgroundElement(i, false), new BackgroundElement(i, true)]
+			const elementSet = [new BackgroundElement(i)]
 			this.elements.push(...elementSet)
+			this.elements[i].initialize(src)
 		})
-		this.setBehaviours()
-		this.elements.forEach((el, i) => el.initialize(this.srcSet[Math.floor(i / 2)]))
-		super.initialize("5_background/layers/air.png")
+		super.initialize("5_background/layers/sky.png")
 		this.isLoaded = true
 	}
 
 	protected setBehaviours(): void {
-		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
+		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
 	}
 
 	draw(ctx: CanvasRenderingContext2D): void {
 		this.drawBehaviour?.draw(ctx)
-		this.elements.forEach((el) => el.drawBehaviour?.draw(ctx))
+		this.elements.forEach((el) => el.draw(ctx))
 	}
 
 	update(deltaTime: number): void {
 		if (!this.isLoaded) return
-		const { focus } = MESSAGER.dispatch("main").renderer.camera
-		this.position = focus
-		this.position.x -= 10
-		this.elements.forEach((el) => el.updateBackground(focus.x))
+		this.position.setToVector(MESSAGER.dispatch("main").renderer.camera.focus)
 	}
 }
+
+// this.elements.forEach((el) => el.updateBackground())

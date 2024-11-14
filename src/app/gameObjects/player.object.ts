@@ -29,7 +29,8 @@ import { Timer } from "../modules/timer.module.js"
 	]
 })
 export class Player extends GameObject {
-	protected walkSpeed = 0.4
+	protected walkSpeed = 0.6
+	// protected walkSpeed: number = 1
 	private jumpStrength = 1
 
 	protected defaultState: keyof stateMap = "idle"
@@ -38,6 +39,7 @@ export class Player extends GameObject {
 	states: (keyof stateMap)[] = ["idle", "walk", "jump", "hurt", "dead"]
 
 	protected getFocus(): Vector {
+		if (this.main.renderer.camera.focusObjects.length > 1) return this.getCenterPoint()
 		return this.getCenterPoint().plus(new Vector(this.focusOffset * this.direction, 0))
 	}
 
@@ -52,7 +54,6 @@ export class Player extends GameObject {
 		this.setBehaviours()
 		this.position.y = this.gravityBehavior!.floorHeight
 		super.initialize("2_character_pepe/1_idle/idle/I-1.png")
-		// this.setState()
 	}
 
 	protected setBehaviours(): void {
@@ -86,8 +87,15 @@ export class Player extends GameObject {
 			offsets: [200, 60, 20, 45],
 			cooldown: 1000
 		}).onAttach(this)
-		const { hp: healthPoints, bottle: bottles, coin: coins } = MESSAGER.dispatch("main").settings.resources
+		const { hp: healthPoints, bottle: bottles, coin: coins } = this.main.settings.resources
 		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints, bottles, coins }).onAttach(this)
+		this.triggerBehaviour = BehaviourFactory.create("trigger", [
+			{
+				name: "endbossSpawn",
+				conditionCallback: () => this.main.endboss.position.x - this.position.x < 1500,
+				triggerCallback: () => this.main.spawnEndboss()
+			}
+		]).onAttach(this)
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {
@@ -105,6 +113,7 @@ export class Player extends GameObject {
 		if (!this.resourceBehaviour?.use("bottles", 1)) return
 		const spawnPosition = this.position
 		new Bottle({ position: spawnPosition, velocity: this.movementBehaviour!.velocity, direction: this.direction })
+		this.setState("idle")
 	}
 
 	collisionCallback(target: GameObject): void {

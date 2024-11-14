@@ -57,13 +57,13 @@ export class AnimationBehaviour implements Updateable {
 
 	private advanceFrame() {
 		const isOnLastFrame = this.currentFrameIndex === this.currentAnimation.length - 1
+		this.currentImage = this.currentAnimation[this.currentFrameIndex]
+		this.gameObject.image = this.currentImage
 		if (isOnLastFrame && !this.shouldLoop) {
 			this.isPlaying = false
 			this.endOfAnimationCallback?.()
 			return
 		}
-		this.currentImage = this.currentAnimation[this.currentFrameIndex]
-		this.gameObject.image = this.currentImage
 		this.currentFrameIndex = isOnLastFrame ? 0 : this.currentFrameIndex + 1
 		if (isOnLastFrame && this.shouldAlternate) this.currentAnimation.reverse()
 	}

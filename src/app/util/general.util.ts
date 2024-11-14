@@ -14,9 +14,9 @@ export function getAllElements<T extends HTMLElement>(
 export function delegateEvent(
 	type: keyof DocumentEventMap,
 	callback: (event: Event) => any,
-	container: Element = document.documentElement
+	useCapture: boolean = false
 ) {
-	container.addEventListener(type, callback)
+	window.addEventListener(type, callback, useCapture)
 }
 
 export function throttle(cb: (...args: any[]) => any, delay = 1000) {
@@ -66,7 +66,7 @@ export async function confirmation(options: confirmationOptions): Promise<boolea
 			template.remove()
 			resolve(true)
 		})
-		getElement("body").append(template)
+		getElement("#game").append(template)
 	})
 }
 
@@ -138,4 +138,8 @@ export function formatTime(totalMilliseconds: number): string {
 	return `${hr}:${min}:${sec}.${roundTo(milliseconds / 1000, 2)
 		.toString()
 		.slice(2)}`
+}
+
+export function modPos(n: number, m: number): number {
+	return ((n % m) + n) % m
 }

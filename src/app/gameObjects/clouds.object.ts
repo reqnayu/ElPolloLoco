@@ -14,7 +14,7 @@ export class Clouds extends GameObject {
 
 	constructor() {
 		super("clouds")
-		this.cameraResolution = MESSAGER.dispatch("main").renderer.camera.baseResolution
+		this.cameraResolution = MESSAGER.dispatch("main").renderer.camera.resolution
 		this.initialize("5_background/layers/4_clouds/full.png")
 		// console.log(`wind speed: ${this.windSpeed}`)
 	}

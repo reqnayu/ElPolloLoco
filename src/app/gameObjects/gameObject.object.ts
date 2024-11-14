@@ -8,11 +8,14 @@ import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
 import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
 import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
+import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
 import { StateFactory } from "../factories/State.factory.js"
 import { getAsset } from "../managers/asset_manager.module.js"
 import { Vector } from "../modules/vector.module.js"
+import { Endboss } from "./endboss.object.js"
 
 export class GameObject {
+	protected main = MESSAGER.dispatch("main")
 	id = GameObject.generateId()
 	dimensions = new Vector(0, 0)
 	position = new Vector(0, 0)
@@ -32,6 +35,7 @@ export class GameObject {
 	collisionBehaviour?: CollisionBehaviour
 	soundBehaviour?: SoundBehaviour
 	resourceBehaviour?: ResourceBehaviour
+	triggerBehaviour?: TriggerBehaviour
 
 	focusOffset?: number
 	protected getFocus?(): Vector
@@ -56,7 +60,12 @@ export class GameObject {
 	protected setBehaviours(): void {}
 
 	setState(stateType: keyof stateMap = this.defaultState): void {
-		if (!this.states.includes(stateType) || this.state?.type === stateType) return
+		if (
+			!this.states.includes(stateType) ||
+			(stateType !== "idle" && this.state?.type === stateType) ||
+			this.state?.type === "dead"
+		)
+			return
 		this.state?.exit(this)
 		this.state = StateFactory.create(stateType)
 		this.state.enter(this)
