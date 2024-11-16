@@ -1,10 +1,9 @@
-import { MESSAGER } from "../../script.js"
-import { getAsset } from "../managers/asset_manager.module.js"
-import { audioTypes } from "../managers/sound_manager.module.js"
+import { AssetManager } from "../managers/asset.manager.js"
+import { audioTypes, SoundManager } from "../managers/sound.manager.js"
 import { Interval } from "./interval.module.js"
+import { Settings } from "./settings.module.js"
 
 export class SoundAsset {
-	private soundManager
 	audioElement: HTMLAudioElement
 	disabled = false
 	name: string
@@ -14,17 +13,15 @@ export class SoundAsset {
 		public src: string,
 		public isPausable: boolean = true
 	) {
-		this.soundManager = MESSAGER.dispatch("soundManager")
-		// this.name = src.match(/(?<=\/)\w+(?=\.)/g)![0]
 		this.name = src.split(".")[0]
-		this.audioElement = getAsset<"audio">(src)
-		this.soundManager.allAudioElements.set(this.name, this)
+		this.audioElement = AssetManager.getAsset<"audio">(src)
+		SoundManager.addSoundAsset(this.name, this)
 		this.setVolume()
-		if (this.name === "player/Snore") this.disabled = MESSAGER.dispatch("main").settings.snoreDisabled
+		if (this.name === "player/Snore") this.disabled = Settings.snoreDisabled
 	}
 
 	setVolume(): void {
-		this.audioElement.volume = this.soundManager.getVolume(this.audioType)
+		this.audioElement.volume = SoundManager.getVolume(this.audioType)
 	}
 
 	async playOnce(): Promise<void> {
@@ -101,9 +98,9 @@ export class SoundAsset {
 
 	enable(): void {
 		this.disabled = false
-		const typeVolume = this.soundManager.volumes[this.audioType]
+		const typeVolume = SoundManager.volumes[this.audioType]
 		this.audioElement.volume = typeVolume
-		// this.soundManager.setVolumeType(typeVolume, this.audioType)
+		// SoundManager.setVolumeType(typeVolume, this.audioType)
 	}
 
 	get isPaused(): boolean {

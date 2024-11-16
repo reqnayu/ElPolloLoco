@@ -7,24 +7,23 @@ export class Vector {
 		return roundTo(Math.sqrt(this.x ** 2 + this.y ** 2))
 	}
 
-	set(x: number, y: number): this {
-		this.x = x
-		this.y = y
+	public set(x: number, y: number): this
+	public set({ x, y }: Vector): this
+	public set(xOrVector: number | Vector, y?: number): this {
+		const setFromVector: boolean = xOrVector instanceof Vector
+		this.x = (setFromVector) ? (xOrVector as Vector).x : (xOrVector as number)
+		this.y = (setFromVector) ? (xOrVector as Vector).y : y!
 		return this
 	}
 
-	setToVector({ x, y }: Vector): this {
-		return this.set(x, y)
-	}
-
-	copy(): Vector {
+	public copy(): Vector {
 		return new Vector(this.x, this.y)
 	}
 
 	/**
 	 * modifies instance
 	 */
-	add(v: Vector): this {
+	public add(v: Vector): this {
 		const { x, y } = this.plus(v)
 		this.x = x
 		this.y = y
@@ -34,26 +33,26 @@ export class Vector {
 	/**
 	 * returns new instance
 	 */
-	plus(v: Vector): Vector {
+	public plus(v: Vector): Vector {
 		return new Vector(this.x + v.x, this.y + v.y)
 	}
 
 	/**
 	 * returns new instance
 	 */
-	scale(factor: number): Vector {
+	public scale(factor: number): Vector {
 		return new Vector(this.x * factor, this.y * factor)
 	}
 
 	/**
 	 * modifies instance
 	 */
-	toScaled(factor: number): this {
+	public toScaled(factor: number): this {
 		const { x, y } = this.scale(factor)
 		return this.set(x, y)
 	}
 
-	static average(vecs: Vector[]): Vector {
+	public static average(vecs: Vector[]): Vector {
 		return vecs.reduce((center, v) => center.plus(v), new Vector(0, 0)).scale(1 / vecs.length)
 	}
 
@@ -65,5 +64,9 @@ export class Vector {
 		const x = roundTo(Math.cos(angle) * radius)
 		const y = roundTo(Math.sin(angle) * radius)
 		return new Vector(x, y)
+	}
+
+	public static get zero(): Vector {
+		return new Vector(0, 0)
 	}
 }

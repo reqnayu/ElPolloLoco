@@ -1,19 +1,32 @@
 import "../.types/prototypes.js"
-import { MESSAGER } from "../../script.js"
 import { confirmation, getAllElements, getElement, pointerEventIsLeftClick } from "../util/general.util.js"
 import { keyInputAction, inputMap, mouseInputAction } from "../.types/input.type.js"
-import { audioTypes } from "../managers/sound_manager.module.js"
-import { KeyBindManager } from "../managers/keybind_manager.module.js"
+import { audioTypes, SoundManager } from "../managers/sound.manager.js"
+import { KeyBindManager } from "../managers/keybind.manager.js"
+import { Settings } from "./settings.module.js"
+import { Main } from "./main.module.js"
+import { Gui } from "./gui.module.js"
+import { Renderer } from "./renderer.module.js"
 
 export class Input {
-	main
-	activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
-	isBlocked = false
-	isKeyInputBlocked = true
-	private keyBindManager
-	elementCache: Map<string, HTMLElement> = new Map()
+	private static activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
+	public static isBlocked = false
+	private static isKeyInputBlocked = false
+	private static elementCache: Map<string, HTMLElement> = new Map()
 
-	keyMap: inputMap<"key"> = {
+	public static toggleKeyInput(bool?: boolean): boolean {
+		if (bool !== undefined) this.isKeyInputBlocked = !bool
+		else this.isKeyInputBlocked = !this.isKeyInputBlocked
+		return this.isKeyInputBlocked
+	}
+
+	public static toggleInput(bool?: boolean): boolean {
+		if (bool !== undefined) this.isBlocked = !bool
+		else this.isBlocked = !this.isBlocked
+		return this.isBlocked
+	}
+
+	public static keyMap: inputMap<"key"> = {
 		FULLSCREEN: {
 			release: () => this.toggleFullscreen()
 		},
@@ -37,7 +50,7 @@ export class Input {
 		}
 	}
 
-	clickTargetMap: inputMap<"mouse"> = {
+	static clickTargetMap: inputMap<"mouse"> = {
 		...this.keyMap,
 		OPEN_SETTINGS: {
 			release: () => this.openWindow("settings")
@@ -49,10 +62,10 @@ export class Input {
 			release: () => this.openWindow("game-settings")
 		},
 		OPEN_SINGLE_KEYBIND: {
-			release: (target) => this.keyBindManager.openSingleKeyBind(target)
+			release: (target) => KeyBindManager.openSingleKeyBind(target)
 		},
 		CANCEL_KEYBIND: {
-			release: () => this.keyBindManager.cancelKeybind()
+			release: () => KeyBindManager.cancelKeybind()
 		},
 		OPEN_AUDIO_SETTINGS: {
 			release: () => this.openAudioSettings()
@@ -74,14 +87,22 @@ export class Input {
 		}
 	}
 
-	constructor() {
-		this.main = MESSAGER.dispatch("main")
-		this.keyBindManager = new KeyBindManager(this)
-		this.cacheElements()
-		this.initialize()
+	public static getElement<T extends HTMLElement>(sel: string): T {
+		return this.elementCache.get(sel) as T
 	}
 
-	private cacheElements(): void {
+	public static initialize(): void {
+		KeyBindManager.initialize();
+		this.cacheElements()
+		window.addEventListener("pointerdown", (e) => this.clickHandler(e))
+		window.addEventListener("keydown", (e) => this.keyHandler(e))
+		window.addEventListener("keyup", (e) => this.keyHandler(e))
+		// this.addZoomFunctionality()
+		this.addVolumeSliderFunctionality()
+		this.addSplashScreenFunctionality()
+	}
+
+	private static cacheElements(): void {
 		const elementSelectors = [
 			"#gui",
 			"#settings",
@@ -106,21 +127,7 @@ export class Input {
 		elementSelectors.forEach((sel) => this.elementCache.set(sel, getElement(sel)))
 	}
 
-	getElement<T extends HTMLElement>(sel: string): T {
-		return this.elementCache.get(sel) as T
-	}
-
-	initialize(): void {
-		window.addEventListener("pointerdown", (e) => this.clickHandler(e))
-		window.addEventListener("keydown", (e) => this.keyHandler(e))
-		window.addEventListener("keyup", (e) => this.keyHandler(e))
-		// this.addZoomFunctionality()
-		this.addVolumeSliderFunctionality()
-		this.addSplashScreenFunctionality()
-		MESSAGER.elements.set("input", this)
-	}
-
-	clickHandler(e: Event): void {
+	private static clickHandler(e: Event): void {
 		if (!pointerEventIsLeftClick(e)) return
 		const target = (e.target as HTMLElement).closest<HTMLElement>("[data-click]")
 		if (!target) return
@@ -149,11 +156,11 @@ export class Input {
 		)
 	}
 
-	private keyHandler(e: KeyboardEvent): void {
+	private static keyHandler(e: KeyboardEvent): void {
 		if (this.isKeyInputBlocked) return
 		// console.log(e.code)
 		const isKeyDown = e.type === "keydown"
-		const action = Object.entries(this.main.settings.keyBindings).find(
+		const action = Object.entries(Settings.keyBindings).find(
 			([, key]) => key === e.code
 		)?.[0] as keyInputAction
 		if (!action) return
@@ -164,112 +171,112 @@ export class Input {
 		isKeyDown ? this.activeInputs.add(action) : this.activeInputs.delete(action)
 	}
 
-	private pressKey(action: keyInputAction): void {
+	private static pressKey(action: keyInputAction): void {
 		this.keyMap[action].press?.(document.documentElement)
 	}
 
-	private releaseKey(action: keyInputAction): void {
+	private static releaseKey(action: keyInputAction): void {
 		this.keyMap[action].release?.(document.documentElement)
 	}
 
 	// Player Actions
 
-	private startMove(direction: "left" | "right"): void {
+	private static startMove(direction: "left" | "right"): void {
 		if (this.isBlocked) return
 		switch (direction) {
 			case "left":
-				this.main.player.movementBehaviour!.input.isMovingLeft = true
+				Main.player.movementBehaviour!.input.isMovingLeft = true
 				break
 			case "right":
-				this.main.player.movementBehaviour!.input.isMovingRight = true
+				Main.player.movementBehaviour!.input.isMovingRight = true
 				break
 		}
 	}
 
-	private stopMove(direction: "left" | "right"): void {
+	private static stopMove(direction: "left" | "right"): void {
 		if (this.isBlocked) return
-		if (direction === "left") this.main.player.movementBehaviour!.input.isMovingLeft = false
-		else if (direction === "right") this.main.player.movementBehaviour!.input.isMovingRight = false
+		if (direction === "left") Main.player.movementBehaviour!.input.isMovingLeft = false
+		else if (direction === "right") Main.player.movementBehaviour!.input.isMovingRight = false
 	}
 
-	private jump(bool: boolean): void {
+	private static jump(bool: boolean): void {
 		if (this.isBlocked) return
-		this.main.player.movementBehaviour!.input.isJumping = bool
+		Main.player.movementBehaviour!.input.isJumping = bool
 	}
 
-	private throw(): void {
+	private static throw(): void {
 		if (this.isBlocked) return
 		// console.log("throwing!")
-		this.main.player.throwBottle()
+		Main.player.throwBottle()
 	}
 
 	// gui actions
 
-	private enterMainMenu(): void {
+	private static enterMainMenu(): void {
 		this.getElement(".splash-screen")?.remove()
-		this.main.gui.soundBehaviour.playLooped("Menu")
+		Gui.soundBehaviour.playLooped("Menu")
 	}
 
-	private async toggleFullscreen(): Promise<void> {
-		await this.main.renderer.toggleFullscreen()
+	private static async toggleFullscreen(): Promise<void> {
+		await Renderer.toggleFullscreen()
 	}
 
-	openWindow(id: string): void {
+	public static openWindow(id: string): void {
 		this.getElement(`#${id}`)?.classList.add("open")
 	}
 
-	closeWindow(id: string): void {
+	public static closeWindow(id: string): void {
 		const container = this.getElement(`#${id}`)
 		container.classList.remove("open")
 		container.getAllElements(".open").forEach((el) => el.classList.remove("open"))
 	}
 
-	private closeContainer(target: HTMLElement): void {
+	private static closeContainer(target: HTMLElement): void {
 		const id = target.closest(".container")!.id
 		this.closeWindow(id)
 		if (id === "main-menu") this.resumeGame()
 	}
 
-	private openAudioSettings(): void {
-		Object.entries(this.main.soundManager.volumes).forEach(
+	private static openAudioSettings(): void {
+		Object.entries(SoundManager.volumes).forEach(
 			([type, volume]) => (this.getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
-		this.getElement<HTMLInputElement>("input#snore").checked = !this.main.settings.snoreDisabled
+		this.getElement<HTMLInputElement>("input#snore").checked = !Settings.snoreDisabled
 		this.openWindow("audio-settings")
 	}
 
-	private toggleSnore(): void {
-		this.main.settings.snoreDisabled = !this.main.settings.snoreDisabled
-		const isDisabled = this.main.settings.snoreDisabled
-		const snoreSound = MESSAGER.dispatch("soundManager").allAudioElements.get("player/Snore")!
-		this.main.settings.saveSettings()
+	private static toggleSnore(): void {
+		Settings.snoreDisabled = !Settings.snoreDisabled
+		const isDisabled = Settings.snoreDisabled
+		const snoreSound = SoundManager.getSound("player/Snore")!
+		Settings.saveSettings()
 		if (!snoreSound) return
 		isDisabled ? snoreSound.disable() : snoreSound.enable()
 	}
 
-	private togglePause(): void {
+	private static togglePause(): void {
 		const mainMenuIsOpen = this.getElement("#main-menu").classList.contains("open")
 		mainMenuIsOpen ? this.resumeGame() : this.pauseGame()
 	}
 
-	pauseGame(): void {
+	public static pauseGame(): void {
 		this.openWindow("main-menu")
-		this.main.pause()
+		Main.pause()
 	}
 
-	resumeGame(): void {
+	public static resumeGame(): void {
 		this.closeWindow("main-menu")
-		this.main.resume()
+		Main.resume()
 	}
 
-	newGame(): void {
+	public static newGame(): void {
 		this.getElement("#main-menu").classList.remove("start")
-		this.main.setupNewGame()
-		this.main.renderer.shouldUpdateStatically = false
+		Main.setupNewGame()
+		Renderer.shouldUpdateStatically = false
 		this.closeWindow("main-menu")
 	}
 
-	async restartGame(): Promise<void> {
+	public static async restartGame(): Promise<void> {
 		const restartConfirmed = await confirmation({
 			requestMessage: "Do you want to restart? All Progress will be lost!",
 			affirmMessage: "Restart"
@@ -284,17 +291,17 @@ export class Input {
 	// 	})
 	// }
 
-	private addVolumeSliderFunctionality(): void {
+	private static addVolumeSliderFunctionality(): void {
 		getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
 			slider.addEventListener("input", (e) => {
 				const type = slider.id as keyof audioTypes
-				this.main.soundManager.setVolumeType(Number(slider.value) / 100, type)
+				SoundManager.setVolumeType(Number(slider.value) / 100, type)
 			})
-			slider.addEventListener("change", () => this.main.settings.saveSettings())
+			slider.addEventListener("change", () => Settings.saveSettings())
 		})
 	}
 
-	private addSplashScreenFunctionality(): void {
+	private static addSplashScreenFunctionality(): void {
 		const ac = new AbortController()
 		const splashScreenFunc = (e: Event) => {
 			const keyboardEvent = e as KeyboardEvent

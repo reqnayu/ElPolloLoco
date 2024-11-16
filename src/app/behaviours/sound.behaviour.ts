@@ -1,19 +1,17 @@
-import { MESSAGER } from "../../script.js"
 import { soundParams } from "../.types/behaviour.type.js"
 import { Audible } from "../.types/behaviours.interface.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
-import { audioTypes } from "../managers/sound_manager.module.js"
+import { audioTypes, SoundManager } from "../managers/sound.manager.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 import { randomize, roundTo } from "../util/general.util.js"
 
 export class SoundBehaviour implements Audible {
 	sounds: Map<string, SoundAsset>
 	private soundType: soundType
-	private soundManager = MESSAGER.dispatch("soundManager")
 	constructor({ soundType, assets }: soundParams) {
 		this.soundType = soundType
 		this.createSounds(assets)
-		this.sounds = this.soundManager.allAudioElements.filter(([name]) => name.startsWith(soundType))
+		this.sounds = SoundManager.AllAudioElements.filter(([name]) => name.startsWith(soundType))
 	}
 
 	private createSounds(assets: string[]): void {
@@ -24,7 +22,7 @@ export class SoundBehaviour implements Audible {
 				string?
 			]
 			const fullName = this.getFullName(name)
-			if (!!this.soundManager.allAudioElements.get(fullName)) return
+			if (!!SoundManager.getSound(fullName)) return
 			const isPausable = isPausableString === "false" ? false : true
 			new SoundAsset(audioType, fullName, isPausable)
 		})

@@ -19,7 +19,7 @@ import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
 
-export class BehaviourFactory {
+export abstract class BehaviourFactory {
 	private constructor() {}
 
 	static create<T extends keyof behaviourMap>(type: T, options?: behaviourParamMap[T]): behaviourMap[T] {

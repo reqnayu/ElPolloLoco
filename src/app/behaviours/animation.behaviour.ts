@@ -1,4 +1,3 @@
-import { MESSAGER } from "../../script.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 import { AnimationSet } from "../.types/animation.type.js"

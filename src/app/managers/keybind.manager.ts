@@ -1,29 +1,26 @@
-import { MESSAGER } from "../../script.js"
 import { keyInputAction } from "../.types/input.type.js"
 import { Input } from "../modules/input.module.js"
+import { Settings } from "../modules/settings.module.js"
 import { Timer } from "../modules/timer.module.js"
 import { capitalizeFirstLetter, confirmation, getAllElements, getElement } from "../util/general.util.js"
 
 export class KeyBindManager {
-	private settings
-	private keyboardFontObserver = new MutationObserver((records) => this.renderKeyboardKeysOnChange(records))
+	private static keyboardFontObserver = new MutationObserver((records) => this.renderKeyboardKeysOnChange(records))
 
-	constructor(private input: Input) {
-		this.settings = MESSAGER.dispatch("main").settings
+	public static initialize(): void {		
 		this.PreventArrowScrollingBehaviour()
 		this.renderKeybinds()
 		this.renderInputKeys()
-		// this.renderKeyBindings()
 	}
 
-	openSingleKeyBind(target: HTMLElement): void {
+	public static openSingleKeyBind(target: HTMLElement): void {
 		const action = target.parentElement!.id as keyInputAction
-		this.input.openWindow("keyBindModal")
-		this.input.isBlocked = true
+		Input.openWindow("keyBindModal")
+		Input.toggleInput(true)
 		window.addReusableEventListener("keydown", (e, reuse) => this.attemptKeyBindPress(e, target, action, reuse))
 	}
 
-	private attemptKeyBindPress(
+	private static attemptKeyBindPress(
 		keyDownEvent: KeyboardEvent,
 		keyElement: HTMLElement,
 		action: keyInputAction,
@@ -43,7 +40,7 @@ export class KeyBindManager {
 		)
 	}
 
-	private attemptKeyBindRelease(
+	private static attemptKeyBindRelease(
 		keyUpEvent: KeyboardEvent,
 		keyDownEvent: KeyboardEvent,
 		timer: Timer | undefined,
@@ -60,7 +57,7 @@ export class KeyBindManager {
 		ac.abort()
 	}
 
-	private async processKeyBind(
+	private static async processKeyBind(
 		key: string,
 		action: keyInputAction,
 		keyElement: HTMLElement,
@@ -78,7 +75,7 @@ export class KeyBindManager {
 				reuse()
 			} else {
 				this.setKeyBind(
-					this.settings.keyBindings[action],
+					Settings.keyBindings[action],
 					alreadyBoundAction,
 					getElement(`[data-keyboard=${alreadyBoundKey}]`)
 				)
@@ -87,7 +84,7 @@ export class KeyBindManager {
 		if (canBind) this.setKeyBind(key, action, keyElement)
 	}
 
-	private keyBindOverWriteTemplate(key: string, alreadyBoundAction: keyInputAction): string {
+	private static keyBindOverWriteTemplate(key: string, alreadyBoundAction: keyInputAction): string {
 		const keyInFont = mapCodeToKeyboardFont(key)
 		const readableAction = mapActionToReadable(alreadyBoundAction)
 		return /*html*/ `
@@ -95,24 +92,24 @@ export class KeyBindManager {
 		`
 	}
 
-	private alreadyBound(inputKey: string): [keyInputAction, string] | [] {
+	private static alreadyBound(inputKey: string): [keyInputAction, string] | [] {
 		const [alreadyBoundAction, alreadyBoundKey] =
-			Object.entries(this.settings.keyBindings).find(([_key, val]) => val === inputKey) ?? []
+			Object.entries(Settings.keyBindings).find(([_key, val]) => val === inputKey) ?? []
 
 		if (alreadyBoundAction && alreadyBoundKey) return [alreadyBoundAction as keyInputAction, alreadyBoundKey]
 		else return []
 	}
 
-	private setKeyBind(key: string, action: keyInputAction, keyElement: HTMLElement): void {
+	private static setKeyBind(key: string, action: keyInputAction, keyElement: HTMLElement): void {
 		// console.log(`binding ${key} to ${action} successfull!`)
-		this.settings.keyBindings[action] = key
+		Settings.keyBindings[action] = key
 		keyElement.dataset.keyboard = key
 		this.renderInputKeys()
-		this.settings.saveSettings()
+		Settings.saveSettings()
 		this.cancelKeybind()
 	}
 
-	private cancelKeyBindTimer(ac: AbortController): Timer {
+	private static cancelKeyBindTimer(ac: AbortController): Timer {
 		return new Timer({
 			handler: () => {
 				ac.abort()
@@ -123,12 +120,12 @@ export class KeyBindManager {
 		})
 	}
 
-	cancelKeybind(): void {
-		this.input.closeWindow("keyBindModal")
-		this.input.isBlocked = false
+	public static cancelKeybind(): void {
+		Input.closeWindow("keyBindModal")
+		Input.toggleInput(false)
 	}
 
-	private renderKeyboardKey(target: HTMLElement): void {
+	private static renderKeyboardKey(target: HTMLElement): void {
 		const code = target.dataset.keyboard!
 		target.classList.toggle("space", code === "Space")
 		const fontKey = mapCodeToKeyboardFont(code)
@@ -137,18 +134,18 @@ export class KeyBindManager {
 		`
 	}
 
-	private updateKeyboardFontObserver(): void {
+	private static updateKeyboardFontObserver(): void {
 		getAllElements("[data-keyboard]").forEach((el) => this.keyboardFontObserver.observe(el, { attributes: true }))
 	}
 
-	private renderKeyboardKeysOnChange(records: MutationRecord[]): void {
+	private static renderKeyboardKeysOnChange(records: MutationRecord[]): void {
 		// console.log(records.map(({ target }) => target))
 		records.forEach((record) => {
 			this.renderKeyboardKey(record.target as HTMLElement)
 		})
 	}
 
-	private renderKeybinds(): void {
+	private static renderKeybinds(): void {
 		this.renderKeybindSettings()
 		getAllElements(".keyboard").forEach((el) => {
 			const key = el.dataset.keyboard
@@ -157,29 +154,28 @@ export class KeyBindManager {
 		})
 	}
 
-	private renderKeybindSettings(): void {
+	private static renderKeybindSettings(): void {
 		const template = (key: string, action: string) => /*html*/ `
 			<div class="row" id="${action}">
 				<div class="action">${mapActionToReadable(action as keyInputAction)}</div>
 				<div class="keyboard btn btn-primary" data-click="OPEN_SINGLE_KEYBIND" data-keyboard="${key}"></div>
 			</div>
 		`
-		const { keyBindings } = MESSAGER.dispatch("main").settings
 		const container = getElement("#keybinds")
 		container.innerHTML = ""
-		Object.entries(keyBindings).forEach(([action, key]) => (container.innerHTML += template(key, action)))
+		Object.entries(Settings.keyBindings).forEach(([action, key]) => (container.innerHTML += template(key, action)))
 		this.updateKeyboardFontObserver()
 	}
 
-	private renderInputKeys(): void {
+	private static renderInputKeys(): void {
 		getAllElements(".btn-input").forEach(
 			(el) =>
 				(el.getElement(".keyboard").dataset.keyboard =
-					this.settings.keyBindings[el.dataset.click as keyInputAction])
+					Settings.keyBindings[el.dataset.click as keyInputAction])
 		)
 	}
 
-	private PreventArrowScrollingBehaviour(): void {
+	private static PreventArrowScrollingBehaviour(): void {
 		const arrowKeys = ["ArrowLeft", "ArrowDown", "ArrowRight", "ArrowUp", " "]
 		window.addEventListener("keydown", (e) => {
 			if (!arrowKeys.includes(e.key)) return

@@ -2,15 +2,12 @@ import { Drawable } from "../.types/behaviours.interface.js"
 import { Frame } from "../.types/frame.type.js"
 import { drawParams } from "../.types/behaviour.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { MESSAGER } from "../../script.js"
+import { Camera } from "../modules/camera.module.js"
 
 export class DrawBehaviour implements Drawable {
 	private gameObject!: GameObject
-	private renderer
 
-	constructor(options: drawParams) {
-		this.renderer = MESSAGER.dispatch("main").renderer
-	}
+	constructor(options: drawParams) { }
 
 	onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
@@ -23,10 +20,10 @@ export class DrawBehaviour implements Drawable {
 		const { image, dx: rawDx, dy: rawDy, dWidth, dHeight, direction } = frame
 		ctx.resetTransform()
 
-		const scale = ctx.canvas.width / this.renderer.camera.resolution.x
+		const scale = ctx.canvas.width / Camera.resolution.x
 		ctx.scale(direction * scale, scale)
 
-		const { x, y } = this.renderer.camera.focus
+		const { x, y } = Camera.focus
 		ctx.translate(-x * direction, y * scale)
 		if (direction === 1) ctx.translate(rawDx, ctx.canvas.height / scale)
 		else ctx.translate(-(rawDx + dWidth), ctx.canvas.height / scale)
@@ -46,8 +43,8 @@ export class DrawBehaviour implements Drawable {
 			image: this.gameObject.image!,
 			dx: Math.round(this.gameObject.position.x),
 			dy: Math.round(this.gameObject.position.y),
-			dWidth: Math.round(this.gameObject.dimensions.x),
-			dHeight: Math.round(this.gameObject.dimensions.y),
+			dWidth: Math.round(this.gameObject.Dimensions.x),
+			dHeight: Math.round(this.gameObject.Dimensions.y),
 			direction: this.gameObject.direction
 		}
 		return frame

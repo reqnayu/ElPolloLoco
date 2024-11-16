@@ -1,69 +1,70 @@
 import "../.types/prototypes.js"
-import { MESSAGER } from "../../script.js"
 import { GameObjectFactory } from "../factories/gameObject.factory.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Gui } from "./gui.modules.js"
+import { Gui } from "./gui.module.js"
 import { Renderer } from "./renderer.module.js"
-import { Settings } from "./settings.module.js"
-import { SoundManager } from "../managers/sound_manager.module.js"
-import { TimerManager } from "../managers/timer_manager.js"
+import { SoundManager } from "../managers/sound.manager.js"
+import { TimerManager } from "../managers/timer.manager.js"
 import { Player } from "../gameObjects/player.object.js"
 import { Background } from "../gameObjects/background.object.js"
 import { Clouds } from "../gameObjects/clouds.object.js"
 import { Enemy } from "../gameObjects/enemy.object.js"
 import { Vector } from "./vector.module.js"
 import { Timer } from "./timer.module.js"
-import "../managers/asset_manager.module.js"
-import { loadAssets } from "../managers/asset_manager.module.js"
-import { CollisionManager } from "../managers/collision_managermodule.js"
+import "../managers/asset.manager.js"
 import { Endboss } from "../gameObjects/endboss.object.js"
 import { formatTime } from "../util/general.util.js"
-import { SpawnManager } from "../managers/spawn_manager.module.js"
-import { TriggerManager } from "../managers/trigger_manager.module.js"
+import { SpawnManager } from "../managers/spawn.manager.js"
+import { TriggerManager } from "../managers/trigger.manager.js"
+import { AssetManager } from "../managers/asset.manager.js"
+import { Input } from "./input.module.js"
+import { Camera } from "./camera.module.js"
+import { Settings } from "./settings.module.js"
 
-export class Main {
-	ctx
-	isPaused = true
-	readonly frameRate = 60 / 1000
-	readonly maxPosX = 10 * 1000
+export abstract class Main {
+	public static canvas: HTMLCanvasElement
+	public static ctx: CanvasRenderingContext2D
+	private static gameElement: HTMLElement
+	public static get GameElement(): HTMLElement {
+		return this.gameElement
+	}
+	public static isPaused = true
+	public static readonly frameRate = 60 / 1000
+	public static readonly maxPosX = 10 * 1000
 
-	hasStarted = false
-	countdownTimer?: Timer
-	totalTime = 0
+	public static hasStarted = false
+	private static countdownTimer?: Timer
+	public static totalTime = 0
 
-	renderer!: Renderer
-	soundManager!: SoundManager
-	timerManager!: TimerManager
-	collisionManager!: CollisionManager
-	triggerManager!: TriggerManager
-	settings!: Settings
-	gui!: Gui
+	// renderer: Renderer
+	// soundManager!: SoundManager
+	// timerManager!: TimerManager
+	// triggerManager!: TriggerManager
+	// gui!: Gui
 
-	player!: Player
-	background!: Background
-	clouds!: Clouds
-	enemies!: Enemy[]
-	endboss!: Endboss
+	public static player: Player
+	public static background: Background
+	public static clouds: Clouds
+	public static enemies: Enemy[]
+	public static endboss: Endboss
 
-	allObjects: Map<number, GameObject> = new Map()
+	public static allObjects: Map<number, GameObject> = new Map()
 
-	constructor(public canvas: HTMLCanvasElement, public gameElement: HTMLElement) {
+	public static async initialize(canvas: HTMLCanvasElement, gameElement: HTMLElement): Promise<void> {
+		this.canvas = canvas
 		this.ctx = this.canvas.getContext("2d")!
-		MESSAGER.elements.set("main", this)
+		this.gameElement = gameElement
+		await AssetManager.loadAssets()
+		Settings.initialize()
+		Input.initialize()
+		SoundManager.initialize()
+		TimerManager.initialize()
+		Gui.initialize()
+		TimerManager.initialize()
+		Renderer.initialize()
 	}
 
-	async initialize(): Promise<void> {
-		this.soundManager = new SoundManager()
-		this.timerManager = new TimerManager()
-		this.triggerManager = new TriggerManager()
-		this.renderer = new Renderer(this.canvas)
-		await loadAssets()
-		this.collisionManager = new CollisionManager()
-		this.settings = new Settings()
-		this.gui = new Gui()
-	}
-
-	private setUpObjects(): void {
+	private static setUpObjects(): void {
 		this.background = GameObjectFactory.create("background")
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
@@ -78,65 +79,72 @@ export class Main {
 		SpawnManager.line("coin", new Vector(1000, 80), 400, 5)
 	}
 
-	setupNewGame(): void {
+	public static addObject(id: number, obj: GameObject): void {
+		this.allObjects.set(id, obj)
+	}
+
+	public static removeObject(id: number): boolean {
+		return this.allObjects.delete(id)
+	}
+
+	public static setupNewGame(): void {
 		this.totalTime = 0
-		MESSAGER.dispatch("input").isKeyInputBlocked = false
+		Input.toggleInput(false)
 		this.allObjects = new Map()
-		this.collisionManager.allObjects = new Map()
 		this.setUpObjects()
 		this.hasStarted = false
 		this.countdownTimer?.kill()
-		this.renderer.camera._focus = new Vector(0, 0)
-		this.renderer.camera.focusObjects = [this.player]
-		this.gui.initialize()
+		Renderer.reset()
+		Camera.initialize()
+		Gui.reset();
+
 		this.update()
 		this.startCountDown()
 	}
 
-	async startGame(): Promise<void> {
-		MESSAGER.dispatch("input").isBlocked = false
+	public static async startGame(): Promise<void> {
+		Input.toggleInput(true)
 		this.resume()
 		this.player.setState("idle")
 	}
 
-	togglePause() {
+	public static togglePause() {
 		// console.log("toggling pause")
 		this.isPaused ? this.resume() : this.pause()
 	}
 
-	pause() {
+	public static pause() {
 		window.dispatchEvent(new CustomEvent("pausegame"))
 		this.isPaused = true
 		console.log("pause")
 	}
 
-	resume() {
+	public static resume() {
 		this.initializeGamePauseOnVisibilityChange()
 		window.dispatchEvent(new CustomEvent("resumegame"))
 		this.isPaused = false
 		console.log("resume")
 	}
 
-	private update() {
-		this.renderer.render()
-		this.triggerManager.check()
+	private static update() {
+		Renderer.render()
+		TriggerManager.check()
 		requestAnimationFrame(() => this.update())
 	}
 
-	private initializeGamePauseOnVisibilityChange(): void {
-		const input = MESSAGER.dispatch("input")
+	private static initializeGamePauseOnVisibilityChange(): void {
 		document.addEventListener(
 			"visibilitychange",
 			(e) => {
 				if (document.visibilityState === "visible") return
-				input.pauseGame()
+				Input.pauseGame()
 			},
 			{ once: true }
 		)
 	}
 
-	startCountDown(secondsLeft = 0): void {
-		this.gui.updateCountDown(secondsLeft)
+	public static startCountDown(secondsLeft = 0): void {
+		Gui.updateCountDown(secondsLeft)
 		if (secondsLeft === 0) {
 			this.hasStarted = true
 			this.startGame()
@@ -151,21 +159,21 @@ export class Main {
 		}).resume()
 	}
 
-	winGame(): void {
+	public static winGame(): void {
 		console.log("Game Won!")
 		this.endGame("won")
 	}
 
-	looseGame(): void {
+	public static looseGame(): void {
 		console.log("Game Over!")
 		this.endGame("lost")
 	}
 
-	private endGame(state: "won" | "lost"): void {
+	private static endGame(state: "won" | "lost"): void {
 		console.log(`${state} in ${formatTime(this.totalTime)}!`)
 	}
 
-	spawnEndboss(): void {
+	public static spawnEndboss(): void {
 		console.log("spawning endboss")
 		this.endboss.spawn()
 	}

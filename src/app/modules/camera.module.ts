@@ -1,60 +1,61 @@
-import { MESSAGER } from "../../script.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Display } from "../util/devtools.util.js"
 import { clamp } from "../util/general.util.js"
+import { Main } from "./main.module.js"
 import { Vector } from "./vector.module.js"
 
 export class Camera {
-	_focus = new Vector(0, 0)
-	private pixelsPerFrame = 1.5
-	readonly aspectRatio = 16 / 9
-	readonly _baseResolution = new Vector(1280, 720)
-	zoom = 1
-	readonly maxZoom = 3
-	readonly minZoom = 1
-	focusObjects: GameObject[] = []
-	private maxPosX
+	public static _focus = Vector.zero
+	private static readonly pixelsPerFrame = 1.5
+	public static readonly aspectRatio = 16 / 9
+	public static readonly _baseResolution = new Vector(1280, 720)
+	public static zoom = 1
+	public static get Zoom(): number {
+		return this.zoom
+	}
+	public static readonly maxZoom = 3
+	private static readonly minZoom = 1
+	public static focusObjects: GameObject[]
 
-	get resolution(): Vector {
+	public static get resolution(): Vector {
 		return this._baseResolution.scale(this.zoom)
 	}
 
-	get focus(): Vector {
+	public static get focus(): Vector {
 		const middleVec = this.resolution.scale(0.5)
 		const focusVector = this._focus.plus(middleVec.scale(-1))
 		// const x = clamp(focusVector.x, 0, this.maxPosX - this.resolution.x)
 		return new Vector(focusVector.x, 0)
 	}
 
-	get desiredFocus(): Vector {
+	public static get desiredFocus(): Vector {
 		const objectFocus = Vector.average(this.getStartAndEndFocusObjects().map(({ focusVector }) => focusVector))
 		const minFocusX = this.resolution.scale(0.5).x
-		objectFocus.x = clamp(objectFocus.x, minFocusX, this.maxPosX - minFocusX)
+		objectFocus.x = clamp(objectFocus.x, minFocusX, Main.maxPosX - minFocusX)
 		return objectFocus
 	}
 
-	get desiredZoom(): number {
+	private static get desiredZoom(): number {
 		if (this.focusObjects.length <= 1) return 1
 		const [obj1, obj2] = this.getStartAndEndFocusObjects()
-		const distance = obj2.position.x + obj2.dimensions.x - obj1.position.x
+		const distance = obj2.position.x + obj2.Dimensions.x - obj1.position.x
 		const paddingFactor = 1.2
 		const desiredZoom = (distance / this._baseResolution.x) * paddingFactor
 		return clamp(desiredZoom, this.minZoom, this.maxZoom)
 	}
 
-	constructor() {
-		this.maxPosX = MESSAGER.dispatch("main").maxPosX
-		Display.new(`zoom`)
+	public static initialize(): void {
+		this._focus = Vector.zero
+		this.focusObjects = [Main.player]
 	}
 
-	update(deltaTime: number): void {
+	public static update(deltaTime: number): void {
 		this.updateFocus(deltaTime)
 		this.updateZoom(deltaTime)
 		// Display.update("zoom", this.desiredZoom)
 		// Display.render()
 	}
 
-	private updateZoom(deltaTime: number): void {
+	private static updateZoom(deltaTime: number): void {
 		if (this.zoom === this.desiredZoom) return
 		const zoomFactor = 1 / 500
 		const stepSize = (this.desiredZoom - this.zoom) * deltaTime * zoomFactor
@@ -65,7 +66,7 @@ export class Camera {
 		this.zoom += stepSize
 	}
 
-	private updateFocus(deltaTime: number) {
+	private static updateFocus(deltaTime: number) {
 		if (this.focusObjects.length === 0) return
 		// objectFocus.x = clamp(objectFocus.x, 0, this.maxPosX)
 
@@ -80,7 +81,7 @@ export class Camera {
 	// 	this.zoom = clamp(this.zoom + dir * stepSize, this.minZoom, this.maxZoom)
 	// }
 
-	private getStartAndEndFocusObjects(): [GameObject, GameObject] {
+	private static getStartAndEndFocusObjects(): [GameObject, GameObject] {
 		const objects = this.focusObjects.sort((a, b) => a.position.x - b.position.x)
 		return [objects[0], objects.at(-1)!]
 	}

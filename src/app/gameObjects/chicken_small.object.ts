@@ -1,7 +1,7 @@
-import { MESSAGER } from "../../script.js"
 import { AnimationSet, EnemyAnimationState } from "../.types/animation.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset.manager.js"
+import { Settings } from "../modules/settings.module.js"
 import { Enemy } from "./enemy.object.js"
 import { getImages, getSingleAnimation } from "./gameObject.object.js"
 
@@ -17,7 +17,7 @@ export class ChickenSmall extends Enemy {
 			type: "enemy",
 			walkSpeed: 0.2,
 			colliderOffsets: [10, 15, 10, 15],
-			healthPoints: MESSAGER.dispatch("main").settings.resources["enemySmallHp"]
+			healthPoints: Settings.resources["enemySmallHp"]
 		})
 		this.dimensions.toScaled(0.5)
 		this.initialize()

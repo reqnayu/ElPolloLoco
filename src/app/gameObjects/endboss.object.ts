@@ -1,12 +1,14 @@
-import { MESSAGER } from "../../script.js"
 import { AnimationSet, EndbossAnimationState } from "../.types/animation.type.js"
 import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset.manager.js"
 import { Enemy } from "./enemy.object.js"
 import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
 import { getElement } from "../util/general.util.js"
 import { Timer } from "../modules/timer.module.js"
+import { Gui } from "../modules/gui.module.js"
+import { Main } from "../modules/main.module.js"
+import { Camera } from "../modules/camera.module.js"
 
 @Assets({
 	img: [
@@ -18,9 +20,9 @@ import { Timer } from "../modules/timer.module.js"
 	]
 })
 export class Endboss extends Enemy {
-	direction: 1 | -1 = -1
-	states: (keyof stateMap)[] = ["walk", "alert", "attack", "hurt", "dead"]
-	healthBarElement = getElement("#endboss-hp-bar")
+	public direction: 1 | -1 = -1
+	public states: (keyof stateMap)[] = ["walk", "alert", "attack", "hurt", "dead"]
+	private healthBarElement = getElement("#endboss-hp-bar")
 	hasSpawned = false
 
 	protected defaultState: keyof stateMap = "alert"
@@ -37,7 +39,7 @@ export class Endboss extends Enemy {
 		this.initialize()
 	}
 
-	protected initialize(): void {
+	protected override initialize(): void {
 		this.setBehaviours()
 		super.setBehaviours()
 		super.initialize()
@@ -45,7 +47,7 @@ export class Endboss extends Enemy {
 		this.healthBarElement.classList.add("d-none")
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		const animationSet = this.getAnimationSet()
 		this.image = animationSet.alert[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
@@ -61,7 +63,7 @@ export class Endboss extends Enemy {
 		}
 	}
 
-	collisionCallback(target: GameObject): void {
+	public override collisionCallback(target: GameObject): void {
 		switch (target.name) {
 			case "bottle":
 				return this.getHitByBottle(target)
@@ -70,10 +72,10 @@ export class Endboss extends Enemy {
 		}
 	}
 
-	protected getHitByBottle(bottle: GameObject): void {
+	protected override getHitByBottle(bottle: GameObject): void {
 		super.getHitByBottle(bottle)
 		const { currentAmount, maxAmount } = this.resourceBehaviour!.healthPoints
-		MESSAGER.dispatch("gui").updateStatusBar("endbossHp", currentAmount, maxAmount)
+		Gui.updateStatusBar("endbossHp", currentAmount, maxAmount)
 		if (currentAmount > 0) this.setState("hurt")
 	}
 
@@ -81,18 +83,18 @@ export class Endboss extends Enemy {
 		this.setState("attack")
 	}
 
-	protected die(): void {
+	protected override die(): void {
 		super.die()
-		this.main.winGame()
+		Main.winGame()
 		new Timer({
-			handler: () => this.main.renderer.camera.focusObjects.remove(this),
+			handler: () => Camera.focusObjects.remove(this),
 			timeout: 2000
 		}).resume()
 	}
 
-	spawn(): void {
+	public spawn(): void {
 		this.healthBarElement.classList.remove("d-none")
-		this.main.renderer.camera.focusObjects.push(this)
+		Camera.focusObjects.push(this)
 		new Timer({
 			handler: () => {
 				this.hasSpawned = true
@@ -103,7 +105,7 @@ export class Endboss extends Enemy {
 
 	private followPlayer(): void {
 		const thisX = this.getCenterPoint().x
-		const playerX = this.main.player.getCenterPoint().x
+		const playerX = Main.player.getCenterPoint().x
 		const direction = thisX < playerX ? 1 : -1
 		this.direction = direction
 		if (Math.abs(thisX - playerX) < this.dimensions.x / 2) return

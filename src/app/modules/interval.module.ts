@@ -1,4 +1,4 @@
-import { MESSAGER } from "../../script.js"
+import { TimerManager } from "../managers/timer.manager.js"
 import { Timer, timerOrIntervalParams } from "./timer.module.js"
 
 export class Interval implements intervalParams {
@@ -30,7 +30,7 @@ export class Interval implements intervalParams {
 		this.isPausable = isPausable
 		this.timeToNextExecution = timeout
 		window.addEventListener("error", () => this.dispose())
-		MESSAGER.dispatch("timerManager").addInterval(this)
+		TimerManager.addInterval(this)
 	}
 
 	private start(): this {

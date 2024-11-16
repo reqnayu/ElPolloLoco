@@ -1,10 +1,13 @@
-import { MESSAGER } from "../../script.js"
 import { SoundAsset } from "../modules/sound_asset.module.js"
 
-export class SoundManager {
-	allAudioElements: Map<string, SoundAsset> = new Map()
+export abstract class SoundManager {
+	private static allAudioElements: Map<string, SoundAsset> = new Map()
 
-	volumes: Record<keyof audioTypes, number> = {
+	public static get AllAudioElements(): typeof this.allAudioElements {
+		return this.allAudioElements;
+	}
+
+	public static volumes: Record<keyof audioTypes, number> = {
 		master: 1,
 		music: 1,
 		sfx: 1,
@@ -12,12 +15,14 @@ export class SoundManager {
 	}
 
 	constructor() {
-		MESSAGER.elements.set("soundManager", this)
+	}
+	
+	public static initialize(): void {
 		window.addEventListener("pausegame", () => this.pauseAll())
 		window.addEventListener("resumegame", () => this.resumeAll())
 	}
 
-	setVolumeType(volume: number, type: keyof audioTypes): void {
+	public static setVolumeType(volume: number, type: keyof audioTypes): void {
 		this.volumes[type] = volume
 
 		Array.from(this.allAudioElements)
@@ -28,16 +33,24 @@ export class SoundManager {
 			.forEach(([name, soundAsset]) => soundAsset.setVolume())
 	}
 
-	getVolume(type: keyof Omit<typeof this.volumes, "master">): number {
+	public static getVolume(type: keyof Omit<typeof this.volumes, "master">): number {
 		return this.volumes[type] * this.volumes.master
 	}
 
-	pauseAll(): void {
+	public static getSound(name: string): SoundAsset | undefined {
+		return this.allAudioElements.get(name)
+	}
+
+	public static pauseAll(): void {
 		this.allAudioElements.forEach((soundAsset) => soundAsset.pause())
 	}
 
-	resumeAll(): void {
+	public static resumeAll(): void {
 		this.allAudioElements.forEach((soundAsset) => soundAsset.resume())
+	}
+
+	public static addSoundAsset(name: string, element: SoundAsset) {
+		this.allAudioElements.set(name, element)
 	}
 }
 

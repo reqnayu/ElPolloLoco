@@ -1,11 +1,11 @@
-import { MESSAGER } from "../../script.js"
+import { GameObjectType } from "../.types/gameObject.type.js"
 import { keyInputAction } from "../.types/input.type.js"
-import { audioTypes } from "../managers/sound_manager.module.js"
-import { statusBars } from "./gui.modules.js"
+import { audioTypes, SoundManager } from "../managers/sound.manager.js"
+import { statusBars } from "./gui.module.js"
 
 export class Settings {
-	private main
-	keyBindings: Record<keyInputAction, string> = {
+	// private main
+	public static keyBindings: Record<keyInputAction, string> = {
 		MOVE_RIGHT: "KeyD",
 		MOVE_LEFT: "KeyA",
 		JUMP: "Space",
@@ -13,9 +13,9 @@ export class Settings {
 		FULLSCREEN: "KeyF",
 		THROW: "KeyT"
 	}
-	snoreDisabled = true
-	countdownDisabled = false
-	readonly resources: Record<keyof statusBars | string, number> = {
+	public static snoreDisabled = true
+	public static countdownDisabled = false
+	static readonly resources: Record<keyof statusBars | string, number> = {
 		hp: 200,
 		bottle: 8,
 		coin: 20,
@@ -27,26 +27,30 @@ export class Settings {
 		bottleCost: 3
 	}
 
-	constructor() {
-		this.main = MESSAGER.dispatch("main")
+	static readonly spawnLocations: Record<GameObjectType | string, number> = {
+		endboss: 1500
+	}
+
+	public static initialize(): void {		
 		this.loadSettings()
 	}
 
-	saveSettings(): void {
+	public static saveSettings(): void {
 		const settings: savedSettings = {
 			keyBindings: this.keyBindings,
-			volumes: MESSAGER.dispatch("main").soundManager.volumes,
+			volumes: SoundManager.volumes,
 			snoreDisabled: this.snoreDisabled
 		}
 		localStorage.setItem("settings", JSON.stringify(settings))
+		console.log("settings saved")
 	}
 
-	loadSettings(): void {
+	public static loadSettings(): void {
 		const settingsString = localStorage.getItem("settings")
 		if (!settingsString) return this.saveSettings()
 		const settings = JSON.parse(settingsString) as savedSettings
 		this.keyBindings = settings.keyBindings
-		this.main.soundManager.volumes = settings.volumes
+		SoundManager.volumes = settings.volumes
 		this.snoreDisabled = settings.snoreDisabled
 	}
 }

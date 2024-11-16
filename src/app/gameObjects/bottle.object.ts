@@ -1,10 +1,9 @@
-import { MESSAGER } from "../../script.js"
 import { AnimationSet, BottleAnimationState } from "../.types/animation.type.js"
 import { GameObjectParams } from "../.types/gameObject.type.js"
 import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets, getAsset } from "../managers/asset_manager.module.js"
-import { SoundAsset } from "../modules/sound_asset.module.js"
+import { AssetManager, Assets } from "../managers/asset.manager.js"
+import { Main } from "../modules/main.module.js"
 import { Timer } from "../modules/timer.module.js"
 import { Vector } from "../modules/vector.module.js"
 import { GameObject } from "./gameObject.object.js"
@@ -29,12 +28,12 @@ import { GameObject } from "./gameObject.object.js"
 export class Bottle extends GameObject {
 	states: (keyof stateMap)[] = ["rotation"]
 	protected defaultState: keyof stateMap = "rotation"
-	private startingVelocity = new Vector(0, 0)
+	private startingVelocity = Vector.zero
 
 	constructor({ position, velocity, direction }: GameObjectParams["bottle"]) {
 		super("bottle")
 		this.dimensions.set(400, 400).toScaled(0.5)
-		this.position.setToVector(position)
+		this.position.set(position)
 		// this.startingVelocity.add(velocity)
 		this.direction = direction
 		this.initialize()
@@ -51,20 +50,20 @@ export class Bottle extends GameObject {
 	protected setBehaviours(): void {
 		const animationSet: Pick<AnimationSet, BottleAnimationState> = {
 			rotation: [
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/1_bottle_rotation.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/2_bottle_rotation.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/3_bottle_rotation.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/4_bottle_rotation.png")
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/1_bottle_rotation.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/2_bottle_rotation.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/3_bottle_rotation.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/4_bottle_rotation.png")
 			],
 			splash: [
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/4_bottle_splash.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/5_bottle_splash.png"),
-				getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png")
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/4_bottle_splash.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/5_bottle_splash.png"),
+				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png")
 			],
-			idle: [getAsset<"img">("6_salsa_bottle/2_salsa_bottle_on_ground.png")]
+			idle: [AssetManager.getAsset<"img">("6_salsa_bottle/2_salsa_bottle_on_ground.png")]
 		}
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
@@ -101,7 +100,7 @@ export class Bottle extends GameObject {
 		this.collisionBehaviour = undefined
 		this.soundBehaviour?.playOnce("Splash")
 		this.animationBehaviour?.setAnimation("splash", false, () =>
-			MESSAGER.dispatch("main").allObjects.delete(this.id)
+			Main.removeObject(this.id)
 		)
 	}
 

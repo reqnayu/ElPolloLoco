@@ -1,14 +1,21 @@
-import { MESSAGER } from "../../script.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
 
-export class CollisionManager {
-	allObjects: Map<number, GameObject> = new Map()
+export abstract class CollisionManager {
+	private static allObjects: Map<number, GameObject> = new Map()
 
-	constructor() {
-		MESSAGER.elements.set("collisionManager", this)
+	public static addObject(id: number, obj: GameObject): void {
+		this.allObjects.set(id, obj)
 	}
 
-	checkAll(): void {
+	public static removeObject(id: number): boolean {
+		return this.allObjects.delete(id)
+	}
+
+	public static getObject(id: number): GameObject | undefined {
+		return this.allObjects.get(id)
+	}
+
+	public static checkAll(): void {
 		const allObjects = Array.from(this.allObjects).map(([id, obj]) => obj)
 		const lastIndex = allObjects.length - 1
 		for (let i = 0; i < lastIndex; i++) {
@@ -22,7 +29,7 @@ export class CollisionManager {
 		}
 	}
 
-	private areColliding(obj1: GameObject, obj2: GameObject): boolean {
+	private static areColliding(obj1: GameObject, obj2: GameObject): boolean {
 		if (obj1.collisionBehaviour === undefined || obj2.collisionBehaviour === undefined) return false
 		if (obj1.collisionBehaviour.cooldownTimer || obj2.collisionBehaviour.cooldownTimer) return false
 		if (

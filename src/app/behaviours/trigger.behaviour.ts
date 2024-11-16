@@ -1,13 +1,11 @@
-import { MESSAGER } from "../../script.js"
 import { Behaviour } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
-import { trigger } from "../managers/trigger_manager.module.js"
+import { trigger, TriggerManager } from "../managers/trigger.manager.js"
 
 export class TriggerBehaviour implements Behaviour {
 	gameObject!: GameObject
 	constructor(private triggers: trigger[]) {
-		const triggerManager = MESSAGER.dispatch("triggerManager")
-		this.triggers.forEach((trigger) => triggerManager.allTriggers.push(trigger))
+		this.triggers.forEach((trigger) => TriggerManager.addTrigger(trigger))
 	}
 	onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject

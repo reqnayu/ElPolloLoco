@@ -1,4 +1,3 @@
-import { MESSAGER } from "../../script.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
 import { State, stateMap } from "../.types/state.type.js"
 import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
@@ -10,22 +9,23 @@ import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
 import { StateFactory } from "../factories/State.factory.js"
-import { getAsset } from "../managers/asset_manager.module.js"
+import { AssetManager } from "../managers/asset.manager.js"
+import { CollisionManager } from "../managers/collision.manager.js"
+import { Main } from "../modules/main.module.js"
 import { Vector } from "../modules/vector.module.js"
-import { Endboss } from "./endboss.object.js"
 
-export class GameObject {
-	protected main = MESSAGER.dispatch("main")
-	id = GameObject.generateId()
-	dimensions = new Vector(0, 0)
-	position = new Vector(0, 0)
+export abstract class GameObject {
+	public readonly id = GameObject.generateId()
+	protected dimensions = Vector.zero
+	public get Dimensions(): Vector { return this.dimensions }
+	position = Vector.zero
 	image?: CanvasImageSource
 
-	direction: -1 | 1 = 1
+	public direction: -1 | 1 = 1
 	protected walkSpeed: number = 0
 
-	state?: State
-	states: (keyof stateMap)[] = []
+	public state?: State
+	protected states: (keyof stateMap)[] = []
 	protected defaultState!: keyof stateMap
 
 	drawBehaviour?: DrawBehaviour
@@ -53,8 +53,8 @@ export class GameObject {
 	}
 
 	protected initialize(imgSrc?: string): void {
-		if (imgSrc) this.image = getAsset<"img">(imgSrc)
-		MESSAGER.dispatch("main").allObjects.set(this.id, this)
+		if (imgSrc) this.image = AssetManager.getAsset<"img">(imgSrc)
+		Main.addObject(this.id, this)
 	}
 
 	protected setBehaviours(): void {}
@@ -90,17 +90,9 @@ export class GameObject {
 	}
 
 	delete(): void {
-		MESSAGER.dispatch("main").allObjects.delete(this.id)
-		MESSAGER.dispatch("collisionManager").allObjects.delete(this.id)
+		Main.removeObject(this.id)
+		CollisionManager.removeObject(this.id)
 	}
-
-	// canMove(): boolean {
-	// 	return true
-	// }
-
-	// canJump(): boolean {
-	// 	return false
-	// }
 
 	collisionCallback(target: GameObject): void {}
 }
@@ -109,8 +101,8 @@ export function getImages(srcs: string[]): CanvasImageSource[]
 export function getImages(src: string): CanvasImageSource
 
 export function getImages(src: string | string[]): CanvasImageSource | CanvasImageSource[] {
-	if (typeof src === "string") return getAsset<"img">(src)
-	return src.map((src) => getAsset<"img">(src))
+	if (typeof src === "string") return AssetManager.getAsset<"img">(src)
+	return src.map((src) => AssetManager.getAsset<"img">(src))
 }
 
 export function getSingleAnimation(path: string, startNumber: number, endNumber: number = startNumber): string[] {

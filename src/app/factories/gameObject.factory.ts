@@ -9,7 +9,7 @@ import { Endboss } from "../gameObjects/endboss.object.js"
 import { Player } from "../gameObjects/player.object.js"
 import { randomize, roundTo } from "../util/general.util.js"
 
-export class GameObjectFactory {
+export abstract class GameObjectFactory {
 	private constructor() {}
 
 	static create<T extends GameObjectType>(type: T, options?: GameObjectParams[T]): GameObjectMap[T] {

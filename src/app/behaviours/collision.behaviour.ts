@@ -1,8 +1,8 @@
-import { MESSAGER } from "../../script.js"
 import { collisionParams } from "../.types/behaviour.type.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
+import { CollisionManager } from "../managers/collision.manager.js"
 import { Timer } from "../modules/timer.module.js"
 
 export class CollisionBehaviour implements Updateable {
@@ -23,7 +23,7 @@ export class CollisionBehaviour implements Updateable {
 	onAttach(gameObject: GameObject): this {
 		// console.log(`attatching collisionBehaviour to ${gameObject.name}`)
 		this.gameObject = gameObject
-		MESSAGER.dispatch("collisionManager").allObjects.set(gameObject.id, gameObject)
+		CollisionManager.addObject(gameObject.id, gameObject)
 		return this
 	}
 
@@ -54,8 +54,8 @@ export class CollisionBehaviour implements Updateable {
 		const [top, right, bottom, left] = this.offsets || [0, 0, 0, 0]
 		const x = this.gameObject.position.x + left
 		const y = this.gameObject.position.y + bottom
-		const width = this.gameObject.dimensions.x - left - right
-		const height = this.gameObject.dimensions.y - bottom - top
+		const width = this.gameObject.Dimensions.x - left - right
+		const height = this.gameObject.Dimensions.y - bottom - top
 		return { x, y, width, height }
 	}
 }

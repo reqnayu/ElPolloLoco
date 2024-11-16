@@ -1,7 +1,7 @@
-import { MESSAGER } from "../../script.js"
 import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset.manager.js"
+import { SoundManager } from "../managers/sound.manager.js"
 import {
 	addAnimationClass,
 	getAllElements,
@@ -9,6 +9,7 @@ import {
 	pointerEventIsLeftClick,
 	roundTo
 } from "../util/general.util.js"
+import { Settings } from "./settings.module.js"
 
 @Assets({
 	img: [
@@ -40,12 +41,12 @@ import {
 		"gui/Game.mp3"
 	]
 })
-export class Gui {
-	soundBehaviour: SoundBehaviour
-	private buttons: HTMLElement[] = []
-	private statusBars: statusBars
+export abstract class Gui {
+	public static soundBehaviour: SoundBehaviour
+	private static buttons: HTMLElement[] = []
+	private static statusBars: statusBars
 
-	constructor() {
+	public static async initialize(): Promise<void> {
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: "gui",
 			assets: [
@@ -65,23 +66,22 @@ export class Gui {
 		}
 		this.getButtons()
 		this.attachSounds()
-		MESSAGER.elements.set("gui", this)
 	}
-
-	async initialize(): Promise<void> {
+	
+	public static async reset(): Promise<void> {
 		this.setUpStatusBars()
 		await this.soundBehaviour.fadeOut("Menu", 1000)
 		this.soundBehaviour.playLooped("Game")
 	}
 
-	private setUpStatusBars(): void {
+	private static setUpStatusBars(): void {
 		Object.keys(this.statusBars).forEach((type) => {
-			const maxAmount = MESSAGER.dispatch("main").settings.resources[type as keyof statusBars]
+			const maxAmount = Settings.resources[type as keyof statusBars]
 			this.updateStatusBar(type as keyof statusBars, type === "coin" ? 0 : maxAmount, maxAmount)
 		})
 	}
 
-	updateStatusBar(type: keyof statusBars, currentAmount: number, maxAmount: number): void {
+	public static updateStatusBar(type: keyof statusBars, currentAmount: number, maxAmount: number): void {
 		const roundedPercent = roundTo(currentAmount / maxAmount, 2)
 		this.statusBars[type].style.setProperty("--value", roundedPercent.toString())
 		this.statusBars[type].getElement(".current-amount").innerHTML = currentAmount.toString()
@@ -94,12 +94,11 @@ export class Gui {
 		}
 	}
 
-	private getButtons(): void {
+	private static getButtons(): void {
 		this.buttons = getAllElements("#game button, input[type='checkbox']")
 	}
 
-	private attachSounds(): void {
-		const soundManager = MESSAGER.dispatch("soundManager")
+	private static attachSounds(): void {
 		const buttonDownSound = this.soundBehaviour.getSound("ButtonDown")
 		const buttonUpSound = this.soundBehaviour.getSound("ButtonUp")
 		this.buttons
@@ -120,16 +119,16 @@ export class Gui {
 			})
 	}
 
-	updateCountDown(secondsLeft: number): void {
+	public static updateCountDown(secondsLeft: number): void {
 		const countDownElement = getElement("#countdown span")
 		const text = secondsLeft > 0 ? secondsLeft.toString() : "GO!"
 		addAnimationClass(countDownElement, "active")
 		countDownElement.innerText = text
 		const countDownSound = secondsLeft > 0 ? "Countdown" : "Countdown_go"
-		MESSAGER.dispatch("soundManager").allAudioElements.get(countDownSound)?.playOnce()
+		SoundManager.getSound(countDownSound)?.playOnce()
 	}
 
-	statusBarError(type: keyof statusBars): void {
+	public static statusBarError(type: keyof statusBars): void {
 		addAnimationClass(this.statusBars[type], "error")
 	}
 }

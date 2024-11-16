@@ -1,10 +1,10 @@
 import { Input } from "../modules/input.module.js"
 import { Main } from "../modules/main.module.js"
-import { SoundManager } from "../managers/sound_manager.module.js"
-import { TimerManager } from "../managers/timer_manager.js"
-import { CollisionManager } from "../managers/collision_managermodule.js"
-import { Gui } from "../modules/gui.modules.js"
-import { TriggerManager } from "../managers/trigger_manager.module.js"
+import { SoundManager } from "../managers/sound.manager.js"
+import { TimerManager } from "../managers/timer.manager.js"
+import { CollisionManager } from "../managers/collision.manager.js"
+import { Gui } from "../modules/gui.module.js"
+import { TriggerManager } from "../managers/trigger.manager.js"
 
 export type DispatchType = {
 	main: typeof Main

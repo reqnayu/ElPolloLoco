@@ -1,13 +1,7 @@
-import { MESSAGER } from "../../script.js"
+export abstract class TriggerManager {
+	private static allTriggers: trigger[] = []
 
-export class TriggerManager {
-	allTriggers: trigger[] = []
-
-	constructor() {
-		MESSAGER.elements.set("triggerManager", this)
-	}
-
-	check(): void {
+	public static check(): void {
 		// console.log("checking all", this.allTriggers)
 		this.allTriggers.forEach(({ name, conditionCallback, triggerCallback }) => {
 			if (!name) return
@@ -16,6 +10,10 @@ export class TriggerManager {
 				this.allTriggers.toFiltered(({ name: _name }) => name !== _name)
 			}
 		})
+	}
+	
+	public static addTrigger(tr: trigger): void {
+		this.allTriggers.push(tr)
 	}
 }
 

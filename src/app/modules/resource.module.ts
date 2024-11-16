@@ -1,7 +1,4 @@
-import { MESSAGER } from "../../script.js"
-
 export class Resource {
-	protected gui
 	currentAmount
 	maxAmount
 
@@ -10,7 +7,6 @@ export class Resource {
 	}
 
 	constructor({ maxAmount, currentAmount = maxAmount }: resourceParams) {
-		this.gui = MESSAGER.dispatch("main").gui
 		this.maxAmount = maxAmount
 		this.currentAmount = currentAmount
 	}

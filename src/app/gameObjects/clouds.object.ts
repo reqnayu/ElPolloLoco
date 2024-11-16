@@ -1,6 +1,6 @@
-import { MESSAGER } from "../../script.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset.manager.js"
+import { Camera } from "../modules/camera.module.js"
 import { GameObject } from "./gameObject.object.js"
 
 @Assets({
@@ -10,18 +10,16 @@ export class Clouds extends GameObject {
 	direction: 1 | -1 = -1
 	private windSpeed = 0.1
 	private posX = 0
-	private cameraResolution
 
 	constructor() {
 		super("clouds")
-		this.cameraResolution = MESSAGER.dispatch("main").renderer.camera.resolution
 		this.initialize("5_background/layers/4_clouds/full.png")
 		// console.log(`wind speed: ${this.windSpeed}`)
 	}
 
 	protected initialize(imgSrc: string): void {
 		this.setBehaviours()
-		this.dimensions.setToVector(this.cameraResolution)
+		this.dimensions.set(Camera.resolution)
 		return super.initialize(imgSrc)
 	}
 
@@ -33,12 +31,12 @@ export class Clouds extends GameObject {
 
 	update(deltaTime: number): void {
 		super.update(deltaTime)
-		const { x } = MESSAGER.dispatch("main").renderer.camera.focus
-		const cameraOffset = x - this.position.x
-		if (cameraOffset > this.cameraResolution.x) {
-			this.position.x += this.cameraResolution.x * 2
-		} else if (cameraOffset < -this.cameraResolution.x) {
-			this.position.x -= this.cameraResolution.x * 2
+		
+		const cameraOffset = Camera.focus.x - this.position.x
+		if (cameraOffset > Camera.resolution.x) {
+			this.position.x += Camera.resolution.x * 2
+		} else if (cameraOffset < -Camera.resolution.x) {
+			this.position.x -= Camera.resolution.x * 2
 		}
 		const focusOffset = cameraOffset - this.position.x
 		// console.log(focusOffset)

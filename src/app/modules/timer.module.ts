@@ -1,4 +1,4 @@
-import { MESSAGER } from "../../script.js"
+import { TimerManager } from "../managers/timer.manager.js"
 
 export class Timer implements timerOrIntervalParams {
 	private timerId?: number
@@ -15,7 +15,7 @@ export class Timer implements timerOrIntervalParams {
 		this.timeout = timeout
 		this.isPausable = isPausable
 		this.timeRemaining = timeout
-		MESSAGER.dispatch("timerManager").addTimer(this)
+		TimerManager.addTimer(this)
 	}
 
 	pause(): void {

@@ -1,20 +1,15 @@
-import { MESSAGER } from "../../script.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset_manager.module.js"
-import { Display } from "../util/devtools.util.js"
-import { modPos } from "../util/general.util.js"
+import { Assets } from "../managers/asset.manager.js"
+import { Camera } from "../modules/camera.module.js"
 import { GameObject } from "./gameObject.object.js"
 
 class BackgroundElement extends GameObject {
-	private camera
-
 	get totalWidth(): number {
-		return this.dimensions.x * (this.camera.resolution.x / this.camera.zoom)
+		return this.dimensions.x * (Camera.resolution.x / Camera.zoom)
 	}
 
 	constructor(public layerNumber: number) {
 		super("background")
-		this.camera = MESSAGER.dispatch("main").renderer.camera
 	}
 
 	async initialize(imgSrc: string): Promise<void> {
@@ -25,7 +20,7 @@ class BackgroundElement extends GameObject {
 
 	private initializeDimensions(): void {
 		this.position.x = 0
-		this.dimensions.set(this.camera._baseResolution.x * 2, this.camera._baseResolution.y)
+		this.dimensions.set(Camera._baseResolution.x * 2, Camera._baseResolution.y)
 	}
 
 	protected setBehaviours(): void {
@@ -35,10 +30,10 @@ class BackgroundElement extends GameObject {
 	private parallaxFactor = (2 - this.layerNumber) / 3
 
 	draw(ctx: CanvasRenderingContext2D): void {
-		const baseOffsetX = this.camera._focus.x * this.parallaxFactor
-		const loopOffsetX = Math.floor((this.camera.focus.x - baseOffsetX) / this.dimensions.x) * this.dimensions.x
+		const baseOffsetX = Camera._focus.x * this.parallaxFactor
+		const loopOffsetX = Math.floor((Camera.focus.x - baseOffsetX) / this.dimensions.x) * this.dimensions.x
 
-		const numRepeats = Math.ceil(this.camera.resolution.x / this.dimensions.x) + 1
+		const numRepeats = Math.ceil(Camera.resolution.x / this.dimensions.x) + 1
 		for (let i = 0; i < numRepeats; i++) {
 			this.position.x = baseOffsetX + loopOffsetX + (this.dimensions.x - 1) * i
 			super.draw(ctx)
@@ -63,12 +58,10 @@ export class Background extends GameObject {
 		"5_background/layers/2_second_layer/full.png",
 		"5_background/layers/1_first_layer/full.png"
 	]
-	private camera
 
 	constructor() {
 		super("background")
-		this.camera = MESSAGER.dispatch("main").renderer.camera
-		this.dimensions.setToVector(this.camera.resolution.scale(this.camera.maxZoom / this.camera.zoom))
+		this.dimensions.set(Camera.resolution.scale(Camera.maxZoom / Camera.zoom))
 		this.setBehaviours()
 		this.initialize()
 	}
@@ -94,7 +87,7 @@ export class Background extends GameObject {
 
 	update(deltaTime: number): void {
 		if (!this.isLoaded) return
-		this.position.setToVector(MESSAGER.dispatch("main").renderer.camera.focus)
+		this.position.set(Camera.focus)
 	}
 }
 

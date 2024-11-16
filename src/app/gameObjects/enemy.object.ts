@@ -1,13 +1,12 @@
-import { MESSAGER } from "../../script.js"
 import { GameObjectType } from "../.types/gameObject.type.js"
 import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { randomize } from "../util/general.util.js"
 import { GameObject } from "./gameObject.object.js"
 
-export class Enemy extends GameObject {
+export abstract class Enemy extends GameObject {
 	direction: 1 | -1 = -1
-	states: (keyof stateMap)[] = ["walk", "dead"]
+	protected states: (keyof stateMap)[] = ["walk", "dead"]
 	private colliderOffsets
 	private healthPoints
 
@@ -22,13 +21,13 @@ export class Enemy extends GameObject {
 		this.randomizeStartingPosition()
 	}
 
-	protected initialize(): void {
+	protected override initialize(): void {
 		super.initialize()
 		this.position.y = this.gravityBehavior!.floorHeight
 		this.setState()
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
 		this.movementBehaviour = BehaviourFactory.create("movement", {
 			walkSpeed: this.walkSpeed,
@@ -52,7 +51,7 @@ export class Enemy extends GameObject {
 		this.position.x = randomX
 	}
 
-	collisionCallback(target: GameObject): void {
+	public override collisionCallback(target: GameObject): void {
 		switch (target.name) {
 			case "bottle": {
 				this.getHitByBottle(target)

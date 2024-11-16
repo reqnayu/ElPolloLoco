@@ -8,7 +8,7 @@ import { JumpState } from "../states/jump.state.js"
 import { RotationState } from "../states/rotation.state.js"
 import { WalkState } from "../states/walk.state.js"
 
-export class StateFactory {
+export abstract class StateFactory {
 	private constructor() {}
 
 	static create<T extends keyof stateMap>(type: T): stateMap[T] {

@@ -3,10 +3,14 @@ import { stateMap } from "../.types/state.type.js"
 import { BehaviourFactory } from "../factories/behaviour.factory.js"
 import { Vector } from "../modules/vector.module.js"
 import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
-import { Assets } from "../managers/asset_manager.module.js"
+import { Assets } from "../managers/asset.manager.js"
 import { Bottle } from "./bottle.object.js"
-import { MESSAGER } from "../../script.js"
 import { Timer } from "../modules/timer.module.js"
+import { Settings } from "../modules/settings.module.js"
+import { Input } from "../modules/input.module.js"
+import { Gui } from "../modules/gui.module.js"
+import { Main } from "../modules/main.module.js"
+import { Camera } from "../modules/camera.module.js"
 
 @Assets({
 	img: [
@@ -39,7 +43,7 @@ export class Player extends GameObject {
 	states: (keyof stateMap)[] = ["idle", "walk", "jump", "hurt", "dead"]
 
 	protected getFocus(): Vector {
-		if (this.main.renderer.camera.focusObjects.length > 1) return this.getCenterPoint()
+		if (Camera.focusObjects.length > 1) return this.getCenterPoint()
 		return this.getCenterPoint().plus(new Vector(this.focusOffset * this.direction, 0))
 	}
 
@@ -87,13 +91,13 @@ export class Player extends GameObject {
 			offsets: [200, 60, 20, 45],
 			cooldown: 1000
 		}).onAttach(this)
-		const { hp: healthPoints, bottle: bottles, coin: coins } = this.main.settings.resources
+		const { hp: healthPoints, bottle: bottles, coin: coins } = Settings.resources
 		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints, bottles, coins }).onAttach(this)
 		this.triggerBehaviour = BehaviourFactory.create("trigger", [
 			{
 				name: "endbossSpawn",
-				conditionCallback: () => this.main.endboss.position.x - this.position.x < 1500,
-				triggerCallback: () => this.main.spawnEndboss()
+				conditionCallback: () => Main.endboss.position.x - this.position.x < Settings.spawnLocations.endboss,
+				triggerCallback: () => Main.spawnEndboss()
 			}
 		]).onAttach(this)
 	}
@@ -136,20 +140,20 @@ export class Player extends GameObject {
 		const damage = target.name === "enemy" ? 40 : 80
 		this.resourceBehaviour!.receiveDamage(damage)
 		const { currentAmount, maxAmount } = this.resourceBehaviour!.healthPoints
-		MESSAGER.dispatch("gui").updateStatusBar("hp", currentAmount, maxAmount)
+		Gui.updateStatusBar("hp", currentAmount, maxAmount)
 		if (this.resourceBehaviour!.healthPoints.currentAmount === 0) return this.die()
 		this.setState("hurt")
 		this.soundBehaviour!.playRandom(["Hurt_1", "Hurt_2", "Hurt_3"])
 	}
 
 	private die(): void {
-		MESSAGER.dispatch("input").isBlocked = true
+		Input.toggleInput(false)
 		this.setState("dead")
 		this.soundBehaviour?.playOnce("Death")
 		new Timer({
 			handler: () => {
 				this.movementBehaviour = undefined
-				MESSAGER.dispatch("main").looseGame()
+				Main.looseGame()
 			},
 			timeout: 1500
 		}).resume()

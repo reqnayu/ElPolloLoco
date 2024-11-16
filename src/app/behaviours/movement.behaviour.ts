@@ -1,15 +1,14 @@
-import { MESSAGER } from "../../script.js"
 import { movementParams } from "../.types/behaviour.type.js"
 import { Updateable } from "../.types/behaviours.interface.js"
 import { GameObject } from "../gameObjects/gameObject.object.js"
+import { Main } from "../modules/main.module.js"
 import { Vector } from "../modules/vector.module.js"
 import { clamp, xOr } from "../util/general.util.js"
 
 export class MovementBehaviour implements Updateable {
 	gameObject!: GameObject
 	maxSpeed: Vector
-	velocity = new Vector(0, 0)
-	private maxPosX
+	velocity = Vector.zero
 	private clampToWorld
 	input: inputMap = {
 		isMovingRight: false,
@@ -19,7 +18,6 @@ export class MovementBehaviour implements Updateable {
 
 	constructor({ walkSpeed, jumpStrength, clampToWorld = false }: movementParams) {
 		this.maxSpeed = new Vector(walkSpeed, jumpStrength || 0)
-		this.maxPosX = MESSAGER.dispatch("main").maxPosX
 		this.clampToWorld = clampToWorld
 	}
 
@@ -34,7 +32,7 @@ export class MovementBehaviour implements Updateable {
 		if (deltaTime === 0) return
 		const newPosition = this.gameObject.position.plus(this.velocity.scale(deltaTime))
 		const x = this.clampToWorld
-			? clamp(newPosition.x, 0, this.maxPosX - this.gameObject.dimensions.x)
+			? clamp(newPosition.x, 0, Main.maxPosX - this.gameObject.Dimensions.x)
 			: newPosition.x
 		const y = newPosition.y
 		// console.log(`dt: ${deltaTime}, y: ${y}`)
