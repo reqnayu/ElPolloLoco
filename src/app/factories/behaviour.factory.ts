@@ -6,23 +6,21 @@ import {
 	drawParams,
 	gravityParams,
 	movementParams,
-	resourceParams,
+	resourceAmountParams,
 	soundParams,
 	triggerParams
-} from "../.types/behaviour.type.js"
-import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
-import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
-import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
-import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
-import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
-import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
-import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
-import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
+} from "../.types/types.js"
+import AnimationBehaviour from "../behaviours/animation.behaviour.js"
+import CollisionBehaviour from "../behaviours/collision.behaviour.js"
+import DrawBehaviour from "../behaviours/draw.behaviour.js"
+import GravityBehaviour from "../behaviours/gravity.behaviour.js"
+import MovementBehaviour from "../behaviours/movement.behaviour.js"
+import ResourceBehaviour from "../behaviours/resources.behaviour.js"
+import SoundBehaviour from "../behaviours/sound.behaviour.js"
+import TriggerBehaviour from "../behaviours/trigger.behaviour.js"
 
-export abstract class BehaviourFactory {
-	private constructor() {}
-
-	static create<T extends keyof behaviourMap>(type: T, options?: behaviourParamMap[T]): behaviourMap[T] {
+export default abstract class BehaviourFactory {
+	public static create<T extends keyof behaviourMap>(type: T, options?: behaviourParamMap[T]): behaviourMap[T] {
 		switch (type) {
 			case "draw": {
 				const params = options as drawParams
@@ -52,7 +50,7 @@ export abstract class BehaviourFactory {
 				return new SoundBehaviour(params) as behaviourMap[T]
 			}
 			case "resource": {
-				const params = options as resourceParams
+				const params = options as resourceAmountParams
 				return new ResourceBehaviour(params) as behaviourMap[T]
 			}
 			case "trigger": {

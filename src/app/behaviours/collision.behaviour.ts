@@ -1,57 +1,66 @@
-import { collisionParams } from "../.types/behaviour.type.js"
-import { Updateable } from "../.types/behaviours.interface.js"
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { CollisionManager } from "../managers/collision.manager.js"
-import { Timer } from "../modules/timer.module.js"
+import { collisionParams } from "../.types/types.js"
+import { Updateable } from "../.types/interfaces.js"
+import { GameObjectType } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import CollisionManager from "../managers/collision.manager.js"
+import Timer from "../modules/timer.module.js"
 
-export class CollisionBehaviour implements Updateable {
+export default class CollisionBehaviour implements Updateable {
 	gameObject!: GameObject
-	cooldown
-	cooldownTimer?: Timer
-	damage
-	targets: GameObjectType[]
-	offsets
+	private _cooldown
+	public get cooldown(): number {
+		return this._cooldown
+	}
+	private _cooldownTimer?: Timer
+	public get cooldownTimer(): Timer | undefined {
+		return this._cooldownTimer
+	}
+	private _damage
+	public get damage(): number {
+		return this._damage
+	}
+	public targets: GameObjectType[]
+	private _offsets
+	public get offsets(): [number, number, number, number] {
+		return this._offsets
+	}
 
 	constructor({ targets, offsets, damage, cooldown }: collisionParams) {
 		this.targets = targets || []
-		this.offsets = offsets
-		this.damage = damage || 0
-		this.cooldown = cooldown || 0
+		this._offsets = offsets || [0, 0, 0, 0]
+		this._damage = damage || 0
+		this._cooldown = cooldown || 0
 	}
 
-	onAttach(gameObject: GameObject): this {
+	public onAttach(gameObject: GameObject): this {
 		// console.log(`attatching collisionBehaviour to ${gameObject.name}`)
 		this.gameObject = gameObject
 		CollisionManager.addObject(gameObject.id, gameObject)
 		return this
 	}
 
-	update(deltaTime: number): void {}
+	public update(deltaTime: number): void {}
 
-	collide(target: GameObject): void {
+	public collide(target: GameObject): void {
 		// console.log(`collision detected between ${this.gameObject.name} and ${target.name}.`)
 
 		this.gameObject.collisionCallback(target)
 		// this.gameObject.health?.recieveDamage(target.collisionBehaviour!.damage)
 	}
 
-	addCollisionCooldown(...types: GameObjectType[]): void {
-		this.cooldownTimer?.reset()
+	public addCollisionCooldown(...types: GameObjectType[]): void {
+		this._cooldownTimer?.reset()
 		types.forEach((type) => this.targets.remove(type))
-		this.cooldownTimer = new Timer({
-			handler: () => {
-				this.targets.push(...types)
-				this.cooldownTimer = undefined
-				// console.log(`collisionCooldown removed from ${this.gameObject.name}!`)
-			},
-			timeout: this.cooldown
-		}).resume()
+		this._cooldownTimer = new Timer(() => {
+			this.targets.push(...types)
+			this._cooldownTimer = undefined
+			// console.log(`collisionCooldown removed from ${this.gameObject.name}!`)
+		}, this.cooldown).resume()
 		// console.log(`collisionCooldown added to ${this.gameObject.name}!`)
 	}
 
-	get collider() {
-		const [top, right, bottom, left] = this.offsets || [0, 0, 0, 0]
+	public get collider() {
+		const [top, right, bottom, left] = this._offsets
 		const x = this.gameObject.position.x + left
 		const y = this.gameObject.position.y + bottom
 		const width = this.gameObject.Dimensions.x - left - right

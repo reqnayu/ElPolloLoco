@@ -1,14 +1,13 @@
-import { AnimationSet, BottleAnimationState } from "../.types/animation.type.js"
-import { GameObjectParams } from "../.types/gameObject.type.js"
-import { stateMap } from "../.types/state.type.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { AssetManager, Assets } from "../managers/asset.manager.js"
-import { Main } from "../modules/main.module.js"
-import { Timer } from "../modules/timer.module.js"
-import { Vector } from "../modules/vector.module.js"
-import { GameObject } from "./gameObject.object.js"
+import { AnimationSet, BottleAnimationState, GameObjectParams, stateMap } from "../.types/types.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import AssetManager from "../managers/asset.manager.js"
+import Main from "../modules/main.module.js"
+import Timer from "../modules/timer.module.js"
+import Vector from "../modules/vector.module.js"
+import Util from "../util/general.util.js"
+import GameObject from "./gameObject.object.js"
 
-@Assets({
+@Util.Assets({
 	img: [
 		"6_salsa_bottle/salsa_bottle.png",
 		"6_salsa_bottle/bottle_rotation/1_bottle_rotation.png",
@@ -25,8 +24,8 @@ import { GameObject } from "./gameObject.object.js"
 	],
 	audio: ["bottle/Splash.mp3", "bottle/Throw_1.mp3", "bottle/Throw_2.mp3"]
 })
-export class Bottle extends GameObject {
-	states: (keyof stateMap)[] = ["rotation"]
+export default class Bottle extends GameObject {
+	protected states: (keyof stateMap)[] = ["rotation"]
 	protected defaultState: keyof stateMap = "rotation"
 	private startingVelocity = Vector.zero
 
@@ -40,14 +39,14 @@ export class Bottle extends GameObject {
 		this.soundBehaviour!.playRandom(["Throw_1", "Throw_2"])
 	}
 
-	protected initialize(): void {
+	protected override initialize(): void {
 		// console.log("background created!")
 		this.setBehaviours()
 		super.initialize("6_salsa_bottle/salsa_bottle.png")
 		this.setState()
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		const animationSet: Pick<AnimationSet, BottleAnimationState> = {
 			rotation: [
 				AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/1_bottle_rotation.png"),
@@ -84,7 +83,7 @@ export class Bottle extends GameObject {
 		})
 	}
 
-	collisionCallback(target: GameObject): void {
+	public override collisionCallback(target: GameObject): void {
 		switch (target.name) {
 			case "enemy":
 			case "endboss":
@@ -99,9 +98,7 @@ export class Bottle extends GameObject {
 		this.movementBehaviour = undefined
 		this.collisionBehaviour = undefined
 		this.soundBehaviour?.playOnce("Splash")
-		this.animationBehaviour?.setAnimation("splash", false, () =>
-			Main.removeObject(this.id)
-		)
+		this.animationBehaviour?.setAnimation("splash", () => Main.removeObject(this.id))
 	}
 
 	private land(): void {
@@ -115,9 +112,6 @@ export class Bottle extends GameObject {
 		this.soundBehaviour?.playOnce("Collect")
 		this.collisionBehaviour?.targets.remove("player")
 		this.movementBehaviour?.jump()
-		new Timer({
-			handler: () => this.delete(),
-			timeout: 300
-		}).resume()
+		new Timer(() => this.delete(), 300).resume()
 	}
 }

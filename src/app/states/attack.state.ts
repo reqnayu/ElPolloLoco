@@ -1,13 +1,13 @@
-import { State, stateMap } from "../.types/state.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Timer } from "../modules/timer.module.js"
+import { State, stateMap } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import Timer from "../modules/timer.module.js"
 
-export class AttackState implements State {
+export default class AttackState implements State {
 	type: keyof stateMap = "attack"
 	timers: Timer[] = []
 
 	enter(gameObject: GameObject): void {
-		gameObject.animationBehaviour?.setAnimation(this.type, false, () => {
+		gameObject.animationBehaviour?.setAnimation(this.type, () => {
 			gameObject.setState("alert")
 		})
 	}

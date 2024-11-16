@@ -1,17 +1,17 @@
-import { AnimationSet, EnemyAnimationState } from "../.types/animation.type.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset.manager.js"
-import { Settings } from "../modules/settings.module.js"
-import { Enemy } from "./enemy.object.js"
-import { getImages, getSingleAnimation } from "./gameObject.object.js"
+import { AnimationSet, EnemyAnimationState } from "../.types/types.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import Settings from "../modules/settings.module.js"
+import Util from "../util/general.util.js"
+import Enemy from "./enemy.object.js"
+import GameObject from "./gameObject.object.js"
 
-@Assets({
+@Util.Assets({
 	img: [
-		...getSingleAnimation(`3_enemies_chicken/chicken_normal/1_walk`, 1, 3),
-		...getSingleAnimation(`3_enemies_chicken/chicken_normal/2_dead`, 1)
+		...GameObject.getSingleAnimation(`3_enemies_chicken/chicken_normal/1_walk`, 1, 3),
+		...GameObject.getSingleAnimation(`3_enemies_chicken/chicken_normal/2_dead`, 1)
 	]
 })
-export class ChickenNormal extends Enemy {
+export default class ChickenNormal extends Enemy {
 	constructor() {
 		super({
 			type: "enemy",
@@ -23,13 +23,13 @@ export class ChickenNormal extends Enemy {
 		this.initialize()
 	}
 
-	protected initialize(): void {
+	protected override initialize(): void {
 		this.setBehaviours()
 		super.setBehaviours()
 		super.initialize()
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		const animationSet = this.getAnimationSet()
 		this.image = animationSet.walk[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
@@ -37,8 +37,8 @@ export class ChickenNormal extends Enemy {
 
 	protected getAnimationSet(): Pick<AnimationSet, EnemyAnimationState> {
 		return {
-			walk: getImages(getSingleAnimation(`3_enemies_chicken/chicken_normal/1_walk`, 1, 3)),
-			dead: getImages(getSingleAnimation(`3_enemies_chicken/chicken_normal/2_dead`, 1))
+			walk: GameObject.getImages(GameObject.getSingleAnimation(`3_enemies_chicken/chicken_normal/1_walk`, 1, 3)),
+			dead: GameObject.getImages(GameObject.getSingleAnimation(`3_enemies_chicken/chicken_normal/2_dead`, 1))
 		}
 	}
 }

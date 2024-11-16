@@ -1,7 +1,7 @@
-import { Main } from "./app/modules/main.module.js"
-import { getElement } from "./app/util/general.util.js"
+import Main from "./app/modules/main.module.js"
+import Util from "./app/util/general.util.js"
 
-const canvas = getElement<HTMLCanvasElement>("canvas")
-const gameElement = getElement("#game")
+const canvas = Util.getElement<HTMLCanvasElement>("canvas")
+const gameElement = Util.getElement("#game")
 
-await Main.initialize(canvas, gameElement)
+Main.initialize(canvas, gameElement)

@@ -1,34 +1,35 @@
-import { TimerManager } from "../managers/timer.manager.js"
-import { Timer, timerOrIntervalParams } from "./timer.module.js"
+import TimerManager from "../managers/timer.manager.js"
+import Timer from "./timer.module.js"
 
-export class Interval implements intervalParams {
-	handler
-	timeout
+export default class Interval {
+	private handler
+	private timeout
 	private intervalId?: number
 	private timeOfLastExecution = 0
 	private timeToNextExecution
 	private timerToNextExecution?: Timer
 	private abortController = new AbortController()
-	stopCallback?(): void
-	stopConditionCallback?(): boolean
-	pauseCallback?(): void
-	isPausable
+	private stopCallback?(): void
+	private stopConditionCallback?(): boolean
+	private isPausable = false
 
-	constructor({
-		handler,
-		timeout,
-		pauseCallback,
-		stopCallback,
-		stopConditionCallback,
-		isPausable = true
-	}: intervalParams) {
+	constructor(handler: () => void, timeout: number)
+	constructor(handler: () => void, timeout: number, isPauseable: boolean)
+	constructor(handler: () => void, timeout: number, stopConditionCallback: () => boolean, stopCallback: () => void)
+	constructor(
+		handler: () => void,
+		timeout: number,
+		isPauseableOrStopConditionCallback?: (() => boolean) | boolean,
+		stopCallback?: () => void
+	) {
 		this.handler = handler
 		this.timeout = timeout
-		this.pauseCallback = pauseCallback
-		this.stopCallback = stopCallback
-		this.stopConditionCallback = stopConditionCallback
-		this.isPausable = isPausable
 		this.timeToNextExecution = timeout
+		if (typeof isPauseableOrStopConditionCallback === "boolean")
+			this.isPausable = isPauseableOrStopConditionCallback
+		else if (isPauseableOrStopConditionCallback !== undefined)
+			this.stopConditionCallback = isPauseableOrStopConditionCallback
+		if (stopCallback !== undefined) this.stopCallback = stopCallback
 		window.addEventListener("error", () => this.dispose())
 		TimerManager.addInterval(this)
 	}
@@ -47,7 +48,6 @@ export class Interval implements intervalParams {
 	pause(): void {
 		if (!this.intervalId || !this.isPausable) return
 		clearInterval(this.intervalId)
-		this.pauseCallback?.()
 		this.intervalId = undefined
 
 		const now = Date.now()
@@ -58,15 +58,15 @@ export class Interval implements intervalParams {
 		if (this.intervalId) return this
 		if (!this.timeToNextExecution) return this.start()
 
-		this.timerToNextExecution = new Timer({
-			handler: () => {
+		this.timerToNextExecution = new Timer(
+			() => {
 				this.start()
 				this.timerToNextExecution?.dispose()
 				this.timerToNextExecution = undefined
 			},
-			timeout: this.timeToNextExecution,
-			isPausable: this.isPausable
-		})
+			this.timeToNextExecution,
+			this.isPausable
+		)
 		this.timerToNextExecution.resume()
 		return this
 	}
@@ -83,11 +83,4 @@ export class Interval implements intervalParams {
 		this.timerToNextExecution?.dispose()
 		this.abortController.abort()
 	}
-}
-
-type intervalParams = timerOrIntervalParams & {
-	pauseOnGamePause?: boolean
-	stopCallback?(): void
-	stopConditionCallback?(): boolean
-	pauseCallback?(): void
 }

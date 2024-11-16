@@ -1,6 +1,6 @@
-import { getElement } from "./app/util/general.util.js"
+import Util from "./app/util/general.util.js"
 
-const canvas = getElement<HTMLCanvasElement>("canvas")
+const canvas = Util.getElement<HTMLCanvasElement>("canvas")
 const ctx = canvas.getContext("2d")!
 
 canvas.width = 1280
@@ -14,6 +14,6 @@ sky.addColorStop(1, "#0183a8")
 ctx.fillStyle = sky
 ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-const link = getElement<HTMLAnchorElement>("a")
+const link = Util.getElement<HTMLAnchorElement>("a")
 const img = canvas.toDataURL()
 link.href = img

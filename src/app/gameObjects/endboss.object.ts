@@ -1,28 +1,26 @@
-import { AnimationSet, EndbossAnimationState } from "../.types/animation.type.js"
-import { stateMap } from "../.types/state.type.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset.manager.js"
-import { Enemy } from "./enemy.object.js"
-import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
-import { getElement } from "../util/general.util.js"
-import { Timer } from "../modules/timer.module.js"
-import { Gui } from "../modules/gui.module.js"
-import { Main } from "../modules/main.module.js"
-import { Camera } from "../modules/camera.module.js"
+import { AnimationSet, EndbossAnimationState, stateMap } from "../.types/types.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import Enemy from "./enemy.object.js"
+import Util from "../util/general.util.js"
+import Timer from "../modules/timer.module.js"
+import Gui from "../modules/gui.module.js"
+import Main from "../modules/main.module.js"
+import Camera from "../modules/camera.module.js"
+import GameObject from "./gameObject.object.js"
 
-@Assets({
+@Util.Assets({
 	img: [
-		...getSingleAnimation("4_enemie_boss_chicken/1_walk", 1, 4),
-		...getSingleAnimation("4_enemie_boss_chicken/2_alert", 5, 12),
-		...getSingleAnimation("4_enemie_boss_chicken/3_attack", 13, 20),
-		...getSingleAnimation("4_enemie_boss_chicken/4_hurt", 21, 23),
-		...getSingleAnimation("4_enemie_boss_chicken/5_dead", 24, 26)
+		...GameObject.getSingleAnimation("4_enemie_boss_chicken/1_walk", 1, 4),
+		...GameObject.getSingleAnimation("4_enemie_boss_chicken/2_alert", 5, 12),
+		...GameObject.getSingleAnimation("4_enemie_boss_chicken/3_attack", 13, 20),
+		...GameObject.getSingleAnimation("4_enemie_boss_chicken/4_hurt", 21, 23),
+		...GameObject.getSingleAnimation("4_enemie_boss_chicken/5_dead", 24, 26)
 	]
 })
-export class Endboss extends Enemy {
+export default class Endboss extends Enemy {
 	public direction: 1 | -1 = -1
 	public states: (keyof stateMap)[] = ["walk", "alert", "attack", "hurt", "dead"]
-	private healthBarElement = getElement("#endboss-hp-bar")
+	private healthBarElement = Util.getElement("#endboss-hp-bar")
 	hasSpawned = false
 
 	protected defaultState: keyof stateMap = "alert"
@@ -55,11 +53,11 @@ export class Endboss extends Enemy {
 
 	protected getAnimationSet(): Pick<AnimationSet, EndbossAnimationState> {
 		return {
-			walk: getImages(getSingleAnimation("4_enemie_boss_chicken/1_walk", 1, 4)),
-			alert: getImages(getSingleAnimation("4_enemie_boss_chicken/2_alert", 5, 12)),
-			attack: getImages(getSingleAnimation("4_enemie_boss_chicken/3_attack", 13, 20)),
-			hurt: getImages(getSingleAnimation("4_enemie_boss_chicken/4_hurt", 21, 23)),
-			dead: getImages(getSingleAnimation("4_enemie_boss_chicken/5_dead", 24, 26))
+			walk: GameObject.getImages(GameObject.getSingleAnimation("4_enemie_boss_chicken/1_walk", 1, 4)),
+			alert: GameObject.getImages(GameObject.getSingleAnimation("4_enemie_boss_chicken/2_alert", 5, 12)),
+			attack: GameObject.getImages(GameObject.getSingleAnimation("4_enemie_boss_chicken/3_attack", 13, 20)),
+			hurt: GameObject.getImages(GameObject.getSingleAnimation("4_enemie_boss_chicken/4_hurt", 21, 23)),
+			dead: GameObject.getImages(GameObject.getSingleAnimation("4_enemie_boss_chicken/5_dead", 24, 26))
 		}
 	}
 
@@ -86,21 +84,15 @@ export class Endboss extends Enemy {
 	protected override die(): void {
 		super.die()
 		Main.winGame()
-		new Timer({
-			handler: () => Camera.focusObjects.remove(this),
-			timeout: 2000
-		}).resume()
+		new Timer(() => Camera.focusObjects.remove(this), 2000).resume()
 	}
 
 	public spawn(): void {
 		this.healthBarElement.classList.remove("d-none")
 		Camera.focusObjects.push(this)
-		new Timer({
-			handler: () => {
-				this.hasSpawned = true
-			},
-			timeout: 2000
-		}).resume()
+		new Timer(() => {
+			this.hasSpawned = true
+		}, 2000).resume()
 	}
 
 	private followPlayer(): void {
@@ -114,7 +106,7 @@ export class Endboss extends Enemy {
 		if (this.state?.type !== "attack") this.setState("walk")
 	}
 
-	update(deltaTime: number): void {
+	public override update(deltaTime: number): void {
 		if (this.hasSpawned && this.resourceBehaviour!.healthPoints.currentAmount > 0) {
 			this.followPlayer()
 		}

@@ -1,15 +1,14 @@
-import { AnimationSet, CoinAnimationState } from "../.types/animation.type.js"
-import { coinParams } from "../.types/gameObject.type.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset.manager.js"
-import { Timer } from "../modules/timer.module.js"
-import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
+import { AnimationSet, CoinAnimationState, coinParams } from "../.types/types.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import Timer from "../modules/timer.module.js"
+import Util from "../util/general.util.js"
+import GameObject from "./gameObject.object.js"
 
-@Assets({
-	img: [...getSingleAnimation("8_coin/1_idle", 1, 7)],
+@Util.Assets({
+	img: [...GameObject.getSingleAnimation("8_coin/1_idle", 1, 7)],
 	audio: ["coin/Collect.mp3"]
 })
-export class Coin extends GameObject {
+export default class Coin extends GameObject {
 	private startFrame
 	constructor({ spawnPosition, startFrame }: coinParams) {
 		super("coin")
@@ -19,14 +18,13 @@ export class Coin extends GameObject {
 		this.initialize()
 	}
 
-	protected initialize(): void {
+	protected override initialize(): void {
 		this.setBehaviours()
 		super.initialize("8_coin/1_idle/I-1.png")
-		this.animationBehaviour!.setAnimation("idle", true, undefined, true)
-		if (this.startFrame) this.animationBehaviour!.currentFrameIndex = this.startFrame
+		this.animationBehaviour!.setAnimation("idle", true, this.startFrame)
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		const animationSet = this.getAnimationSet()
 		this.image = animationSet.idle[0]
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
@@ -43,11 +41,11 @@ export class Coin extends GameObject {
 
 	protected getAnimationSet(): Pick<AnimationSet, CoinAnimationState> {
 		return {
-			idle: getImages(getSingleAnimation("8_coin/1_idle", 1, 7))
+			idle: GameObject.getImages(GameObject.getSingleAnimation("8_coin/1_idle", 1, 7))
 		}
 	}
 
-	collisionCallback(target: GameObject): void {
+	public override collisionCallback(target: GameObject): void {
 		// console.log("coin collected!")
 		switch (target.name) {
 			case "player":
@@ -59,9 +57,6 @@ export class Coin extends GameObject {
 		this.soundBehaviour?.playOnce("Collect")
 		this.collisionBehaviour?.targets.remove("player")
 		this.movementBehaviour?.jump()
-		new Timer({
-			handler: () => this.delete(),
-			timeout: 300
-		}).resume()
+		new Timer(() => this.delete(), 300).resume()
 	}
 }

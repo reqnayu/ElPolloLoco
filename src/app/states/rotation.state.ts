@@ -1,8 +1,7 @@
-import { Updateable } from "../.types/behaviours.interface.js"
-import { State, stateMap } from "../.types/state.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
+import { State, stateMap } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
 
-export class RotationState implements State {
+export default class RotationState implements State {
 	type: keyof stateMap = "rotation"
 	enter(gameObject: GameObject): void {
 		// console.log(`${gameObject.name} entering rotation state!`)

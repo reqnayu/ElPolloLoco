@@ -1,10 +1,11 @@
-import { SoundAsset } from "../modules/sound_asset.module.js"
+import { audioTypes } from "../.types/types.js"
+import SoundAsset from "../modules/sound_asset.module.js"
 
-export abstract class SoundManager {
+export default abstract class SoundManager {
 	private static allAudioElements: Map<string, SoundAsset> = new Map()
 
 	public static get AllAudioElements(): typeof this.allAudioElements {
-		return this.allAudioElements;
+		return this.allAudioElements
 	}
 
 	public static volumes: Record<keyof audioTypes, number> = {
@@ -14,9 +15,8 @@ export abstract class SoundManager {
 		menu: 1
 	}
 
-	constructor() {
-	}
-	
+	constructor() {}
+
 	public static initialize(): void {
 		window.addEventListener("pausegame", () => this.pauseAll())
 		window.addEventListener("resumegame", () => this.resumeAll())
@@ -52,11 +52,4 @@ export abstract class SoundManager {
 	public static addSoundAsset(name: string, element: SoundAsset) {
 		this.allAudioElements.set(name, element)
 	}
-}
-
-export type audioTypes = {
-	master?: undefined
-	music: HTMLAudioElement[]
-	sfx: HTMLAudioElement[]
-	menu: HTMLAudioElement[]
 }

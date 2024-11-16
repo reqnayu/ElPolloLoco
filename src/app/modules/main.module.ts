@@ -1,27 +1,27 @@
 import "../.types/prototypes.js"
-import { GameObjectFactory } from "../factories/gameObject.factory.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Gui } from "./gui.module.js"
-import { Renderer } from "./renderer.module.js"
-import { SoundManager } from "../managers/sound.manager.js"
-import { TimerManager } from "../managers/timer.manager.js"
-import { Player } from "../gameObjects/player.object.js"
-import { Background } from "../gameObjects/background.object.js"
-import { Clouds } from "../gameObjects/clouds.object.js"
-import { Enemy } from "../gameObjects/enemy.object.js"
-import { Vector } from "./vector.module.js"
-import { Timer } from "./timer.module.js"
+import GameObjectFactory from "../factories/gameObject.factory.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import Gui from "./gui.module.js"
+import Renderer from "./renderer.module.js"
+import SoundManager from "../managers/sound.manager.js"
+import TimerManager from "../managers/timer.manager.js"
+import Player from "../gameObjects/player.object.js"
+import Background from "../gameObjects/background.object.js"
+import Clouds from "../gameObjects/clouds.object.js"
+import Enemy from "../gameObjects/enemy.object.js"
+import Vector from "./vector.module.js"
+import Timer from "./timer.module.js"
 import "../managers/asset.manager.js"
-import { Endboss } from "../gameObjects/endboss.object.js"
-import { formatTime } from "../util/general.util.js"
-import { SpawnManager } from "../managers/spawn.manager.js"
-import { TriggerManager } from "../managers/trigger.manager.js"
-import { AssetManager } from "../managers/asset.manager.js"
-import { Input } from "./input.module.js"
-import { Camera } from "./camera.module.js"
-import { Settings } from "./settings.module.js"
+import Endboss from "../gameObjects/endboss.object.js"
+import Util from "../util/general.util.js"
+import SpawnManager from "../managers/spawn.manager.js"
+import TriggerManager from "../managers/trigger.manager.js"
+import AssetManager from "../managers/asset.manager.js"
+import Input from "./input.module.js"
+import Camera from "./camera.module.js"
+import Settings from "./settings.module.js"
 
-export abstract class Main {
+export default abstract class Main {
 	public static canvas: HTMLCanvasElement
 	public static ctx: CanvasRenderingContext2D
 	private static gameElement: HTMLElement
@@ -96,7 +96,7 @@ export abstract class Main {
 		this.countdownTimer?.kill()
 		Renderer.reset()
 		Camera.initialize()
-		Gui.reset();
+		Gui.reset()
 
 		this.update()
 		this.startCountDown()
@@ -150,13 +150,7 @@ export abstract class Main {
 			this.startGame()
 			return
 		}
-		this.countdownTimer = new Timer({
-			handler: () => {
-				this.startCountDown(secondsLeft - 1)
-			},
-			timeout: 1000,
-			isPausable: false
-		}).resume()
+		this.countdownTimer = new Timer(() => this.startCountDown(secondsLeft - 1), 1000, false).resume()
 	}
 
 	public static winGame(): void {
@@ -170,7 +164,7 @@ export abstract class Main {
 	}
 
 	private static endGame(state: "won" | "lost"): void {
-		console.log(`${state} in ${formatTime(this.totalTime)}!`)
+		console.log(`${state} in ${Util.formatTime(this.totalTime)}!`)
 	}
 
 	public static spawnEndboss(): void {

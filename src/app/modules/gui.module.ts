@@ -1,17 +1,11 @@
-import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset.manager.js"
-import { SoundManager } from "../managers/sound.manager.js"
-import {
-	addAnimationClass,
-	getAllElements,
-	getElement,
-	pointerEventIsLeftClick,
-	roundTo
-} from "../util/general.util.js"
-import { Settings } from "./settings.module.js"
+import { statusBars } from "../.types/types.js"
+import SoundBehaviour from "../behaviours/sound.behaviour.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import SoundManager from "../managers/sound.manager.js"
+import Util from "../util/general.util.js"
+import Settings from "./settings.module.js"
 
-@Assets({
+@Util.Assets({
 	img: [
 		"7_statusbars/1_statusbar/1_statusbar_coin/blue/0.png",
 		"7_statusbars/1_statusbar/1_statusbar_coin/blue/20.png",
@@ -41,7 +35,7 @@ import { Settings } from "./settings.module.js"
 		"gui/Game.mp3"
 	]
 })
-export abstract class Gui {
+export default abstract class Gui {
 	public static soundBehaviour: SoundBehaviour
 	private static buttons: HTMLElement[] = []
 	private static statusBars: statusBars
@@ -59,15 +53,15 @@ export abstract class Gui {
 			]
 		})
 		this.statusBars = {
-			hp: getElement("#hp-bar"),
-			coin: getElement("#coin-bar"),
-			bottle: getElement("#bottle-bar"),
-			endbossHp: getElement("#endboss-hp-bar")
+			hp: Util.getElement("#hp-bar"),
+			coin: Util.getElement("#coin-bar"),
+			bottle: Util.getElement("#bottle-bar"),
+			endbossHp: Util.getElement("#endboss-hp-bar")
 		}
 		this.getButtons()
 		this.attachSounds()
 	}
-	
+
 	public static async reset(): Promise<void> {
 		this.setUpStatusBars()
 		await this.soundBehaviour.fadeOut("Menu", 1000)
@@ -82,7 +76,7 @@ export abstract class Gui {
 	}
 
 	public static updateStatusBar(type: keyof statusBars, currentAmount: number, maxAmount: number): void {
-		const roundedPercent = roundTo(currentAmount / maxAmount, 2)
+		const roundedPercent = Util.roundTo(currentAmount / maxAmount, 2)
 		this.statusBars[type].style.setProperty("--value", roundedPercent.toString())
 		this.statusBars[type].getElement(".current-amount").innerHTML = currentAmount.toString()
 		this.statusBars[type].getElement(".max-amount").innerHTML = maxAmount.toString()
@@ -95,7 +89,7 @@ export abstract class Gui {
 	}
 
 	private static getButtons(): void {
-		this.buttons = getAllElements("#game button, input[type='checkbox']")
+		this.buttons = Util.getAllElements("#game button, input[type='checkbox']")
 	}
 
 	private static attachSounds(): void {
@@ -105,12 +99,12 @@ export abstract class Gui {
 			.filter((btn) => !btn.classList.contains("no-sound"))
 			.forEach((btn) => {
 				btn.addEventListener("pointerdown", (e) => {
-					if (!pointerEventIsLeftClick(e)) return
+					if (!Util.pointerEventIsLeftClick(e)) return
 					buttonDownSound?.playOnce()
 					btn.addEventListener(
 						"pointerup",
 						(e) => {
-							if (!pointerEventIsLeftClick(e)) return
+							if (!Util.pointerEventIsLeftClick(e)) return
 							buttonUpSound?.playOnce()
 						},
 						{ once: true }
@@ -120,22 +114,15 @@ export abstract class Gui {
 	}
 
 	public static updateCountDown(secondsLeft: number): void {
-		const countDownElement = getElement("#countdown span")
+		const countDownElement = Util.getElement("#countdown span")
 		const text = secondsLeft > 0 ? secondsLeft.toString() : "GO!"
-		addAnimationClass(countDownElement, "active")
+		Util.addAnimationClass(countDownElement, "active")
 		countDownElement.innerText = text
 		const countDownSound = secondsLeft > 0 ? "Countdown" : "Countdown_go"
 		SoundManager.getSound(countDownSound)?.playOnce()
 	}
 
 	public static statusBarError(type: keyof statusBars): void {
-		addAnimationClass(this.statusBars[type], "error")
+		Util.addAnimationClass(this.statusBars[type], "error")
 	}
-}
-
-export type statusBars = {
-	hp: HTMLElement
-	coin: HTMLElement
-	bottle: HTMLElement
-	endbossHp: HTMLElement
 }

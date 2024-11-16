@@ -1,4 +1,6 @@
-export abstract class TriggerManager {
+import { trigger } from "../.types/types.js"
+
+export default abstract class TriggerManager {
 	private static allTriggers: trigger[] = []
 
 	public static check(): void {
@@ -11,14 +13,8 @@ export abstract class TriggerManager {
 			}
 		})
 	}
-	
+
 	public static addTrigger(tr: trigger): void {
 		this.allTriggers.push(tr)
 	}
-}
-
-export type trigger = {
-	name: string
-	conditionCallback: () => boolean
-	triggerCallback: () => void
 }

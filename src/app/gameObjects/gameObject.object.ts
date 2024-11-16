@@ -1,23 +1,24 @@
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { State, stateMap } from "../.types/state.type.js"
-import { AnimationBehaviour } from "../behaviours/animation.behaviour.js"
-import { CollisionBehaviour } from "../behaviours/collision.behaviour.js"
-import { DrawBehaviour } from "../behaviours/draw.behaviour.js"
-import { GravityBehaviour } from "../behaviours/gravity.behaviour.js"
-import { MovementBehaviour } from "../behaviours/movement.behaviour.js"
-import { ResourceBehaviour } from "../behaviours/resources.behaviour.js"
-import { SoundBehaviour } from "../behaviours/sound.behaviour.js"
-import { TriggerBehaviour } from "../behaviours/trigger.behaviour.js"
-import { StateFactory } from "../factories/State.factory.js"
-import { AssetManager } from "../managers/asset.manager.js"
-import { CollisionManager } from "../managers/collision.manager.js"
-import { Main } from "../modules/main.module.js"
-import { Vector } from "../modules/vector.module.js"
+import { GameObjectType, State, stateMap } from "../.types/types.js"
+import AnimationBehaviour from "../behaviours/animation.behaviour.js"
+import CollisionBehaviour from "../behaviours/collision.behaviour.js"
+import DrawBehaviour from "../behaviours/draw.behaviour.js"
+import GravityBehaviour from "../behaviours/gravity.behaviour.js"
+import MovementBehaviour from "../behaviours/movement.behaviour.js"
+import ResourceBehaviour from "../behaviours/resources.behaviour.js"
+import SoundBehaviour from "../behaviours/sound.behaviour.js"
+import TriggerBehaviour from "../behaviours/trigger.behaviour.js"
+import StateFactory from "../factories/State.factory.js"
+import AssetManager from "../managers/asset.manager.js"
+import CollisionManager from "../managers/collision.manager.js"
+import Main from "../modules/main.module.js"
+import Vector from "../modules/vector.module.js"
 
-export abstract class GameObject {
+export default abstract class GameObject {
 	public readonly id = GameObject.generateId()
 	protected dimensions = Vector.zero
-	public get Dimensions(): Vector { return this.dimensions }
+	public get Dimensions(): Vector {
+		return this.dimensions
+	}
 	position = Vector.zero
 	image?: CanvasImageSource
 
@@ -59,7 +60,7 @@ export abstract class GameObject {
 
 	protected setBehaviours(): void {}
 
-	setState(stateType: keyof stateMap = this.defaultState): void {
+	public setState(stateType: keyof stateMap = this.defaultState): void {
 		if (
 			!this.states.includes(stateType) ||
 			(stateType !== "idle" && this.state?.type === stateType) ||
@@ -71,7 +72,7 @@ export abstract class GameObject {
 		this.state.enter(this)
 	}
 
-	update(deltaTime: number): void {
+	public update(deltaTime: number): void {
 		// console.log("updating")
 		this.animationBehaviour?.update(deltaTime)
 		this.gravityBehavior?.update(deltaTime)
@@ -81,40 +82,40 @@ export abstract class GameObject {
 		this.state?.update(this, deltaTime)
 	}
 
-	draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D): void {
 		this.drawBehaviour?.draw(ctx)
 	}
 
-	getCenterPoint(): Vector {
+	public getCenterPoint(): Vector {
 		return this.position.plus(this.dimensions.scale(0.5))
 	}
 
-	delete(): void {
+	public delete(): void {
 		Main.removeObject(this.id)
 		CollisionManager.removeObject(this.id)
 	}
 
-	collisionCallback(target: GameObject): void {}
-}
+	public collisionCallback(target: GameObject): void {}
 
-export function getImages(srcs: string[]): CanvasImageSource[]
-export function getImages(src: string): CanvasImageSource
+	public static getImages(srcs: string[]): CanvasImageSource[]
+	public static getImages(src: string): CanvasImageSource
 
-export function getImages(src: string | string[]): CanvasImageSource | CanvasImageSource[] {
-	if (typeof src === "string") return AssetManager.getAsset<"img">(src)
-	return src.map((src) => AssetManager.getAsset<"img">(src))
-}
-
-export function getSingleAnimation(path: string, startNumber: number, endNumber: number = startNumber): string[] {
-	const assetPaths: string[] = []
-	const assetInitial = path
-		.split("/")
-		.at(-1)!
-		.match(/(?<=_?)[a-z]/g)![0]
-		.toUpperCase()
-	for (let i = startNumber; i <= endNumber; i++) {
-		const src = `${path}/${assetInitial}-${i}.png`
-		assetPaths.push(src)
+	public static getImages(src: string | string[]): CanvasImageSource | CanvasImageSource[] {
+		if (typeof src === "string") return AssetManager.getAsset<"img">(src)
+		return src.map((src) => AssetManager.getAsset<"img">(src))
 	}
-	return assetPaths
+
+	public static getSingleAnimation(path: string, startNumber: number, endNumber: number = startNumber): string[] {
+		const assetPaths: string[] = []
+		const assetInitial = path
+			.split("/")
+			.at(-1)!
+			.match(/(?<=_?)[a-z]/g)![0]
+			.toUpperCase()
+		for (let i = startNumber; i <= endNumber; i++) {
+			const src = `${path}/${assetInitial}-${i}.png`
+			assetPaths.push(src)
+		}
+		return assetPaths
+	}
 }

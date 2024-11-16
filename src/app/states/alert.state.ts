@@ -1,7 +1,7 @@
-import { State, stateMap } from "../.types/state.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
+import { State, stateMap } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
 
-export class AlertState implements State {
+export default class AlertState implements State {
 	type: keyof stateMap = "alert"
 
 	enter(gameObject: GameObject): void {

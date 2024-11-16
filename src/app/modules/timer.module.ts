@@ -1,19 +1,21 @@
-import { TimerManager } from "../managers/timer.manager.js"
+import TimerManager from "../managers/timer.manager.js"
 
-export class Timer implements timerOrIntervalParams {
+export default class Timer {
 	private timerId?: number
-	handler
-	timeout
-	isPausable
+	private handler
+	private timeout
+	private isPausable = true
 	private timeRemaining
 	private startTime = 0
 	private done = false
 	private abortController = new AbortController()
 
-	constructor({ handler, timeout, isPausable = true }: timerParams) {
+	constructor(handler: () => void, timeout: number)
+	constructor(handler: () => void, timeout: number, isPausable: boolean)
+	constructor(handler: () => void, timeout: number, isPausable?: boolean) {
 		this.handler = handler
 		this.timeout = timeout
-		this.isPausable = isPausable
+		if (isPausable !== undefined) this.isPausable = isPausable
 		this.timeRemaining = timeout
 		TimerManager.addTimer(this)
 	}
@@ -58,12 +60,4 @@ export class Timer implements timerOrIntervalParams {
 		this.reset()
 		this.dispose()
 	}
-}
-
-type timerParams = timerOrIntervalParams & {}
-
-export type timerOrIntervalParams = {
-	handler(): void
-	timeout: number
-	isPausable?: boolean
 }

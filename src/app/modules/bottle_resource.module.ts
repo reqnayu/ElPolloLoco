@@ -1,8 +1,8 @@
-import { Gui } from "./gui.module.js"
-import { Resource } from "./resource.module.js"
+import Gui from "./gui.module.js"
+import Resource from "./resource.module.js"
 
 export class BottleResource extends Resource {
-	use(): boolean {
+	public override use(): boolean {
 		const isSuccessful = super.use(1, () => this.emptyUse())
 		if (!isSuccessful) return false
 		Gui.updateStatusBar("bottle", this.currentAmount, this.maxAmount)
@@ -10,13 +10,13 @@ export class BottleResource extends Resource {
 		return true
 	}
 
-	add(): void {
+	public override add(): void {
 		// console.log("picking up bottle!")
 		super.add(1)
 		Gui.updateStatusBar("bottle", this.currentAmount, this.maxAmount)
 	}
 
-	emptyUse(): void {
+	public override emptyUse(): void {
 		Gui.statusBarError("bottle")
 		// console.log("no bottles left!")
 	}

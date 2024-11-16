@@ -1,9 +1,10 @@
-import { AssetManager } from "../managers/asset.manager.js"
-import { audioTypes, SoundManager } from "../managers/sound.manager.js"
-import { Interval } from "./interval.module.js"
-import { Settings } from "./settings.module.js"
+import { audioTypes } from "../.types/types.js"
+import AssetManager from "../managers/asset.manager.js"
+import SoundManager from "../managers/sound.manager.js"
+import Interval from "./interval.module.js"
+import Settings from "./settings.module.js"
 
-export class SoundAsset {
+export default class SoundAsset {
 	audioElement: HTMLAudioElement
 	disabled = false
 	name: string
@@ -75,19 +76,18 @@ export class SoundAsset {
 			const startVolume = this.audioElement.volume
 			const frequency = 50
 			const stepSize = (startVolume / duration) * frequency
-			new Interval({
-				handler: () => {
+			new Interval(
+				() => {
 					this.audioElement.volume = Math.max(0, this.audioElement.volume - stepSize)
 				},
-				stopConditionCallback: () => this.audioElement.volume === 0,
-				stopCallback: () => {
+				frequency,
+				() => this.audioElement.volume === 0,
+				() => {
 					this.stop()
 					this.audioElement.volume = startVolume
 					resolve()
-				},
-				timeout: frequency,
-				isPausable: false
-			}).resume()
+				}
+			).resume()
 		})
 	}
 

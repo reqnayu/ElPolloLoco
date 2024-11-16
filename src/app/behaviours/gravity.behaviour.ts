@@ -1,9 +1,9 @@
-import { Vector } from "../modules/vector.module.js"
-import { Updateable } from "../.types/behaviours.interface.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { gravityParams } from "../.types/behaviour.type.js"
+import Vector from "../modules/vector.module.js"
+import { Updateable } from "../.types/interfaces.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import { gravityParams } from "../.types/types.js"
 
-export class GravityBehaviour implements Updateable {
+export default class GravityBehaviour implements Updateable {
 	gameObject!: GameObject
 	private gravity = new Vector(0, -0.002)
 	floorHeight = 85
@@ -14,20 +14,20 @@ export class GravityBehaviour implements Updateable {
 		this.landCallback = landCallback
 	}
 
-	onAttach(gameObject: GameObject): this {
+	public onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
 		// this.gameObject.position.y = this.floorHeight
 		// console.log(`gravity behaviour added to '${gameObject.name}'!`)
 		return this
 	}
 
-	update(deltaTime: number): void {
+	public update(deltaTime: number): void {
 		if (this.shouldLand()) return this.land()
 		if (!this.canFall()) return
 		this.fall(deltaTime)
 	}
 
-	canFall(): boolean {
+	public canFall(): boolean {
 		return this.gameObject.position.y > this.floorHeight
 	}
 

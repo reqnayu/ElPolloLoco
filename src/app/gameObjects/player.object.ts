@@ -1,25 +1,24 @@
-import { AnimationSet, PlayerAnimationState } from "../.types/animation.type.js"
-import { stateMap } from "../.types/state.type.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Vector } from "../modules/vector.module.js"
-import { GameObject, getImages, getSingleAnimation } from "./gameObject.object.js"
-import { Assets } from "../managers/asset.manager.js"
-import { Bottle } from "./bottle.object.js"
-import { Timer } from "../modules/timer.module.js"
-import { Settings } from "../modules/settings.module.js"
-import { Input } from "../modules/input.module.js"
-import { Gui } from "../modules/gui.module.js"
-import { Main } from "../modules/main.module.js"
-import { Camera } from "../modules/camera.module.js"
+import { AnimationSet, PlayerAnimationState, stateMap } from "../.types/types.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import Vector from "../modules/vector.module.js"
+import Bottle from "./bottle.object.js"
+import Timer from "../modules/timer.module.js"
+import Settings from "../modules/settings.module.js"
+import Input from "../modules/input.module.js"
+import Gui from "../modules/gui.module.js"
+import Main from "../modules/main.module.js"
+import Camera from "../modules/camera.module.js"
+import Util from "../util/general.util.js"
+import GameObject from "./gameObject.object.js"
 
-@Assets({
+@Util.Assets({
 	img: [
-		...getSingleAnimation("2_character_pepe/1_idle/idle", 1, 10),
-		...getSingleAnimation("2_character_pepe/1_idle/idle_long", 11, 20),
-		...getSingleAnimation("2_character_pepe/2_walk", 21, 26),
-		...getSingleAnimation("2_character_pepe/3_jump", 31, 39),
-		...getSingleAnimation("2_character_pepe/4_hurt", 41, 43),
-		...getSingleAnimation("2_character_pepe/5_dead", 51, 57)
+		...GameObject.getSingleAnimation("2_character_pepe/1_idle/idle", 1, 10),
+		...GameObject.getSingleAnimation("2_character_pepe/1_idle/idle_long", 11, 20),
+		...GameObject.getSingleAnimation("2_character_pepe/2_walk", 21, 26),
+		...GameObject.getSingleAnimation("2_character_pepe/3_jump", 31, 39),
+		...GameObject.getSingleAnimation("2_character_pepe/4_hurt", 41, 43),
+		...GameObject.getSingleAnimation("2_character_pepe/5_dead", 51, 57)
 	],
 	audio: [
 		"player/Jump.mp3",
@@ -32,7 +31,7 @@ import { Camera } from "../modules/camera.module.js"
 		"player/Hurt_3.mp3"
 	]
 })
-export class Player extends GameObject {
+export default class Player extends GameObject {
 	protected walkSpeed = 0.6
 	// protected walkSpeed: number = 1
 	private jumpStrength = 1
@@ -54,13 +53,13 @@ export class Player extends GameObject {
 		this.initialize()
 	}
 
-	protected initialize(): void {
+	protected override initialize(): void {
 		this.setBehaviours()
 		this.position.y = this.gravityBehavior!.floorHeight
 		super.initialize("2_character_pepe/1_idle/idle/I-1.png")
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		const animationSet = this.getAnimationSet()
 		const { walkSpeed, jumpStrength } = this
 
@@ -104,23 +103,23 @@ export class Player extends GameObject {
 
 	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {
 		return {
-			idle: getImages(getSingleAnimation("2_character_pepe/1_idle/idle", 1, 10)),
-			idle_long: getImages(getSingleAnimation("2_character_pepe/1_idle/idle_long", 11, 20)),
-			walk: getImages(getSingleAnimation("2_character_pepe/2_walk", 21, 26)),
-			jump: getImages(getSingleAnimation("2_character_pepe/3_jump", 31, 39)),
-			hurt: getImages(getSingleAnimation("2_character_pepe/4_hurt", 41, 43)),
-			dead: getImages(getSingleAnimation("2_character_pepe/5_dead", 51, 57))
+			idle: GameObject.getImages(GameObject.getSingleAnimation("2_character_pepe/1_idle/idle", 1, 10)),
+			idle_long: GameObject.getImages(GameObject.getSingleAnimation("2_character_pepe/1_idle/idle_long", 11, 20)),
+			walk: GameObject.getImages(GameObject.getSingleAnimation("2_character_pepe/2_walk", 21, 26)),
+			jump: GameObject.getImages(GameObject.getSingleAnimation("2_character_pepe/3_jump", 31, 39)),
+			hurt: GameObject.getImages(GameObject.getSingleAnimation("2_character_pepe/4_hurt", 41, 43)),
+			dead: GameObject.getImages(GameObject.getSingleAnimation("2_character_pepe/5_dead", 51, 57))
 		}
 	}
 
-	throwBottle(): void {
+	public throwBottle(): void {
 		if (!this.resourceBehaviour?.use("bottles", 1)) return
 		const spawnPosition = this.position
 		new Bottle({ position: spawnPosition, velocity: this.movementBehaviour!.velocity, direction: this.direction })
 		this.setState("idle")
 	}
 
-	collisionCallback(target: GameObject): void {
+	public override collisionCallback(target: GameObject): void {
 		// console.log(`player collided with ${target.name}`)
 		switch (target.name) {
 			case "coin":
@@ -150,12 +149,9 @@ export class Player extends GameObject {
 		Input.toggleInput(false)
 		this.setState("dead")
 		this.soundBehaviour?.playOnce("Death")
-		new Timer({
-			handler: () => {
-				this.movementBehaviour = undefined
-				Main.looseGame()
-			},
-			timeout: 1500
-		}).resume()
+		new Timer(() => {
+			this.movementBehaviour = undefined
+			Main.looseGame()
+		}, 1500).resume()
 	}
 }

@@ -1,37 +1,38 @@
-import { resourceParams } from "../.types/behaviour.type.js"
+import { resourceAmountParams } from "../.types/types.js"
 import { BottleResource } from "../modules/bottle_resource.module.js"
 import { CoinResource } from "../modules/coin_resource.module.js"
 import { HealthResource } from "../modules/health_resource.module.js"
-import { Updateable } from "../.types/behaviours.interface.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
+import { Updateable } from "../.types/interfaces.js"
+import GameObject from "../gameObjects/gameObject.object.js"
 
-export class ResourceBehaviour implements Updateable {
+export default class ResourceBehaviour implements Updateable {
 	gameObject!: GameObject
-	healthPoints
-	bottles?
-	coins?
-	constructor({ healthPoints, bottles, coins }: resourceParams) {
+	public healthPoints
+	public bottles?
+	public coins?
+
+	constructor({ healthPoints, bottles, coins }: resourceAmountParams) {
 		this.healthPoints = new HealthResource({ maxAmount: healthPoints })
 		if (bottles) this.bottles = new BottleResource({ maxAmount: bottles })
 		if (coins) this.coins = new CoinResource({ maxAmount: coins, currentAmount: 0 })
 	}
 
-	onAttach(gameObject: GameObject): this {
+	public onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
 		return this
 	}
 
-	update(deltaTime: number): void {}
+	public update(deltaTime: number): void {}
 
-	use(type: keyof resourceParams, amount: number): boolean {
+	public use(type: keyof resourceAmountParams, amount: number): boolean {
 		return this[type]?.use(amount) || false
 	}
 
-	add(type: keyof resourceParams, amount: number): void {
+	public add(type: keyof resourceAmountParams, amount: number): void {
 		return this[type]?.add(amount)
 	}
 
-	receiveDamage(amount: number): void {
+	public receiveDamage(amount: number): void {
 		if (this.use("healthPoints", amount)) {
 			// this.gameObject.setState("hurt")
 		} else {

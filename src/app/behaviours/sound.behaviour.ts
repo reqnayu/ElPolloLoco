@@ -1,12 +1,12 @@
-import { soundParams } from "../.types/behaviour.type.js"
-import { Audible } from "../.types/behaviours.interface.js"
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { audioTypes, SoundManager } from "../managers/sound.manager.js"
-import { SoundAsset } from "../modules/sound_asset.module.js"
-import { randomize, roundTo } from "../util/general.util.js"
+import { soundParams } from "../.types/types.js"
+import { Audible } from "../.types/types.js"
+import SoundManager from "../managers/sound.manager.js"
+import SoundAsset from "../modules/sound_asset.module.js"
+import Util from "../util/general.util.js"
+import { audioTypes, soundType } from "../.types/types.js"
 
-export class SoundBehaviour implements Audible {
-	sounds: Map<string, SoundAsset>
+export default class SoundBehaviour implements Audible {
+	public sounds: Map<string, SoundAsset>
 	private soundType: soundType
 	constructor({ soundType, assets }: soundParams) {
 		this.soundType = soundType
@@ -28,23 +28,23 @@ export class SoundBehaviour implements Audible {
 		})
 	}
 
-	playOnce(name: string): void {
+	public playOnce(name: string): void {
 		this.getSound(name)?.playOnce()
 	}
 
-	playRandom(names: string[]): void {
+	public playRandom(names: string[]): void {
 		this.getRandomSound(names)?.playOnce()
 	}
 
-	playLooped(name: string): void {
+	public playLooped(name: string): void {
 		this.getSound(name)!.playLooped()
 	}
 
-	stop(name: string): void {
+	public stop(name: string): void {
 		this.getSound(name)?.stop()
 	}
 
-	fadeOut(name: string, duration: number): Promise<void> {
+	public fadeOut(name: string, duration: number): Promise<void> {
 		return this.getSound(name)!.fadeOut(duration)
 	}
 
@@ -52,16 +52,14 @@ export class SoundBehaviour implements Audible {
 		return `${this.soundType}/${name}`
 	}
 
-	getSound(name: string): SoundAsset | undefined {
+	public getSound(name: string): SoundAsset | undefined {
 		const sound = this.sounds.get(this.getFullName(name))
 		return sound
 	}
 
-	getRandomSound(names: string[]): SoundAsset | undefined {
-		const randomIndex = roundTo(randomize(0, names.length - 1))
+	public getRandomSound(names: string[]): SoundAsset | undefined {
+		const randomIndex = Util.roundTo(Util.randomize(0, names.length - 1))
 		const randomSoundName = names[randomIndex]
 		return this.getSound(randomSoundName)
 	}
 }
-
-export type soundType = GameObjectType | "gui"

@@ -1,9 +1,9 @@
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { keyInputAction } from "../.types/input.type.js"
-import { audioTypes, SoundManager } from "../managers/sound.manager.js"
-import { statusBars } from "./gui.module.js"
+import { GameObjectType } from "../.types/types.js"
+import { keyInputAction } from "../.types/types.js"
+import { audioTypes, statusBars } from "../.types/types.js"
+import SoundManager from "../managers/sound.manager.js"
 
-export class Settings {
+export default abstract class Settings {
 	// private main
 	public static keyBindings: Record<keyInputAction, string> = {
 		MOVE_RIGHT: "KeyD",
@@ -31,7 +31,7 @@ export class Settings {
 		endboss: 1500
 	}
 
-	public static initialize(): void {		
+	public static initialize(): void {
 		this.loadSettings()
 	}
 

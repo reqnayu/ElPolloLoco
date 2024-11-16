@@ -1,18 +1,18 @@
-import { roundTo } from "../util/general.util.js"
+import Util from "../util/general.util.js"
 
-export class Vector {
+export default class Vector {
 	constructor(public x: number, public y: number) {}
 
-	get magnitude(): number {
-		return roundTo(Math.sqrt(this.x ** 2 + this.y ** 2))
+	public get magnitude(): number {
+		return Util.roundTo(Math.sqrt(this.x ** 2 + this.y ** 2))
 	}
 
 	public set(x: number, y: number): this
 	public set({ x, y }: Vector): this
 	public set(xOrVector: number | Vector, y?: number): this {
 		const setFromVector: boolean = xOrVector instanceof Vector
-		this.x = (setFromVector) ? (xOrVector as Vector).x : (xOrVector as number)
-		this.y = (setFromVector) ? (xOrVector as Vector).y : y!
+		this.x = setFromVector ? (xOrVector as Vector).x : (xOrVector as number)
+		this.y = setFromVector ? (xOrVector as Vector).y : y!
 		return this
 	}
 
@@ -53,16 +53,16 @@ export class Vector {
 	}
 
 	public static average(vecs: Vector[]): Vector {
-		return vecs.reduce((center, v) => center.plus(v), new Vector(0, 0)).scale(1 / vecs.length)
+		return vecs.reduce((center, v) => center.plus(v), this.zero).scale(1 / vecs.length)
 	}
 
-	normalize(): Vector {
+	public normalize(): Vector {
 		return this.scale(1 / this.magnitude)
 	}
 
-	static fromAngleAndRadius(angle: number, radius: number): Vector {
-		const x = roundTo(Math.cos(angle) * radius)
-		const y = roundTo(Math.sin(angle) * radius)
+	public static fromAngleAndRadius(angle: number, radius: number): Vector {
+		const x = Util.roundTo(Math.cos(angle) * radius)
+		const y = Util.roundTo(Math.sin(angle) * radius)
 		return new Vector(x, y)
 	}
 

@@ -1,10 +1,10 @@
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { Assets } from "../managers/asset.manager.js"
-import { Camera } from "../modules/camera.module.js"
-import { GameObject } from "./gameObject.object.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import Camera from "../modules/camera.module.js"
+import Util from "../util/general.util.js"
+import GameObject from "./gameObject.object.js"
 
 class BackgroundElement extends GameObject {
-	get totalWidth(): number {
+	public get totalWidth(): number {
 		return this.dimensions.x * (Camera.resolution.x / Camera.zoom)
 	}
 
@@ -12,7 +12,7 @@ class BackgroundElement extends GameObject {
 		super("background")
 	}
 
-	async initialize(imgSrc: string): Promise<void> {
+	public override async initialize(imgSrc: string): Promise<void> {
 		super.initialize(imgSrc)
 		this.setBehaviours()
 		this.initializeDimensions()
@@ -23,13 +23,13 @@ class BackgroundElement extends GameObject {
 		this.dimensions.set(Camera._baseResolution.x * 2, Camera._baseResolution.y)
 	}
 
-	protected setBehaviours(): void {
+	protected override setBehaviours(): void {
 		this.drawBehaviour = BehaviourFactory.create("draw").onAttach(this)
 	}
 
 	private parallaxFactor = (2 - this.layerNumber) / 3
 
-	draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D): void {
 		const baseOffsetX = Camera._focus.x * this.parallaxFactor
 		const loopOffsetX = Math.floor((Camera.focus.x - baseOffsetX) / this.dimensions.x) * this.dimensions.x
 
@@ -42,7 +42,7 @@ class BackgroundElement extends GameObject {
 	}
 }
 
-@Assets({
+@Util.Assets({
 	img: [
 		"5_background/layers/3_third_layer/full.png",
 		"5_background/layers/2_second_layer/full.png",
@@ -50,7 +50,7 @@ class BackgroundElement extends GameObject {
 		"5_background/layers/sky.png"
 	]
 })
-export class Background extends GameObject {
+export default class Background extends GameObject {
 	private elements: BackgroundElement[] = []
 	private isLoaded = false
 	private srcSet = [
@@ -80,15 +80,13 @@ export class Background extends GameObject {
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
 	}
 
-	draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D): void {
 		this.drawBehaviour?.draw(ctx)
 		this.elements.forEach((el) => el.draw(ctx))
 	}
 
-	update(deltaTime: number): void {
+	public update(deltaTime: number): void {
 		if (!this.isLoaded) return
 		this.position.set(Camera.focus)
 	}
 }
-
-// this.elements.forEach((el) => el.updateBackground())

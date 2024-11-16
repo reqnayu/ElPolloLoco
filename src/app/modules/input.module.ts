@@ -1,14 +1,15 @@
 import "../.types/prototypes.js"
-import { confirmation, getAllElements, getElement, pointerEventIsLeftClick } from "../util/general.util.js"
-import { keyInputAction, inputMap, mouseInputAction } from "../.types/input.type.js"
-import { audioTypes, SoundManager } from "../managers/sound.manager.js"
-import { KeyBindManager } from "../managers/keybind.manager.js"
-import { Settings } from "./settings.module.js"
-import { Main } from "./main.module.js"
-import { Gui } from "./gui.module.js"
-import { Renderer } from "./renderer.module.js"
+import Util from "../util/general.util.js"
+import { keyInputAction, inputMap, mouseInputAction } from "../.types/types.js"
+import SoundManager from "../managers/sound.manager.js"
+import KeyBindManager from "../managers/keybind.manager.js"
+import Settings from "./settings.module.js"
+import Main from "./main.module.js"
+import Gui from "./gui.module.js"
+import Renderer from "./renderer.module.js"
+import { audioTypes } from "../.types/types.js"
 
-export class Input {
+export default class Input {
 	private static activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
 	public static isBlocked = false
 	private static isKeyInputBlocked = false
@@ -92,7 +93,7 @@ export class Input {
 	}
 
 	public static initialize(): void {
-		KeyBindManager.initialize();
+		KeyBindManager.initialize()
 		this.cacheElements()
 		window.addEventListener("pointerdown", (e) => this.clickHandler(e))
 		window.addEventListener("keydown", (e) => this.keyHandler(e))
@@ -124,11 +125,11 @@ export class Input {
 			"[data-click='JUMP']",
 			"[data-click='THROW']"
 		]
-		elementSelectors.forEach((sel) => this.elementCache.set(sel, getElement(sel)))
+		elementSelectors.forEach((sel) => this.elementCache.set(sel, Util.getElement(sel)))
 	}
 
 	private static clickHandler(e: Event): void {
-		if (!pointerEventIsLeftClick(e)) return
+		if (!Util.pointerEventIsLeftClick(e)) return
 		const target = (e.target as HTMLElement).closest<HTMLElement>("[data-click]")
 		if (!target) return
 		const action = target?.dataset.click
@@ -160,9 +161,7 @@ export class Input {
 		if (this.isKeyInputBlocked) return
 		// console.log(e.code)
 		const isKeyDown = e.type === "keydown"
-		const action = Object.entries(Settings.keyBindings).find(
-			([, key]) => key === e.code
-		)?.[0] as keyInputAction
+		const action = Object.entries(Settings.keyBindings).find(([, key]) => key === e.code)?.[0] as keyInputAction
 		if (!action) return
 
 		if (isKeyDown && !this.activeInputs.has(action)) this.pressKey(action)
@@ -277,7 +276,7 @@ export class Input {
 	}
 
 	public static async restartGame(): Promise<void> {
-		const restartConfirmed = await confirmation({
+		const restartConfirmed = await Util.confirmation({
 			requestMessage: "Do you want to restart? All Progress will be lost!",
 			affirmMessage: "Restart"
 		})
@@ -292,7 +291,7 @@ export class Input {
 	// }
 
 	private static addVolumeSliderFunctionality(): void {
-		getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
+		Util.getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {
 			slider.addEventListener("input", (e) => {
 				const type = slider.id as keyof audioTypes
 				SoundManager.setVolumeType(Number(slider.value) / 100, type)

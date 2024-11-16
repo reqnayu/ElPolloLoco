@@ -1,8 +1,10 @@
-export class Resource {
+import { resourceParams } from "../.types/types.js"
+
+export default abstract class Resource {
 	currentAmount
 	maxAmount
 
-	get fraction(): number {
+	public get fraction(): number {
 		return this.currentAmount > 0 ? this.currentAmount / this.maxAmount : 0
 	}
 
@@ -11,8 +13,7 @@ export class Resource {
 		this.currentAmount = currentAmount
 	}
 
-	use(amount: number, emptyUseCallback?: () => void): boolean {
-		// return true
+	public use(amount: number, emptyUseCallback?: () => void): boolean {
 		if (this.currentAmount === 0) {
 			emptyUseCallback?.()
 			return false
@@ -21,14 +22,9 @@ export class Resource {
 		return true
 	}
 
-	add(amount: number): void {
+	public add(amount: number): void {
 		this.currentAmount = Math.min(this.maxAmount, this.currentAmount + amount)
 	}
 
-	emptyUse(): void {}
-}
-
-export type resourceParams = {
-	maxAmount: number
-	currentAmount?: number
+	public emptyUse(): void {}
 }

@@ -1,8 +1,8 @@
-import { State, stateMap } from "../.types/state.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Timer } from "../modules/timer.module.js"
+import { State, stateMap } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import Timer from "../modules/timer.module.js"
 
-export class WalkState implements State {
+export default class WalkState implements State {
 	type: keyof stateMap = "walk"
 	timers: Timer[] = []
 

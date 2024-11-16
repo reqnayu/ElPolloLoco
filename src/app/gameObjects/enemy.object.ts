@@ -1,10 +1,9 @@
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { stateMap } from "../.types/state.type.js"
-import { BehaviourFactory } from "../factories/behaviour.factory.js"
-import { randomize } from "../util/general.util.js"
-import { GameObject } from "./gameObject.object.js"
+import { GameObjectType, stateMap } from "../.types/types.js"
+import BehaviourFactory from "../factories/behaviour.factory.js"
+import Util from "../util/general.util.js"
+import GameObject from "./gameObject.object.js"
 
-export abstract class Enemy extends GameObject {
+export default abstract class Enemy extends GameObject {
 	direction: 1 | -1 = -1
 	protected states: (keyof stateMap)[] = ["walk", "dead"]
 	private colliderOffsets
@@ -47,7 +46,7 @@ export abstract class Enemy extends GameObject {
 	protected randomizeStartingPosition(): void {
 		const minX = 1000
 		const maxX = 2000
-		const randomX = randomize(minX, maxX)
+		const randomX = Util.randomize(minX, maxX)
 		this.position.x = randomX
 	}
 

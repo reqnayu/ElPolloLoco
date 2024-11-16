@@ -1,6 +1,6 @@
-import { GameObject } from "../gameObjects/gameObject.object.js"
+import GameObject from "../gameObjects/gameObject.object.js"
 
-export abstract class CollisionManager {
+export default abstract class CollisionManager {
 	private static allObjects: Map<number, GameObject> = new Map()
 
 	public static addObject(id: number, obj: GameObject): void {

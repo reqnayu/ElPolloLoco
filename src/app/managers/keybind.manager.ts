@@ -1,13 +1,13 @@
-import { keyInputAction } from "../.types/input.type.js"
-import { Input } from "../modules/input.module.js"
-import { Settings } from "../modules/settings.module.js"
-import { Timer } from "../modules/timer.module.js"
-import { capitalizeFirstLetter, confirmation, getAllElements, getElement } from "../util/general.util.js"
+import { keyInputAction } from "../.types/types.js"
+import Input from "../modules/input.module.js"
+import Settings from "../modules/settings.module.js"
+import Timer from "../modules/timer.module.js"
+import Util from "../util/general.util.js"
 
-export class KeyBindManager {
+export default abstract class KeyBindManager {
 	private static keyboardFontObserver = new MutationObserver((records) => this.renderKeyboardKeysOnChange(records))
 
-	public static initialize(): void {		
+	public static initialize(): void {
 		this.PreventArrowScrollingBehaviour()
 		this.renderKeybinds()
 		this.renderInputKeys()
@@ -30,7 +30,7 @@ export class KeyBindManager {
 		const ac = new AbortController()
 		let timer: Timer | undefined = this.cancelKeyBindTimer(ac)
 		if (keyDownEvent.key === "Escape") {
-			getElement("#keyBindModal .button-progress").classList.add("active")
+			Util.getElement("#keyBindModal .button-progress").classList.add("active")
 			timer.resume()
 		}
 		window.addEventListener(
@@ -50,7 +50,7 @@ export class KeyBindManager {
 		ac: AbortController
 	): void {
 		if (keyUpEvent.key !== keyDownEvent.key) return
-		getElement("#keyBindModal .button-progress").classList.remove("active")
+		Util.getElement("#keyBindModal .button-progress").classList.remove("active")
 		this.processKeyBind(keyUpEvent.code, action, keyElement, reuse)
 		timer?.kill()
 		timer = undefined
@@ -67,7 +67,7 @@ export class KeyBindManager {
 		const [alreadyBoundAction, alreadyBoundKey] = this.alreadyBound(key)
 		let canBind = true
 		if (alreadyBoundAction) {
-			const shouldOverWrite = await confirmation({
+			const shouldOverWrite = await Util.confirmation({
 				requestMessage: this.keyBindOverWriteTemplate(key, alreadyBoundAction)
 			})
 			if (!shouldOverWrite) {
@@ -77,7 +77,7 @@ export class KeyBindManager {
 				this.setKeyBind(
 					Settings.keyBindings[action],
 					alreadyBoundAction,
-					getElement(`[data-keyboard=${alreadyBoundKey}]`)
+					Util.getElement(`[data-keyboard=${alreadyBoundKey}]`)
 				)
 			}
 		}
@@ -110,14 +110,11 @@ export class KeyBindManager {
 	}
 
 	private static cancelKeyBindTimer(ac: AbortController): Timer {
-		return new Timer({
-			handler: () => {
-				ac.abort()
-				this.cancelKeybind()
-				getElement("#keyBindModal .button-progress").classList.remove("active")
-			},
-			timeout: 800
-		})
+		return new Timer(() => {
+			ac.abort()
+			this.cancelKeybind()
+			Util.getElement("#keyBindModal .button-progress").classList.remove("active")
+		}, 800)
 	}
 
 	public static cancelKeybind(): void {
@@ -135,7 +132,9 @@ export class KeyBindManager {
 	}
 
 	private static updateKeyboardFontObserver(): void {
-		getAllElements("[data-keyboard]").forEach((el) => this.keyboardFontObserver.observe(el, { attributes: true }))
+		Util.getAllElements("[data-keyboard]").forEach((el) =>
+			this.keyboardFontObserver.observe(el, { attributes: true })
+		)
 	}
 
 	private static renderKeyboardKeysOnChange(records: MutationRecord[]): void {
@@ -147,7 +146,7 @@ export class KeyBindManager {
 
 	private static renderKeybinds(): void {
 		this.renderKeybindSettings()
-		getAllElements(".keyboard").forEach((el) => {
+		Util.getAllElements(".keyboard").forEach((el) => {
 			const key = el.dataset.keyboard
 			if (!key) return
 			this.renderKeyboardKey(el)
@@ -161,17 +160,16 @@ export class KeyBindManager {
 				<div class="keyboard btn btn-primary" data-click="OPEN_SINGLE_KEYBIND" data-keyboard="${key}"></div>
 			</div>
 		`
-		const container = getElement("#keybinds")
+		const container = Util.getElement("#keybinds")
 		container.innerHTML = ""
 		Object.entries(Settings.keyBindings).forEach(([action, key]) => (container.innerHTML += template(key, action)))
 		this.updateKeyboardFontObserver()
 	}
 
 	private static renderInputKeys(): void {
-		getAllElements(".btn-input").forEach(
+		Util.getAllElements(".btn-input").forEach(
 			(el) =>
-				(el.getElement(".keyboard").dataset.keyboard =
-					Settings.keyBindings[el.dataset.click as keyInputAction])
+				(el.getElement(".keyboard").dataset.keyboard = Settings.keyBindings[el.dataset.click as keyInputAction])
 		)
 	}
 
@@ -187,7 +185,7 @@ export class KeyBindManager {
 function mapActionToReadable(action: keyInputAction): string {
 	return action
 		.split("_")
-		.map((word) => capitalizeFirstLetter(word))
+		.map((word) => Util.capitalizeFirstLetter(word))
 		.join(" ")
 }
 

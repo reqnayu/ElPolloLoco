@@ -1,4 +1,4 @@
-import { getElement, roundTo } from "./general.util.js"
+import Util from "./general.util.js"
 
 export function runOnce<T extends (...args: any) => any>(func: T): T {
 	let hasRun = false
@@ -11,7 +11,7 @@ export function runOnce<T extends (...args: any) => any>(func: T): T {
 
 export class Display {
 	private static activeDisplays: Map<string, string> = new Map()
-	private static container = getElement("#display")
+	private static container = Util.getElement("#display")
 
 	static new(name: string): void {
 		if (!this.container) return console.log("#display container not found!")

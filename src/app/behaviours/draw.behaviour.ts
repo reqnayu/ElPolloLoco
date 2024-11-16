@@ -1,21 +1,21 @@
-import { Drawable } from "../.types/behaviours.interface.js"
-import { Frame } from "../.types/frame.type.js"
-import { drawParams } from "../.types/behaviour.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Camera } from "../modules/camera.module.js"
+import { Drawable } from "../.types/interfaces.js"
+import { Frame } from "../.types/types.js"
+import { drawParams } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import Camera from "../modules/camera.module.js"
 
-export class DrawBehaviour implements Drawable {
+export default class DrawBehaviour implements Drawable {
 	private gameObject!: GameObject
 
-	constructor(options: drawParams) { }
+	constructor(options: drawParams) {}
 
-	onAttach(gameObject: GameObject): this {
+	public onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
 		// console.log(`drawBehaviour added to '${gameObject.name}'`)
 		return this
 	}
 
-	draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D): void {
 		const frame = this.requestFrame()
 		const { image, dx: rawDx, dy: rawDy, dWidth, dHeight, direction } = frame
 		ctx.resetTransform()
@@ -33,7 +33,7 @@ export class DrawBehaviour implements Drawable {
 		ctx.setTransform(1, 0, 0, 1, 0, 0)
 	}
 
-	private drawCollider(ctx: CanvasRenderingContext2D, dx: number, dy: number, dWidth: number, dHeight: number): void {
+	public drawCollider(ctx: CanvasRenderingContext2D, dx: number, dy: number, dWidth: number, dHeight: number): void {
 		const [top, right, bottom, left] = this.gameObject.collisionBehaviour?.offsets || [0, 0, 0, 0]
 		ctx.strokeRect(dx + left, dy + top, dWidth - left - right, dHeight - bottom - top)
 	}

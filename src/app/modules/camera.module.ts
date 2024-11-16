@@ -1,9 +1,9 @@
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { clamp } from "../util/general.util.js"
-import { Main } from "./main.module.js"
-import { Vector } from "./vector.module.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import Util from "../util/general.util.js"
+import Main from "./main.module.js"
+import Vector from "./vector.module.js"
 
-export class Camera {
+export default class Camera {
 	public static _focus = Vector.zero
 	private static readonly pixelsPerFrame = 1.5
 	public static readonly aspectRatio = 16 / 9
@@ -30,7 +30,7 @@ export class Camera {
 	public static get desiredFocus(): Vector {
 		const objectFocus = Vector.average(this.getStartAndEndFocusObjects().map(({ focusVector }) => focusVector))
 		const minFocusX = this.resolution.scale(0.5).x
-		objectFocus.x = clamp(objectFocus.x, minFocusX, Main.maxPosX - minFocusX)
+		objectFocus.x = Util.clamp(objectFocus.x, minFocusX, Main.maxPosX - minFocusX)
 		return objectFocus
 	}
 
@@ -40,7 +40,7 @@ export class Camera {
 		const distance = obj2.position.x + obj2.Dimensions.x - obj1.position.x
 		const paddingFactor = 1.2
 		const desiredZoom = (distance / this._baseResolution.x) * paddingFactor
-		return clamp(desiredZoom, this.minZoom, this.maxZoom)
+		return Util.clamp(desiredZoom, this.minZoom, this.maxZoom)
 	}
 
 	public static initialize(): void {

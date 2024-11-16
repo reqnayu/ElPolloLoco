@@ -1,17 +1,25 @@
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { CollisionManager } from "../managers/collision.manager.js"
-import { getElement, roundTo } from "../util/general.util.js"
-import { Camera } from "./camera.module.js"
-import { Main } from "./main.module.js"
-import { Vector } from "./vector.module.js"
+import { GameObjectType } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import CollisionManager from "../managers/collision.manager.js"
+import Util from "../util/general.util.js"
+import Camera from "./camera.module.js"
+import Main from "./main.module.js"
+import Vector from "./vector.module.js"
 
-export class Renderer {
+export default abstract class Renderer {
 	public static shouldUpdateStatically = true
 	private static currentFrame = 0
 	private static timeOfLastFrame = 0
 	private static windowScale = 0.8
-	private static orderOfObjects: GameObjectType[] = ["background", "clouds", "enemy", "endboss", "coin", "player", "bottle"]
+	private static orderOfObjects: GameObjectType[] = [
+		"background",
+		"clouds",
+		"enemy",
+		"endboss",
+		"coin",
+		"player",
+		"bottle"
+	]
 
 	private static lastTime = 0
 	private static fps = 0
@@ -83,7 +91,7 @@ export class Renderer {
 	}
 
 	private static displayPerformanceMetrics(): void {
-		getElement("#fps-counter").innerHTML = roundTo(this.fps).toString()
+		Util.getElement("#fps-counter").innerHTML = Util.roundTo(this.fps).toString()
 	}
 
 	private static renderObject = (gameObject: GameObject, deltaTime: number) => {

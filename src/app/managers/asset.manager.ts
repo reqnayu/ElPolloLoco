@@ -1,6 +1,6 @@
-import { getElement, roundTo, sleep } from "../util/general.util.js"
+import Util from "../util/general.util.js"
 
-export class AssetManager {
+export default abstract class AssetManager {
 	public static imagePaths: string[] = []
 	public static soundPahts: string[] = []
 
@@ -21,7 +21,10 @@ export class AssetManager {
 		// console.log("loading started!")
 		this.totalAssetCount = [...this.imagePaths, ...this.soundPahts].length
 		const timeOfLoadStart = Date.now()
-		const allPromises = [...this.imagePaths.map((src) => this.loadImage(src)), ...this.soundPahts.map((src) => this.loadAudio(src))]
+		const allPromises = [
+			...this.imagePaths.map((src) => this.loadImage(src)),
+			...this.soundPahts.map((src) => this.loadAudio(src))
+		]
 		await Promise.all(allPromises)
 		const timeOfLoadCompletion = Date.now()
 		// console.log(`loading completed in ${(timeOfLoadCompletion - timeOfLoadStart) / 1000} seconds!`)
@@ -52,28 +55,16 @@ export class AssetManager {
 
 	private static async incrementLoadCounter(): Promise<void> {
 		this.loadedAssetsCount++
-		const progress = `${roundTo((this.loadedAssetsCount / this.totalAssetCount) * 100)}`
-		getElement(".loading .progress-thumb").style.width = `${progress}%`
-		getElement(".loading .row span").innerHTML = `${progress}%`
+		const progress = `${Util.roundTo((this.loadedAssetsCount / this.totalAssetCount) * 100)}`
+		Util.getElement(".loading .progress-thumb").style.width = `${progress}%`
+		Util.getElement(".loading .row span").innerHTML = `${progress}%`
 		if (progress === `100`) this.finishLoading()
 	}
 
 	private static async finishLoading(): Promise<void> {
-		getElement(".loading > span").innerHTML = "DONE!"
+		Util.getElement(".loading > span").innerHTML = "DONE!"
 		// console.log(allAssets)
-		await sleep(500)
-		getElement(".loading").classList.add("d-none-animated")
+		await Util.sleep(500)
+		Util.getElement(".loading").classList.add("d-none-animated")
 	}
-}
-
-type assetsParams = {
-	img?: string[]
-	audio?: string[]
-}
-
-
-export function Assets({ img, audio }: assetsParams) {
-	if (img) AssetManager.imagePaths.push(...img.map((src) => `app/assets/img/${src}`))
-	if (audio) AssetManager.soundPahts.push(...audio.map((src) => `app/assets/audio/${src}`))
-	return function (constructor: Function) {}
 }

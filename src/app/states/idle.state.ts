@@ -1,8 +1,8 @@
-import { GameObject } from "../gameObjects/gameObject.object.js"
-import { Timer } from "../modules/timer.module.js"
-import { State, stateMap } from "../.types/state.type.js"
+import GameObject from "../gameObjects/gameObject.object.js"
+import Timer from "../modules/timer.module.js"
+import { State, stateMap } from "../.types/types.js"
 
-export class IdleState implements State {
+export default class IdleState implements State {
 	type: keyof stateMap = "idle"
 	timers: Timer[] = []
 
@@ -28,14 +28,11 @@ export class IdleState implements State {
 	}
 
 	private addIdleLongTimer(gameObject: GameObject): void {
-		const longIdleTimer = new Timer({
-			handler: () => {
-				gameObject.animationBehaviour?.setAnimation("idle_long")
-				gameObject.soundBehaviour?.playLooped("Snore")
-				gameObject.focusOffset = 0
-			},
-			timeout: 3000
-		}).resume()
+		const longIdleTimer = new Timer(() => {
+			gameObject.animationBehaviour?.setAnimation("idle_long")
+			gameObject.soundBehaviour?.playLooped("Snore")
+			gameObject.focusOffset = 0
+		}, 3000).resume()
 		this.timers.push(longIdleTimer)
 	}
 }

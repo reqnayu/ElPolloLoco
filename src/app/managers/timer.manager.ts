@@ -1,11 +1,11 @@
-import { Interval } from "../modules/interval.module.js"
-import { Timer } from "../modules/timer.module.js"
+import Interval from "../modules/interval.module.js"
+import Timer from "../modules/timer.module.js"
 
-export class TimerManager {
+export default abstract class TimerManager {
 	private static allTimers: Timer[] = []
 	private static allIntervals: Interval[] = []
 
-	public static initialize(): void {		
+	public static initialize(): void {
 		window.addEventListener("resumegame", () => this.resumeAll())
 		window.addEventListener("pausegame", () => this.pauseAll())
 	}

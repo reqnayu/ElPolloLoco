@@ -1,9 +1,8 @@
-import { GameObjectType } from "../.types/gameObject.type.js"
-import { GameObjectFactory } from "../factories/gameObject.factory.js"
-import { Vector } from "../modules/vector.module.js"
-import { roundTo } from "../util/general.util.js"
+import GameObjectFactory from "../factories/gameObject.factory.js"
+import Vector from "../modules/vector.module.js"
+import Util from "../util/general.util.js"
 
-export class SpawnManager {
+export default abstract class SpawnManager {
 	static arch(type: "coin", centerPoint: Vector, radius: number, amount: number): void {
 		const positions = this.newForm(amount, (i) => {
 			const angle = (i / (amount - 1)) * Math.PI
@@ -46,5 +45,5 @@ export class SpawnManager {
 }
 
 function radToDeg(rad: number): number {
-	return roundTo((rad * 180) / Math.PI)
+	return Util.roundTo((rad * 180) / Math.PI)
 }
