@@ -84,7 +84,7 @@ export default class Endboss extends Enemy {
 
 	protected override die(): void {
 		super.die()
-		Main.winGame()
+		Main.endGame(true)
 		new Timer(() => Camera.focusObjects.remove(this), 2000).resume()
 	}
 

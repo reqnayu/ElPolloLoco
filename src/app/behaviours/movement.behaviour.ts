@@ -39,12 +39,12 @@ export default class MovementBehaviour implements Updateable {
 		this.gameObject.position.set(x, y)
 	}
 
-	public startWalking(): void {
+	private startWalking(): void {
 		// console.log(`${this.gameObject.name} started walking!`)
 		this.velocity.x = this.gameObject.direction * this.maxSpeed.x
 	}
 
-	public stopWalking(): void {
+	private stopWalking(): void {
 		// console.log(`${this.gameObject.name} stopped walking!`)
 		this.velocity.x = 0
 	}

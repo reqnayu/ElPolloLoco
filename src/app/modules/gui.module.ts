@@ -36,11 +36,13 @@ import Settings from "./settings.module.js"
 	]
 })
 export default abstract class Gui {
+	private static elementCache: Map<string, HTMLElement> = new Map()
 	public static soundBehaviour: SoundBehaviour
 	private static buttons: HTMLElement[] = []
 	private static statusBars: statusBars
 
 	public static async initialize(): Promise<void> {
+		this.cacheElements()
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: "gui",
 			assets: [
@@ -53,14 +55,62 @@ export default abstract class Gui {
 			]
 		})
 		this.statusBars = {
-			hp: Util.getElement("#hp-bar"),
-			coin: Util.getElement("#coin-bar"),
-			bottle: Util.getElement("#bottle-bar"),
-			endbossHp: Util.getElement("#endboss-hp-bar")
+			hp: this.getElement("#hp-bar"),
+			coin: this.getElement("#coin-bar"),
+			bottle: this.getElement("#bottle-bar"),
+			endbossHp: this.getElement("#endboss-hp-bar")
 		}
 		this.getButtons()
 		this.attachSounds()
 		this.loadSettings()
+	}
+
+	private static cacheElements(): void {
+		const elementSelectors = [
+			"#gui",
+			"#settings",
+			"#game-settings",
+			"#audio-settings",
+			"#keyBindSettings",
+			"#keyBindModal",
+			"#end-screen",
+			".splash-screen",
+			"input#master",
+			"input#sfx",
+			"input#music",
+			"input#menu",
+			"input#snore",
+			"input#toggle-fps",
+			"#fps-counter",
+			"#main-menu",
+			"#hp-bar",
+			"#coin-bar",
+			"#bottle-bar",
+			"#endboss-hp-bar",
+			"[data-click='PAUSE']",
+			"[data-click='TOGGLE_FULLSCREEN']",
+			"[data-click='MOVE_LEFT']",
+			"[data-click='MOVE_RIGHT']",
+			"[data-click='JUMP']",
+			"[data-click='THROW']"
+		]
+		elementSelectors.forEach((sel) => this.elementCache.set(sel, Util.getElement(sel)))
+	}
+
+	public static getElement<T extends HTMLElement>(sel: string): T {
+		return this.elementCache.get(sel) as T
+	}
+
+	public static openWindow(id: string): HTMLElement {
+		const el = this.getElement(`#${id}`)
+		el.classList.add("open")
+		return el
+	}
+
+	public static closeWindow(id: string): void {
+		const container = this.getElement(`#${id}`)
+		container.classList.remove("open")
+		container.getAllElements(".open").forEach((el) => el.classList.remove("open"))
 	}
 
 	public static async reset(): Promise<void> {

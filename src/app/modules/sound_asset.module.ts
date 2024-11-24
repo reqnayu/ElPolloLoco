@@ -8,6 +8,7 @@ export default class SoundAsset {
 	audioElement: HTMLAudioElement
 	disabled = false
 	name: string
+	private instances: HTMLAudioElement[] = []
 
 	constructor(
 		public audioType: keyof Omit<audioTypes, "master">,
@@ -22,23 +23,35 @@ export default class SoundAsset {
 	}
 
 	setVolume(): void {
-		this.audioElement.volume = SoundManager.getVolume(this.audioType)
+		const volume = SoundManager.getVolume(this.audioType)
+		this.audioElement.volume = volume
+		this.instances.forEach((instance) => (instance.volume = volume))
 	}
 
 	async playOnce(): Promise<void> {
 		if (this.disabled) return
-		this.audioElement.play()
+		const sound = this.newInstance()
+		sound.play()
 		return new Promise((resolve, reject) => {
-			this.audioElement.addEventListener("stop", () => reject())
-			this.audioElement.addEventListener(
+			sound.addEventListener("stop", () => reject())
+			sound.addEventListener(
 				"ended",
 				() => {
 					resolve()
-					this.audioElement.currentTime = 0
+					sound.currentTime = 0
+					this.instances.remove(sound)
+					sound.remove()
 				},
 				{ once: true }
 			)
 		})
+	}
+
+	private newInstance(): HTMLAudioElement {
+		const sound = this.audioElement.cloneNode() as HTMLAudioElement
+		sound.volume = this.audioElement.volume
+		this.instances.push(sound)
+		return sound
 	}
 
 	async playLooped(): Promise<void> {
@@ -54,41 +67,47 @@ export default class SoundAsset {
 
 	pause(): void {
 		if (!this.isPausable) return
-		this.audioElement.pause()
+		this.instances.forEach((instance) => instance.pause())
 	}
 
 	resume(): void {
 		if (!this.isPaused) return
-		this.audioElement.play()
+		this.instances.forEach((instance) => instance.play())
 	}
 
 	stop(): void {
-		if (this.audioElement.currentTime === 0) return
-		this.audioElement.currentTime = 0
-		this.audioElement.pause()
-		const stopEvent = new CustomEvent("stop")
-		this.audioElement.dispatchEvent(stopEvent)
+		this.instances.forEach((instance) => {
+			if (instance.currentTime === 0) return
+			instance.currentTime = 0
+			instance.pause()
+			const stopEvent = new CustomEvent("stop")
+			instance.dispatchEvent(stopEvent)
+		})
 	}
 
-	fadeOut(duration: number): Promise<void> {
-		return new Promise((resolve) => {
-			if (this.audioElement.paused) return resolve()
-			const startVolume = this.audioElement.volume
-			const frequency = 50
-			const stepSize = (startVolume / duration) * frequency
-			new Interval(
-				() => {
-					this.audioElement.volume = Math.max(0, this.audioElement.volume - stepSize)
-				},
-				frequency,
-				() => this.audioElement.volume === 0,
-				() => {
-					this.stop()
-					this.audioElement.volume = startVolume
-					resolve()
-				}
-			).resume()
-		})
+	fadeOut(duration: number): Promise<void[]> {
+		return Promise.all(
+			this.instances.map((instance) => {
+				return new Promise<void>((resolve) => {
+					if (instance.paused) return resolve()
+					const startVolume = instance.volume
+					const frequency = 50
+					const stepSize = (startVolume / duration) * frequency
+					new Interval(
+						() => {
+							instance.volume = Math.max(0, instance.volume - stepSize)
+						},
+						frequency,
+						() => instance.volume === 0,
+						() => {
+							this.stop()
+							instance.volume = startVolume
+							resolve()
+						}
+					).resume()
+				})
+			})
+		)
 	}
 
 	disable(): void {
@@ -100,7 +119,6 @@ export default class SoundAsset {
 		this.disabled = false
 		const typeVolume = SoundManager.volumes[this.audioType]
 		this.audioElement.volume = typeVolume
-		// SoundManager.setVolumeType(typeVolume, this.audioType)
 	}
 
 	get isPaused(): boolean {

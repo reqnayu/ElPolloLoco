@@ -1,7 +1,10 @@
-import { audioTypes, GameObjectType, keyInputAction, statusBars } from "../.types/types.js"
+import { audioTypes, GameObjectType, keyInputAction, lang, statusBars } from "../.types/types.js"
 import SoundManager from "../managers/sound.manager.js"
+import { Language } from "./language.module.js"
 
 export default abstract class Settings {
+	// public static language: lang = navigator.language.startsWith("de") ? "de" : "en"
+	public static language: lang = "de"
 	public static keyBindings: Record<keyInputAction, string> = {
 		MOVE_RIGHT: "KeyD",
 		MOVE_LEFT: "KeyA",
@@ -32,10 +35,12 @@ export default abstract class Settings {
 
 	public static initialize(): void {
 		this.loadSettings()
+		Language.change(this.language)
 	}
 
 	public static saveSettings(): void {
 		const settings: savedSettings = {
+			language: this.language,
 			keyBindings: this.keyBindings,
 			volumes: SoundManager.volumes,
 			snoreDisabled: this.snoreDisabled,
@@ -49,6 +54,7 @@ export default abstract class Settings {
 		const settingsString = localStorage.getItem("settings")
 		if (!settingsString) return this.saveSettings()
 		const settings = this.getSavedSettings(settingsString)
+		this.language = settings.language
 		this.keyBindings = settings.keyBindings
 		SoundManager.volumes = settings.volumes
 		this.snoreDisabled = settings.snoreDisabled
@@ -56,8 +62,11 @@ export default abstract class Settings {
 	}
 
 	private static getSavedSettings(settingsString: string): savedSettings {
-		const { keyBindings, volumes, snoreDisabled, fpsEnabled } = JSON.parse(settingsString) as Partial<savedSettings>
+		const { language, keyBindings, volumes, snoreDisabled, fpsEnabled } = JSON.parse(
+			settingsString
+		) as Partial<savedSettings>
 		if (
+			language === undefined ||
 			keyBindings === undefined ||
 			volumes === undefined ||
 			snoreDisabled === undefined ||
@@ -66,6 +75,7 @@ export default abstract class Settings {
 			this.saveSettings()
 		}
 		return {
+			language: language ?? this.language,
 			keyBindings: keyBindings ?? this.keyBindings,
 			volumes: volumes ?? SoundManager.volumes,
 			snoreDisabled: snoreDisabled ?? this.snoreDisabled,
@@ -75,6 +85,7 @@ export default abstract class Settings {
 }
 
 type savedSettings = {
+	language: lang
 	keyBindings: Record<keyInputAction, string>
 	volumes: Record<keyof audioTypes, number>
 	snoreDisabled: boolean

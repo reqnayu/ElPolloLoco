@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
+		<title>El Pollo Loco</title>
 		<link rel="stylesheet" href="fonts.css" />
 		<link rel="stylesheet" href="cssLib.css?v=1.2" />
 		<link rel="stylesheet" href="style.css?v=1.2" />
@@ -14,7 +14,7 @@
 			<div id="display"></div>
 			<div id="fps-counter"></div>
 			<div class="loading column">
-				<span>LOADING...</span>
+				<span data-lang="loading"></span>
 				<div class="row gap-20">
 					<div class="progress-track border btn">
 						<div class="progress-thumb"></div>
@@ -26,21 +26,33 @@
 			<div id="gui">
 				<header class="mobile-1 row">
 					<div id="statuses" class="status-container column">
-						<div id="hp-bar" class="status-bar health" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health.png)">
+						<div
+							id="hp-bar"
+							class="status-bar health"
+							style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
-						<div id="bottle-bar" class="status-bar bottle" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
+						<div
+							id="bottle-bar"
+							class="status-bar bottle"
+							style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
 						<!-- <div id="potion-bar" class="status-bar potion" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div> -->
-						<div id="coin-bar" class="status-bar coin" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_coin.png)">
+						<div
+							id="coin-bar"
+							class="status-bar coin"
+							style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_coin.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
 					</div>
 					<div class="status-container column">
-						<div id="endboss-hp-bar" class="status-bar health d-none" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health_endboss.png)">
+						<div
+							id="endboss-hp-bar"
+							class="status-bar health d-none"
+							style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health_endboss.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
 						</div>
 					</div>
@@ -56,8 +68,7 @@
 						</button>
 					</div>
 				</header>
-				<div id="mid-section" class="row">
-				</div>
+				<div id="mid-section" class="row"></div>
 				<div id="countdown"><span>3</span></div>
 				<footer class="mobile-1 row">
 					<div class="row gap-20">
@@ -85,57 +96,77 @@
 			<div id="main-menu" class="container open start">
 				<div class="title">El Pollo Loco</div>
 				<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
-				<div class="splash-screen">Press any button to start...</div>
+				<div class="splash-screen" data-lang="press_any_button">Press any button to start...</div>
 				<div class="menu-btns column">
-					<button class="btn btn-primary" data-click="NEW_GAME">New Game</button>
-					<button class="btn btn-primary" data-click="RESUME_GAME">Resume</button>
-					<button class="btn btn-primary" data-click="OPEN_SETTINGS">Settings</button>
-					<button class="btn btn-primary" data-click="RESTART_GAME">Restart</button>
+					<button class="btn btn-primary" data-click="NEW_GAME" data-lang="new_game">New Game</button>
+					<button class="btn btn-primary" data-click="RESUME_GAME" data-lang="resume_game">Resume</button>
+					<button class="btn btn-primary" data-click="OPEN_SETTINGS" data-lang="settings">Settings</button>
+					<button class="btn btn-primary" data-click="RESTART_GAME" data-lang="restart_game">Restart</button>
+					<button class="btn btn-primary" data-click="MAIN_MENU" data-lang="main_menu">Main Menu</button>
 				</div>
 				<div class="menu-content">
 					<div id="settings" class="container">
 						<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 						<div class="menu-btns column">
-							<button class="btn btn-primary" data-click="OPEN_GAME_SETTINGS">Game Settings</button>
-							<button class="btn btn-primary desktop" data-click="OPEN_KEYBIND_SETTINGS">Keybinds</button>
-							<button class="btn btn-primary" data-click="OPEN_AUDIO_SETTINGS">Audio</button>
+							<button class="btn btn-primary" data-click="OPEN_GAME_SETTINGS" data-lang="game_settings">
+								Game Settings
+							</button>
+							<button
+								class="btn btn-primary desktop"
+								data-click="OPEN_KEYBIND_SETTINGS"
+								data-lang="keybind_settings">
+								Keybinds
+							</button>
+							<button class="btn btn-primary" data-click="OPEN_AUDIO_SETTINGS" data-lang="audio_settings">
+								Audio
+							</button>
 						</div>
 						<div class="menu-content">
 							<div id="game-settings" class="container">
 								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+								<div id="language-setting" class="option">
+									<span data-lang="language_setting"></span>
+									<div class="row">
+										<button data-click="CHANGE_LANGUAGE" data-lang-setting="en">
+											<img src="app/assets/img/gui/en.webp" alt="" />
+										</button>
+										<button data-click="CHANGE_LANGUAGE" data-lang-setting="de">
+											<img src="app/assets/img/gui/de.webp" alt="" />
+										</button>
+									</div>
+								</div>
 								<div class="option">
-									<span>fps counter</span>
+									<span data-lang="fps_counter_setting">fps counter</span>
 									<input data-click="TOGGLE_FPS" type="checkbox" name="" id="toggle-fps" />
 								</div>
-							</div>
 							</div>
 							<div id="keyBindSettings" class="container">
 								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 								<div id="keybinds"></div>
-								<div id="singleKeyBind" class="container">Single KeyBind!</div>
+								<div id="singleKeyBind" class="container"></div>
 							</div>
 							<div id="audio-settings" class="container">
 								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
-								Volume
+								<span data-lang="volume"></span>
 								<div class="audio-options">
 									<div class="option">
-										<span>Master</span>
+										<span data-lang="master_volume">Master</span>
 										<input type="range" min="0" max="100" id="master" />
 									</div>
 									<div class="option">
-										<span>Music</span>
+										<span data-lang="music_volume">Music</span>
 										<input type="range" min="0" max="100" id="music" />
 									</div>
 									<div class="option">
-										<span>SFX</span>
+										<span data-lang="sfx_volume">SFX</span>
 										<input type="range" min="0" max="100" id="sfx" />
 									</div>
 									<div class="option">
-										<span>Menu</span>
+										<span data-lang="menu_volume">Menu</span>
 										<input type="range" min="0" max="100" id="menu" />
 									</div>
 									<div class="option">
-										<span>Snore</span>
+										<span data-lang="snore_volume">Snore</span>
 										<input data-click="TOGGLE_SNORE" type="checkbox" name="" id="snore" />
 									</div>
 								</div>
@@ -145,11 +176,21 @@
 				</div>
 				<div id="keyBindModal" class="txt-normal">
 					<div class="confirmation column">
-						<span>Press a key to bind or hold "Esc" to cancel</span>
+						<span data-lang="bind_key">Press a key to bind or hold "Esc" to cancel</span>
 						<div class="button-progress">
-							<button class="btn btn-primary keyboard" data-click="CANCEL_KEYBIND" data-keyboard="Escape">Cancel</button>
+							<button class="btn btn-primary keyboard" data-click="CANCEL_KEYBIND" data-keyboard="Escape">
+								<span data-lang="cancel">Cancel</span>
+							</button>
 						</div>
 					</div>
+				</div>
+			</div>
+			<div id="end-screen" class="container">
+				<span class="center d-none" data-lang="game_over"></span>
+				<span class="center d-none" data-lang="game_won"></span>
+				<div class="menu-btns column">
+					<div class="btn btn-primary" data-click="NEW_GAME" data-lang="new_game"></div>
+					<div class="btn btn-primary" data-click="MAIN_MENU" data-lang="main_menu"></div>
 				</div>
 			</div>
 		</div>

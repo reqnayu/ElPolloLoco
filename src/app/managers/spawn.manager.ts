@@ -9,14 +9,12 @@ export default abstract class SpawnManager {
 			spawnPosition < 5000;
 			spawnPosition += this.getRandomSpawnDistance()
 		) {
-			// Util.randomize([this.square, this.arch, this.line]).call(this, spawnPosition)
-			this.line(spawnPosition)
+			Util.randomize([this.square, this.arch, this.line]).call(this, spawnPosition)
 		}
 	}
 
 	private static getRandomSpawnDistance(): number {
-		// return Util.randomize(800, 1600, true)
-		return 600
+		return Util.randomize(800, 1600, true)
 	}
 
 	private static arch(spawnPosition: number): void {
@@ -48,7 +46,7 @@ export default abstract class SpawnManager {
 		const length = 400
 		const amount = 5
 		const rotation = 0
-		const verticalPosition = Util.randomize(40, 120, true)
+		const verticalPosition = Util.randomize(40, 220, true)
 		const centerPoint = new Vector(spawnPosition, verticalPosition)
 		const startPoint = centerPoint.plus(Vector.fromAngleAndRadius(-rotation, length / 2))
 		const positions = this.newForm(amount, (i) => {

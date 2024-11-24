@@ -4,12 +4,9 @@ body {
 	height: 100dvh;
 	width: 100vw;
 	display: grid;
+	overflow: hidden;
 	place-items: center;
 	background: url(app/assets/img/gui/floor.jpg) center/cover no-repeat;
-}
-
-* {
-	/* outline: 1px solid black; */
 }
 
 *:has(> .open) > :not(.open) {
@@ -23,7 +20,7 @@ body {
 	cursor: var(--cursor-normal);
 }
 
-#game:has(#main-menu.open) > :not(:is(#main-menu, .confirmation-container, .loading, #keyBindModal)) {
+#game:has(:is(#main-menu, #end-screen).open) :is(#gui, canvas) {
 	filter: blur(1px);
 }
 
@@ -60,6 +57,7 @@ canvas {
 }
 
 #main-menu.start {
+	z-index: 995;
 	inset: 0;
 	translate: unset;
 	width: 100%;
@@ -70,7 +68,7 @@ canvas {
 
 #main-menu.start > .menu-btns {
 	padding: 0 5%;
-	margin-right: 50%;
+	margin-right: 40%;
 }
 
 #main-menu.start .btn-secondary {
@@ -81,7 +79,7 @@ canvas {
 	display: none;
 }
 
-#main-menu.start :is([data-click="RESUME_GAME"], [data-click="RESTART_GAME"]) {
+#main-menu.start :is([data-click="RESUME_GAME"], [data-click="RESTART_GAME"], [data-click="MAIN_MENU"]) {
 	display: none;
 }
 
@@ -243,7 +241,7 @@ canvas {
 	padding: calc(var(--game-width) * 0.07) calc(var(--game-width) * 0.07);
 }
 
-#main-menu .container,
+.container,
 #main-menu:not(.start).container {
 	inset: 50% auto auto 50%;
 	translate: -50% -50%;
@@ -505,6 +503,22 @@ canvas {
 	align-items: center;
 }
 
+#language-setting div {
+	gap: calc(var(--game-width) * 0.01);
+}
+
+#language-setting button {
+	width: calc(var(--game-width) * 0.04);
+	aspect-ratio: 1;
+	border-radius: 9999px;
+	overflow: hidden;
+}
+
+#language-setting button img {
+	height: 100%;
+	object-fit: contain;
+}
+
 input[type="range"] {
 	-webkit-appearance: none;
 	appearance: none;
@@ -703,9 +717,8 @@ input[type="checkbox"]:checked::after {
 #fps-counter {
 	position: absolute;
 	color: yellow;
-	text-shadow: 0 0 1px solid black;
-	inset: 0 0 auto auto;
-	padding: 5px;
+	text-shadow: black 0 0 2px;
+	inset: 0 calc(var(--game-width) * 0.01) auto auto;
 	z-index: 900;
 	font-size: 0.5em;
 }
@@ -731,4 +744,8 @@ input[type="checkbox"]:checked::after {
 #display .row {
 	gap: 20px;
 	justify-content: space-between;
+}
+
+#end-screen {
+	z-index: 995;
 }

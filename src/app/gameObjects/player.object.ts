@@ -151,7 +151,7 @@ export default class Player extends GameObject {
 		this.soundBehaviour?.playOnce("Death")
 		new Timer(() => {
 			this.movementBehaviour = undefined
-			Main.looseGame()
+			Main.endGame(false)
 		}, 1500).resume()
 	}
 }

@@ -3,6 +3,10 @@ import GameObject from "../gameObjects/gameObject.object.js"
 export default abstract class CollisionManager {
 	private static allObjects: Map<number, GameObject> = new Map()
 
+	public static reset(): void {
+		this.allObjects.clear()
+	}
+
 	public static addObject(id: number, obj: GameObject): void {
 		this.allObjects.set(id, obj)
 	}

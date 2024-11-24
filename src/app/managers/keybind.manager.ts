@@ -1,4 +1,5 @@
 import { keyInputAction } from "../.types/types.js"
+import Gui from "../modules/gui.module.js"
 import Input from "../modules/input.module.js"
 import Settings from "../modules/settings.module.js"
 import Timer from "../modules/timer.module.js"
@@ -15,7 +16,7 @@ export default abstract class KeyBindManager {
 
 	public static openSingleKeyBind(target: HTMLElement): void {
 		const action = target.parentElement!.id as keyInputAction
-		Input.openWindow("keyBindModal")
+		Gui.openWindow("keyBindModal")
 		Input.toggleInput(true)
 		window.addReusableEventListener("keydown", (e, reuse) => this.attemptKeyBindPress(e, target, action, reuse))
 	}
@@ -118,7 +119,7 @@ export default abstract class KeyBindManager {
 	}
 
 	public static cancelKeybind(): void {
-		Input.closeWindow("keyBindModal")
+		Gui.closeWindow("keyBindModal")
 		Input.toggleInput(false)
 	}
 

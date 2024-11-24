@@ -1,5 +1,5 @@
 import "../.types/prototypes.js"
-import { keyInputAction, inputMap, mouseInputAction, audioTypes } from "../.types/types.js"
+import { keyInputAction, inputMap, mouseInputAction, audioTypes, lang } from "../.types/types.js"
 import Util from "../util/general.util.js"
 import SoundManager from "../managers/sound.manager.js"
 import KeyBindManager from "../managers/keybind.manager.js"
@@ -7,23 +7,23 @@ import Settings from "./settings.module.js"
 import Main from "./main.module.js"
 import Gui from "./gui.module.js"
 import Renderer from "./renderer.module.js"
+import { Language } from "./language.module.js"
 
 export default class Input {
 	private static activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
-	public static isBlocked = false
-	private static isKeyInputBlocked = false
-	private static elementCache: Map<string, HTMLElement> = new Map()
-
-	public static toggleKeyInput(bool?: boolean): boolean {
-		if (bool !== undefined) this.isKeyInputBlocked = !bool
-		else this.isKeyInputBlocked = !this.isKeyInputBlocked
-		return this.isKeyInputBlocked
-	}
+	public static isPlayerInputBlocked = true
+	private static isBlocked = true
 
 	public static toggleInput(bool?: boolean): boolean {
 		if (bool !== undefined) this.isBlocked = !bool
 		else this.isBlocked = !this.isBlocked
 		return this.isBlocked
+	}
+
+	public static togglePlayerInput(bool?: boolean): boolean {
+		if (bool !== undefined) this.isPlayerInputBlocked = !bool
+		else this.isPlayerInputBlocked = !this.isPlayerInputBlocked
+		return this.isPlayerInputBlocked
 	}
 
 	public static keyMap: inputMap<"key"> = {
@@ -53,10 +53,10 @@ export default class Input {
 	static clickTargetMap: inputMap<"mouse"> = {
 		...this.keyMap,
 		OPEN_SETTINGS: {
-			release: () => this.openWindow("settings")
+			release: () => Gui.openWindow("settings")
 		},
 		OPEN_KEYBIND_SETTINGS: {
-			release: () => this.openWindow("keyBindSettings")
+			release: () => Gui.openWindow("keyBindSettings")
 		},
 		OPEN_GAME_SETTINGS: {
 			release: () => this.openGameSettings()
@@ -79,57 +79,31 @@ export default class Input {
 		TOGGLE_SNORE: {
 			release: () => this.toggleSnore()
 		},
+		CHANGE_LANGUAGE: {
+			release: (target) => this.changeLanguage(target)
+		},
 		TOGGLE_FPS: {
 			release: () => this.toggleFps()
 		},
 		NEW_GAME: {
 			release: () => this.newGame()
 		},
+		MAIN_MENU: {
+			release: () => this.enterMainMenu()
+		},
 		RESUME_GAME: {
 			release: () => this.togglePause()
 		}
 	}
 
-	public static getElement<T extends HTMLElement>(sel: string): T {
-		return this.elementCache.get(sel) as T
-	}
-
 	public static initialize(): void {
 		KeyBindManager.initialize()
-		this.cacheElements()
 		window.addEventListener("pointerdown", (e) => this.clickHandler(e))
 		window.addEventListener("keydown", (e) => this.keyHandler(e))
 		window.addEventListener("keyup", (e) => this.keyHandler(e))
 		// this.addZoomFunctionality()
 		this.addVolumeSliderFunctionality()
 		this.addSplashScreenFunctionality()
-	}
-
-	private static cacheElements(): void {
-		const elementSelectors = [
-			"#gui",
-			"#settings",
-			"#game-settings",
-			"#audio-settings",
-			"#keyBindSettings",
-			"#keyBindModal",
-			".splash-screen",
-			"input#master",
-			"input#sfx",
-			"input#music",
-			"input#menu",
-			"input#snore",
-			"input#toggle-fps",
-			"#fps-counter",
-			"#main-menu",
-			"[data-click='PAUSE']",
-			"[data-click='TOGGLE_FULLSCREEN']",
-			"[data-click='MOVE_LEFT']",
-			"[data-click='MOVE_RIGHT']",
-			"[data-click='JUMP']",
-			"[data-click='THROW']"
-		]
-		elementSelectors.forEach((sel) => this.elementCache.set(sel, Util.getElement(sel)))
 	}
 
 	private static clickHandler(e: Event): void {
@@ -162,7 +136,7 @@ export default class Input {
 	}
 
 	private static keyHandler(e: KeyboardEvent): void {
-		if (this.isKeyInputBlocked) return
+		if (this.isBlocked) return
 		// console.log(e.code)
 		const isKeyDown = e.type === "keydown"
 		const action = Object.entries(Settings.keyBindings).find(([, key]) => key === e.code)?.[0] as keyInputAction
@@ -185,7 +159,7 @@ export default class Input {
 	// Player Actions
 
 	private static startMove(direction: "left" | "right"): void {
-		if (this.isBlocked) return
+		if (this.isPlayerInputBlocked) return
 		switch (direction) {
 			case "left":
 				Main.player.movementBehaviour!.input.isMovingLeft = true
@@ -197,18 +171,18 @@ export default class Input {
 	}
 
 	private static stopMove(direction: "left" | "right"): void {
-		if (this.isBlocked) return
+		if (this.isPlayerInputBlocked) return
 		if (direction === "left") Main.player.movementBehaviour!.input.isMovingLeft = false
 		else if (direction === "right") Main.player.movementBehaviour!.input.isMovingRight = false
 	}
 
 	private static jump(bool: boolean): void {
-		if (this.isBlocked) return
+		if (this.isPlayerInputBlocked) return
 		Main.player.movementBehaviour!.input.isJumping = bool
 	}
 
 	private static throw(): void {
-		if (this.isBlocked) return
+		if (this.isPlayerInputBlocked) return
 		// console.log("throwing!")
 		Main.player.throwBottle()
 	}
@@ -216,7 +190,10 @@ export default class Input {
 	// gui actions
 
 	private static enterMainMenu(): void {
-		this.getElement(".splash-screen")?.remove()
+		Gui.getElement(".splash-screen")?.remove()
+		Gui.openWindow("main-menu").classList.add("start")
+		Gui.closeWindow("end-screen")
+		Gui.soundBehaviour.stop("Game")
 		Gui.soundBehaviour.playLooped("Menu")
 	}
 
@@ -224,32 +201,23 @@ export default class Input {
 		await Renderer.toggleFullscreen()
 	}
 
-	public static openWindow(id: string): void {
-		this.getElement(`#${id}`)?.classList.add("open")
-	}
-
-	public static closeWindow(id: string): void {
-		const container = this.getElement(`#${id}`)
-		container.classList.remove("open")
-		container.getAllElements(".open").forEach((el) => el.classList.remove("open"))
-	}
-
 	private static closeContainer(target: HTMLElement): void {
 		const id = target.closest(".container")!.id
-		this.closeWindow(id)
+		Gui.closeWindow(id)
 		if (id === "main-menu") this.resumeGame()
 	}
 
 	private static openAudioSettings(): void {
 		Object.entries(SoundManager.volumes).forEach(
-			([type, volume]) => (this.getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
+			([type, volume]) => (Gui.getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
-		this.openWindow("audio-settings")
+		Gui.openWindow("audio-settings")
 	}
 
 	private static openGameSettings(): void {
-		this.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
-		this.openWindow("game-settings")
+		Gui.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
+		Util.getElement(`[data-lang-setting="${Settings.language}"]`).classList.add("border")
+		Gui.openWindow("game-settings")
 	}
 
 	private static toggleSnore(): void {
@@ -264,29 +232,39 @@ export default class Input {
 	private static toggleFps(): void {
 		Settings.fpsEnabled = !Settings.fpsEnabled
 		Settings.saveSettings()
-		this.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
+		Gui.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
+	}
+
+	private static changeLanguage(target: HTMLElement): void {
+		const lang = target.dataset.langSetting as lang
+		Language.change(lang)
+		target
+			.parentElement!.getAllElements("button")
+			.forEach((button) => button.classList.toggle("border", button === target))
 	}
 
 	private static togglePause(): void {
-		const mainMenuIsOpen = this.getElement("#main-menu").classList.contains("open")
+		const mainMenuIsOpen = Gui.getElement("#main-menu").classList.contains("open")
 		mainMenuIsOpen ? this.resumeGame() : this.pauseGame()
 	}
 
 	public static pauseGame(): void {
-		this.openWindow("main-menu")
+		Gui.openWindow("main-menu")
 		Main.pause()
 	}
 
 	public static resumeGame(): void {
-		this.closeWindow("main-menu")
+		Gui.closeWindow("main-menu")
 		Main.resume()
 	}
 
 	public static newGame(): void {
-		this.getElement("#main-menu").classList.remove("start")
+		Gui.getElement("#main-menu").classList.remove("start")
 		Main.setupNewGame()
-		Renderer.shouldUpdateStatically = false
-		this.closeWindow("main-menu")
+		Gui.closeWindow("main-menu")
+		Gui.closeWindow("end-screen")
+		this.isPlayerInputBlocked = false
+		this.isBlocked = false
 	}
 
 	public static async restartGame(): Promise<void> {

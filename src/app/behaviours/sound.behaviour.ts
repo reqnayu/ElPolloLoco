@@ -42,7 +42,7 @@ export default class SoundBehaviour implements Audible {
 		this.getSound(name)?.stop()
 	}
 
-	public fadeOut(name: string, duration: number): Promise<void> {
+	public fadeOut(name: string, duration: number): Promise<void[]> {
 		return this.getSound(name)!.fadeOut(duration)
 	}
 

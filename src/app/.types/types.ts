@@ -27,6 +27,8 @@ import JumpState from "../states/jump.state.js"
 import RotationState from "../states/rotation.state.js"
 import WalkState from "../states/walk.state.js"
 
+export type lang = "en" | "de"
+
 export type audioTypes = {
 	master?: undefined
 	music: HTMLAudioElement[]

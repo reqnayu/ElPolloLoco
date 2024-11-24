@@ -11,13 +11,14 @@ import Clouds from "../gameObjects/clouds.object.js"
 import Enemy from "../gameObjects/enemy.object.js"
 import Timer from "./timer.module.js"
 import Endboss from "../gameObjects/endboss.object.js"
-import Util from "../util/general.util.js"
 import SpawnManager from "../managers/spawn.manager.js"
 import TriggerManager from "../managers/trigger.manager.js"
 import AssetManager from "../managers/asset.manager.js"
 import Input from "./input.module.js"
 import Camera from "./camera.module.js"
 import Settings from "./settings.module.js"
+import { Language } from "./language.module.js"
+import CollisionManager from "../managers/collision.manager.js"
 
 export default abstract class Main {
 	public static canvas: HTMLCanvasElement
@@ -33,12 +34,7 @@ export default abstract class Main {
 	public static hasStarted = false
 	private static countdownTimer?: Timer
 	public static totalTime = 0
-
-	// renderer: Renderer
-	// soundManager!: SoundManager
-	// timerManager!: TimerManager
-	// triggerManager!: TriggerManager
-	// gui!: Gui
+	private static animationFrameId: number | null = null
 
 	public static player: Player
 	public static background: Background
@@ -52,13 +48,13 @@ export default abstract class Main {
 		this.canvas = canvas
 		this.ctx = this.canvas.getContext("2d")!
 		this.gameElement = gameElement
+		await Language.initialize()
 		await AssetManager.loadAssets()
 		Settings.initialize()
 		Input.initialize()
 		SoundManager.initialize()
 		TimerManager.initialize()
 		Gui.initialize()
-		TimerManager.initialize()
 		Renderer.initialize()
 	}
 
@@ -84,11 +80,16 @@ export default abstract class Main {
 	}
 
 	public static setupNewGame(): void {
+		if (this.animationFrameId !== null) {
+			cancelAnimationFrame(this.animationFrameId)
+			this.animationFrameId = null
+		}
 		this.totalTime = 0
+		CollisionManager.reset()
+		this.setUpObjects()
 		Input.toggleInput(false)
 		this.hasStarted = false
 		this.countdownTimer?.kill()
-		this.setUpObjects()
 		Renderer.reset()
 		Camera.initialize()
 		Gui.reset()
@@ -122,7 +123,7 @@ export default abstract class Main {
 	private static update() {
 		Renderer.render()
 		TriggerManager.check()
-		requestAnimationFrame(() => this.update())
+		this.animationFrameId = requestAnimationFrame(() => this.update())
 	}
 
 	private static initializeGamePauseOnVisibilityChange(): void {
@@ -146,23 +147,16 @@ export default abstract class Main {
 		this.countdownTimer = new Timer(() => this.startCountDown(secondsLeft - 1), 1000, false).resume()
 	}
 
-	public static winGame(): void {
-		console.log("Game Won!")
-		this.endGame("won")
-	}
-
-	public static looseGame(): void {
-		console.log("Game Over!")
-		this.endGame("lost")
-	}
-
-	private static endGame(state: "won" | "lost"): void {
-		console.log(`${state} in ${Util.formatTime(this.totalTime)}!`)
+	public static endGame(won: boolean): void {
+		Gui.getElement("#end-screen").getElement("[data-lang='game_won']").classList.toggle("d-none", !won)
+		Gui.getElement("#end-screen").getElement("[data-lang='game_over']").classList.toggle("d-none", won)
+		Gui.openWindow("end-screen")
+		Input.toggleInput(false)
+		// console.log(`${state} in ${Util.formatTime(this.totalTime)}!`)
 	}
 
 	public static spawnEndboss(): void {
-		console.log("spawning endboss")
+		// console.log("spawning endboss")
 		this.endboss = GameObjectFactory.create("endboss")
-		// this.endboss.spawn()
 	}
 }

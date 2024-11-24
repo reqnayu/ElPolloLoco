@@ -8,7 +8,6 @@ import Main from "./main.module.js"
 import Vector from "./vector.module.js"
 
 export default abstract class Renderer {
-	public static shouldUpdateStatically = true
 	private static currentFrame = 0
 	private static timeOfLastFrame = 0
 	private static windowScale = 0.8
@@ -22,17 +21,12 @@ export default abstract class Renderer {
 		"bottle"
 	]
 
-	private static lastTime = 0
 	private static fps = 0
 	private static frameTimes: number[] = []
 	private static numFramesToAverage = 30
 
 	private static calculateFps(deltaTime: number): void {
-		const currentTime = Date.now()
-		const frameTime = currentTime - this.lastTime
-		this.lastTime = currentTime
-
-		this.frameTimes.push(frameTime)
+		this.frameTimes.push(deltaTime)
 		if (this.frameTimes.length > this.numFramesToAverage) {
 			this.frameTimes.shift()
 		}
@@ -42,12 +36,14 @@ export default abstract class Renderer {
 	}
 
 	public static initialize(): void {
-		// this.updateDimensions()
 		this.staticDimensionUpdate()
 	}
 
 	public static reset(): void {
-		// TO DO
+		this.fps = 0
+		this.frameTimes = []
+		this.timeOfLastFrame = 0
+		// console.log("renderer reset")
 	}
 
 	public static updateDimensions(): void {
@@ -65,26 +61,24 @@ export default abstract class Renderer {
 		Main.ctx.clearRect(0, 0, width, height)
 	}
 
-	private static readonly desiredFps = 60
-	private static readonly frameDuration = 1000 / this.desiredFps
+	// private static readonly desiredFps = 60
+	// private static readonly frameDuration = 1000 / this.desiredFps
 
 	public static render() {
 		const now = Date.now()
 		let deltaTime = 0
-		// if (now - this.timeOfLastFrame >= this.frameDuration) {
-		this.updateDimensions()
 		this.wipe()
 
 		deltaTime = now - this.timeOfLastFrame
 		this.timeOfLastFrame = now
 
+		this.getSortedObjects().forEach((gameObject) => this.renderObject(gameObject, deltaTime))
 		if (this.shouldUpdate()) {
 			Main.totalTime += deltaTime
 			this.currentFrame++
 			Camera.update(deltaTime)
 			CollisionManager.checkAll()
 		}
-		this.getSortedObjects().forEach((gameObject) => this.renderObject(gameObject, deltaTime))
 
 		this.calculateFps(deltaTime)
 		this.displayPerformanceMetrics()
@@ -122,7 +116,6 @@ export default abstract class Renderer {
 	}
 
 	private static staticDimensionUpdate(): void {
-		if (this.shouldUpdateStatically === false) return
 		this.updateDimensions()
 		requestAnimationFrame(() => this.staticDimensionUpdate())
 	}
