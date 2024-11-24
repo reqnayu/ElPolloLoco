@@ -60,6 +60,7 @@ export default abstract class Gui {
 		}
 		this.getButtons()
 		this.attachSounds()
+		this.loadSettings()
 	}
 
 	public static async reset(): Promise<void> {
@@ -111,6 +112,12 @@ export default abstract class Gui {
 					)
 				})
 			})
+	}
+
+	private static loadSettings(): void {
+		Util.getElement<HTMLInputElement>("input#snore").checked = !Settings.snoreDisabled
+		Util.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
+		Util.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
 	}
 
 	public static updateCountDown(secondsLeft: number): void {

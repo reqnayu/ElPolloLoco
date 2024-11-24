@@ -1,5 +1,5 @@
-import { Behaviour } from "../.types/interfaces.js"
 import { trigger } from "../.types/types.js"
+import { Behaviour } from "../.types/interfaces.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 import TriggerManager from "../managers/trigger.manager.js"
 

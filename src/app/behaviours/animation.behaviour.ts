@@ -1,7 +1,6 @@
 import { Updateable } from "../.types/interfaces.js"
 import GameObject from "../gameObjects/gameObject.object.js"
-import { AnimationSet } from "../.types/types.js"
-import { animationParams } from "../.types/types.js"
+import { animationParams, AnimationSet } from "../.types/types.js"
 
 export default class AnimationBehaviour implements Updateable {
 	gameObject!: GameObject
@@ -33,7 +32,7 @@ export default class AnimationBehaviour implements Updateable {
 	): void {
 		if (!(animationName in this.animationSet)) return
 		if (typeof endCallbackOrShouldAlternate === "boolean") this.shouldAlternate = endCallbackOrShouldAlternate
-		else {
+		else if (typeof endCallbackOrShouldAlternate === "function") {
 			this.shouldLoop = false
 			this.endOfAnimationCallback = endCallbackOrShouldAlternate
 		}
@@ -43,26 +42,9 @@ export default class AnimationBehaviour implements Updateable {
 		this.isPlaying = true
 	}
 
-	// public setAnimation(
-	// 	animationName: keyof AnimationSet,
-	// 	shouldLoop = true,
-	// 	endOfAnimationCallback?: () => void,
-	// 	shouldAlternate = false
-	// ): void {
-	// 	if (!(animationName in this.animationSet)) return
-	// 	this.shouldLoop = shouldLoop
-	// 	this.endOfAnimationCallback = endOfAnimationCallback
-	// 	this.shouldAlternate = shouldAlternate
-	// 	this.currentAnimation = this.animationSet[animationName]!
-	// 	this._currentFrameIndex = 0
-	// 	this.isPlaying = true
-	// }
-
 	public onAttach(gameObject: GameObject): this {
 		// console.log(`animationBehaviour added to '${gameObject.name}'`)
 		this.gameObject = gameObject
-
-		// this.setAnimation("idle")
 		return this
 	}
 

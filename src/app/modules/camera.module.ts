@@ -4,7 +4,7 @@ import Main from "./main.module.js"
 import Vector from "./vector.module.js"
 
 export default class Camera {
-	public static _focus = Vector.zero
+	public static _focus: Vector
 	private static readonly pixelsPerFrame = 1.5
 	public static readonly aspectRatio = 16 / 9
 	public static readonly _baseResolution = new Vector(1280, 720)
@@ -22,7 +22,7 @@ export default class Camera {
 
 	public static get focus(): Vector {
 		const middleVec = this.resolution.scale(0.5)
-		const focusVector = this._focus.plus(middleVec.scale(-1))
+		const focusVector = (this._focus ?? Vector.zero).plus(middleVec.scale(-1))
 		// const x = clamp(focusVector.x, 0, this.maxPosX - this.resolution.x)
 		return new Vector(focusVector.x, 0)
 	}
@@ -44,42 +44,31 @@ export default class Camera {
 	}
 
 	public static initialize(): void {
-		this._focus = Vector.zero
+		this.zoom = 1
 		this.focusObjects = [Main.player]
+		// this._focus = this.desiredFocus
+		this._focus = new Vector(this.resolution.x / 2, 0)
 	}
 
 	public static update(deltaTime: number): void {
 		this.updateFocus(deltaTime)
 		this.updateZoom(deltaTime)
-		// Display.update("zoom", this.desiredZoom)
-		// Display.render()
 	}
 
 	private static updateZoom(deltaTime: number): void {
 		if (this.zoom === this.desiredZoom) return
 		const zoomFactor = 1 / 500
 		const stepSize = (this.desiredZoom - this.zoom) * deltaTime * zoomFactor
-		// if (stepSize < 0.0001) {
-		// 	this.zoom = this.desiredZoom
-		// 	return
-		// }
 		this.zoom += stepSize
 	}
 
 	private static updateFocus(deltaTime: number) {
 		if (this.focusObjects.length === 0) return
-		// objectFocus.x = clamp(objectFocus.x, 0, this.maxPosX)
-
 		const distance = this._focus.plus(this.desiredFocus.scale(-1))
 		if (Math.abs(distance.x) <= 1) return (this._focus.x = this.desiredFocus.x)
 		const step = distance.normalize().scale(-this.pixelsPerFrame * deltaTime)
 		this._focus.x += step.x
 	}
-
-	// changeZoom(dir: 1 | -1): void {
-	// 	const stepSize = 0.1
-	// 	this.zoom = clamp(this.zoom + dir * stepSize, this.minZoom, this.maxZoom)
-	// }
 
 	private static getStartAndEndFocusObjects(): [GameObject, GameObject] {
 		const objects = this.focusObjects.sort((a, b) => a.position.x - b.position.x)

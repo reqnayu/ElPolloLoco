@@ -1,6 +1,5 @@
-import { collisionParams } from "../.types/types.js"
+import { collisionParams, GameObjectType } from "../.types/types.js"
 import { Updateable } from "../.types/interfaces.js"
-import { GameObjectType } from "../.types/types.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 import CollisionManager from "../managers/collision.manager.js"
 import Timer from "../modules/timer.module.js"

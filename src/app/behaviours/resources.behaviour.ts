@@ -1,8 +1,8 @@
 import { resourceAmountParams } from "../.types/types.js"
+import { Updateable } from "../.types/interfaces.js"
 import { BottleResource } from "../modules/bottle_resource.module.js"
 import { CoinResource } from "../modules/coin_resource.module.js"
 import { HealthResource } from "../modules/health_resource.module.js"
-import { Updateable } from "../.types/interfaces.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 
 export default class ResourceBehaviour implements Updateable {

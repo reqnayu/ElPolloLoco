@@ -95,7 +95,7 @@ export default class Player extends GameObject {
 		this.triggerBehaviour = BehaviourFactory.create("trigger", [
 			{
 				name: "endbossSpawn",
-				conditionCallback: () => Main.endboss.position.x - this.position.x < Settings.spawnLocations.endboss,
+				conditionCallback: () => Settings.spawnLocations.endboss < this.position.x + 1000,
 				triggerCallback: () => Main.spawnEndboss()
 			}
 		]).onAttach(this)

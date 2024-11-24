@@ -21,7 +21,7 @@ export default abstract class GameObjectFactory {
 			case "bottle":
 				return new Bottle(options as bottleParams) as GameObjectMap[T]
 			case "enemy": {
-				const randomInt = Util.roundTo(Util.randomize(0, 1))
+				const randomInt = Util.randomize(0, 1, true)
 				return (randomInt === 0 ? new ChickenNormal() : new ChickenSmall()) as GameObjectMap[T]
 			}
 			case "endboss": {

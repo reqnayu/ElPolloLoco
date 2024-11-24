@@ -20,6 +20,10 @@ export default class Vector {
 		return new Vector(this.x, this.y)
 	}
 
+	public static copy(v: Vector): Vector {
+		return new Vector(v.x, v.y)
+	}
+
 	/**
 	 * modifies instance
 	 */

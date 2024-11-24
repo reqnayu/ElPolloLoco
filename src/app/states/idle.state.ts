@@ -1,19 +1,19 @@
+import { State, stateMap } from "../.types/types.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 import Timer from "../modules/timer.module.js"
-import { State, stateMap } from "../.types/types.js"
 
 export default class IdleState implements State {
-	type: keyof stateMap = "idle"
-	timers: Timer[] = []
+	public type: keyof stateMap = "idle"
+	public timers: Timer[] = []
 
-	enter(gameObject: GameObject): void {
+	public enter(gameObject: GameObject): void {
 		// console.log(`'${gameObject.name}' entering idle state!`)
 		gameObject.animationBehaviour?.setAnimation("idle")
 		this.addIdleLongTimer(gameObject)
 		gameObject.focusOffset = 200
 	}
 
-	update(gameObject: GameObject, deltaTime: number): void {
+	public update(gameObject: GameObject, deltaTime: number): void {
 		if (deltaTime === 0) return
 		if (gameObject.movementBehaviour?.canMove() === true) {
 			// gameObject.movementBehaviour?.move()
@@ -22,7 +22,7 @@ export default class IdleState implements State {
 		if (gameObject.movementBehaviour?.canJump() === true) gameObject.setState("jump")
 	}
 
-	exit(gameObject: GameObject): void {
+	public exit(gameObject: GameObject): void {
 		this.timers.forEach((timer) => timer.kill())
 		gameObject.soundBehaviour?.stop("Snore")
 	}

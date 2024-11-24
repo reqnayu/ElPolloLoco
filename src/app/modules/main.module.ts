@@ -9,9 +9,7 @@ import Player from "../gameObjects/player.object.js"
 import Background from "../gameObjects/background.object.js"
 import Clouds from "../gameObjects/clouds.object.js"
 import Enemy from "../gameObjects/enemy.object.js"
-import Vector from "./vector.module.js"
 import Timer from "./timer.module.js"
-import "../managers/asset.manager.js"
 import Endboss from "../gameObjects/endboss.object.js"
 import Util from "../util/general.util.js"
 import SpawnManager from "../managers/spawn.manager.js"
@@ -65,6 +63,7 @@ export default abstract class Main {
 	}
 
 	private static setUpObjects(): void {
+		this.allObjects = new Map()
 		this.background = GameObjectFactory.create("background")
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
@@ -73,10 +72,7 @@ export default abstract class Main {
 			// GameObjectFactory.create("enemy"),
 			// GameObjectFactory.create("enemy")
 		]
-		this.endboss = GameObjectFactory.create("endboss")
-		SpawnManager.square("coin", new Vector(2000, 100), 100, Math.PI / 4)
-		SpawnManager.arch("coin", new Vector(3000, 180), 200, 5)
-		SpawnManager.line("coin", new Vector(1000, 80), 400, 5)
+		SpawnManager.initialize()
 	}
 
 	public static addObject(id: number, obj: GameObject): void {
@@ -90,10 +86,9 @@ export default abstract class Main {
 	public static setupNewGame(): void {
 		this.totalTime = 0
 		Input.toggleInput(false)
-		this.allObjects = new Map()
-		this.setUpObjects()
 		this.hasStarted = false
 		this.countdownTimer?.kill()
+		this.setUpObjects()
 		Renderer.reset()
 		Camera.initialize()
 		Gui.reset()
@@ -116,14 +111,12 @@ export default abstract class Main {
 	public static pause() {
 		window.dispatchEvent(new CustomEvent("pausegame"))
 		this.isPaused = true
-		console.log("pause")
 	}
 
 	public static resume() {
 		this.initializeGamePauseOnVisibilityChange()
 		window.dispatchEvent(new CustomEvent("resumegame"))
 		this.isPaused = false
-		console.log("resume")
 	}
 
 	private static update() {
@@ -143,7 +136,7 @@ export default abstract class Main {
 		)
 	}
 
-	public static startCountDown(secondsLeft = 0): void {
+	public static startCountDown(secondsLeft = Settings.countdownTime): void {
 		Gui.updateCountDown(secondsLeft)
 		if (secondsLeft === 0) {
 			this.hasStarted = true
@@ -169,6 +162,7 @@ export default abstract class Main {
 
 	public static spawnEndboss(): void {
 		console.log("spawning endboss")
-		this.endboss.spawn()
+		this.endboss = GameObjectFactory.create("endboss")
+		// this.endboss.spawn()
 	}
 }

@@ -1,6 +1,7 @@
 import { GameObjectType } from "../.types/types.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 import CollisionManager from "../managers/collision.manager.js"
+import Display from "../util/devtools.util.js"
 import Util from "../util/general.util.js"
 import Camera from "./camera.module.js"
 import Main from "./main.module.js"
@@ -87,7 +88,7 @@ export default abstract class Renderer {
 
 		this.calculateFps(deltaTime)
 		this.displayPerformanceMetrics()
-		// }
+		Display.render()
 	}
 
 	private static displayPerformanceMetrics(): void {

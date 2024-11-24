@@ -499,7 +499,7 @@ canvas {
 	padding: 0 calc(var(--game-width) * 0.04);
 }
 
-.audio-options > div {
+.option {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;

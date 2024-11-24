@@ -1,6 +1,5 @@
 import { Drawable } from "../.types/interfaces.js"
-import { Frame } from "../.types/types.js"
-import { drawParams } from "../.types/types.js"
+import { drawParams, Frame } from "../.types/types.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 import Camera from "../modules/camera.module.js"
 

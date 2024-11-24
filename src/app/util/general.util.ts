@@ -46,9 +46,20 @@ export default abstract class Util {
 		return Math.min(Math.max(number, min), max)
 	}
 
-	public static randomize(min: number, max: number): number {
-		const range = max - min
-		return Math.random() * range + min
+	public static randomize(min: number, max: number): number
+	public static randomize(min: number, max: number, rounded: boolean): number
+	public static randomize<T extends any>(items: T[]): T
+	public static randomize<T extends any>(minOrItems: number | T[], max?: number, rounded?: boolean): number | T {
+		if (typeof minOrItems === "number") {
+			const min = minOrItems
+			const range = max! - min + 1
+			const rand = Math.floor(Math.random() * range + min)
+			return rounded ? this.roundTo(rand) : rand
+		} else {
+			const items = minOrItems
+			const randomIndex = this.randomize(0, items.length - 1, true)
+			return items[randomIndex] as T
+		}
 	}
 
 	public static pointerEventIsLeftClick(e: Event): boolean {

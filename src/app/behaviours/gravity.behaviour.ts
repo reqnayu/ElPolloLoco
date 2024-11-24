@@ -1,7 +1,7 @@
-import Vector from "../modules/vector.module.js"
 import { Updateable } from "../.types/interfaces.js"
-import GameObject from "../gameObjects/gameObject.object.js"
 import { gravityParams } from "../.types/types.js"
+import Vector from "../modules/vector.module.js"
+import GameObject from "../gameObjects/gameObject.object.js"
 
 export default class GravityBehaviour implements Updateable {
 	gameObject!: GameObject

@@ -1,13 +1,12 @@
 import "../.types/prototypes.js"
+import { keyInputAction, inputMap, mouseInputAction, audioTypes } from "../.types/types.js"
 import Util from "../util/general.util.js"
-import { keyInputAction, inputMap, mouseInputAction } from "../.types/types.js"
 import SoundManager from "../managers/sound.manager.js"
 import KeyBindManager from "../managers/keybind.manager.js"
 import Settings from "./settings.module.js"
 import Main from "./main.module.js"
 import Gui from "./gui.module.js"
 import Renderer from "./renderer.module.js"
-import { audioTypes } from "../.types/types.js"
 
 export default class Input {
 	private static activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
@@ -60,7 +59,7 @@ export default class Input {
 			release: () => this.openWindow("keyBindSettings")
 		},
 		OPEN_GAME_SETTINGS: {
-			release: () => this.openWindow("game-settings")
+			release: () => this.openGameSettings()
 		},
 		OPEN_SINGLE_KEYBIND: {
 			release: (target) => KeyBindManager.openSingleKeyBind(target)
@@ -79,6 +78,9 @@ export default class Input {
 		},
 		TOGGLE_SNORE: {
 			release: () => this.toggleSnore()
+		},
+		TOGGLE_FPS: {
+			release: () => this.toggleFps()
 		},
 		NEW_GAME: {
 			release: () => this.newGame()
@@ -117,6 +119,8 @@ export default class Input {
 			"input#music",
 			"input#menu",
 			"input#snore",
+			"input#toggle-fps",
+			"#fps-counter",
 			"#main-menu",
 			"[data-click='PAUSE']",
 			"[data-click='TOGGLE_FULLSCREEN']",
@@ -240,8 +244,12 @@ export default class Input {
 		Object.entries(SoundManager.volumes).forEach(
 			([type, volume]) => (this.getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
-		this.getElement<HTMLInputElement>("input#snore").checked = !Settings.snoreDisabled
 		this.openWindow("audio-settings")
+	}
+
+	private static openGameSettings(): void {
+		this.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
+		this.openWindow("game-settings")
 	}
 
 	private static toggleSnore(): void {
@@ -251,6 +259,12 @@ export default class Input {
 		Settings.saveSettings()
 		if (!snoreSound) return
 		isDisabled ? snoreSound.disable() : snoreSound.enable()
+	}
+
+	private static toggleFps(): void {
+		Settings.fpsEnabled = !Settings.fpsEnabled
+		Settings.saveSettings()
+		this.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
 	}
 
 	private static togglePause(): void {
@@ -282,13 +296,6 @@ export default class Input {
 		})
 		if (restartConfirmed) this.newGame()
 	}
-
-	// addZoomFunctionality(): void {
-	// 	this.getElement("#gui").addEventListener("wheel", (e) => {
-	// 		const direction = e.deltaY > 0 ? 1 : -1
-	// 		MESSAGER.dispatch("main").renderer.camera.changeZoom(direction)
-	// 	})
-	// }
 
 	private static addVolumeSliderFunctionality(): void {
 		Util.getAllElements<HTMLInputElement>("input[type='range']").forEach((slider) => {

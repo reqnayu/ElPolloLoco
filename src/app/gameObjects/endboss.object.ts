@@ -7,6 +7,7 @@ import Gui from "../modules/gui.module.js"
 import Main from "../modules/main.module.js"
 import Camera from "../modules/camera.module.js"
 import GameObject from "./gameObject.object.js"
+import Settings from "../modules/settings.module.js"
 
 @Util.Assets({
 	img: [
@@ -33,19 +34,19 @@ export default class Endboss extends Enemy {
 			healthPoints: 400
 		})
 		this.dimensions.set(1045, 1217).toScaled(0.5)
-		this.position.set(2000, 100)
+		this.position.set(Settings.spawnLocations.endboss, 100)
 		this.initialize()
+		this.spawn()
 	}
 
 	protected override initialize(): void {
 		this.setBehaviours()
-		super.setBehaviours()
 		super.initialize()
-		this.animationBehaviour?.setAnimation("alert")
 		this.healthBarElement.classList.add("d-none")
 	}
 
 	protected override setBehaviours(): void {
+		super.setBehaviours()
 		const animationSet = this.getAnimationSet()
 		this.image = animationSet.alert[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
