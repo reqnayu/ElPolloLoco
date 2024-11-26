@@ -1,6 +1,7 @@
 import { keyInputAction } from "../.types/types.js"
 import Gui from "../modules/gui.module.js"
 import Input from "../modules/input.module.js"
+import { Language } from "../modules/language.module.js"
 import Settings from "../modules/settings.module.js"
 import Timer from "../modules/timer.module.js"
 import Util from "../util/general.util.js"
@@ -87,16 +88,16 @@ export default abstract class KeyBindManager {
 
 	private static keyBindOverWriteTemplate(key: string, alreadyBoundAction: keyInputAction): string {
 		const keyInFont = mapCodeToKeyboardFont(key)
-		const readableAction = mapActionToReadable(alreadyBoundAction)
-		return /*html*/ `
-			<span class="key">${keyInFont}</span> is already bound to <span class="action">${readableAction}</span>. Do you want to overwrite it?
-		`
+		return Language.get(
+			"key_already_bound",
+			/*html*/ `<span class="keyboard"><span>${keyInFont}</span></span>`,
+			/*html*/ `<span class="action">${Language.get(alreadyBoundAction.toLowerCase())}</span>`
+		)
 	}
 
 	private static alreadyBound(inputKey: string): [keyInputAction, string] | [] {
 		const [alreadyBoundAction, alreadyBoundKey] =
 			Object.entries(Settings.keyBindings).find(([_key, val]) => val === inputKey) ?? []
-
 		if (alreadyBoundAction && alreadyBoundKey) return [alreadyBoundAction as keyInputAction, alreadyBoundKey]
 		else return []
 	}
@@ -157,8 +158,8 @@ export default abstract class KeyBindManager {
 	private static renderKeybindSettings(): void {
 		const template = (key: string, action: string) => /*html*/ `
 			<div class="row" id="${action}">
-				<div class="action">${mapActionToReadable(action as keyInputAction)}</div>
-				<div class="keyboard btn btn-primary" data-click="OPEN_SINGLE_KEYBIND" data-keyboard="${key}"></div>
+				<div class="action">${Language.get(action.toLowerCase())}</div>
+				<div class="keyboard btn btn-primary border" data-click="OPEN_SINGLE_KEYBIND" data-keyboard="${key}"></div>
 			</div>
 		`
 		const container = Util.getElement("#keybinds")
@@ -181,13 +182,6 @@ export default abstract class KeyBindManager {
 			e.preventDefault()
 		})
 	}
-}
-
-function mapActionToReadable(action: keyInputAction): string {
-	return action
-		.split("_")
-		.map((word) => Util.capitalizeFirstLetter(word))
-		.join(" ")
 }
 
 function mapCodeToKey(code: string): string {

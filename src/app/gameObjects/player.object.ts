@@ -124,8 +124,8 @@ export default class Player extends GameObject {
 		switch (target.name) {
 			case "coin":
 				return this.resourceBehaviour?.add("coins", 1)
-			case "bottle":
-				return this.resourceBehaviour?.add("bottles", 1)
+			// case "bottle":
+			// 	return this.resourceBehaviour?.add("bottles", 1)
 			case "enemy":
 			case "endboss": {
 				return this.collideWithEnemy(target)
@@ -139,7 +139,7 @@ export default class Player extends GameObject {
 		const damage = target.name === "enemy" ? 40 : 80
 		this.resourceBehaviour!.receiveDamage(damage)
 		const { currentAmount, maxAmount } = this.resourceBehaviour!.healthPoints
-		Gui.updateStatusBar("hp", currentAmount, maxAmount)
+		Gui.updateStatusBar("hp", currentAmount, maxAmount, true)
 		if (this.resourceBehaviour!.healthPoints.currentAmount === 0) return this.die()
 		this.setState("hurt")
 		this.soundBehaviour!.playRandom(["Hurt_1", "Hurt_2", "Hurt_3"])

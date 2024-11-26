@@ -75,6 +75,7 @@ export default class Bottle extends GameObject {
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			targets: ["enemy", "endboss"],
 			offsets: [30, 30, 30, 30],
+			cooldown: 1000,
 			damage: 100
 		}).onAttach(this)
 		this.soundBehaviour = BehaviourFactory.create("sound", {
@@ -89,7 +90,7 @@ export default class Bottle extends GameObject {
 			case "endboss":
 				return this.hitEnemy(target)
 			case "player":
-				this.collect()
+				this.collect(target)
 		}
 	}
 
@@ -108,7 +109,10 @@ export default class Bottle extends GameObject {
 		this.collisionBehaviour!.targets = ["player"]
 	}
 
-	private collect(): void {
+	private collect(player: GameObject): void {
+		const playerBottles = player.resourceBehaviour!.bottles!
+		if (playerBottles.fraction === 1) return
+		playerBottles.add()
 		this.soundBehaviour?.playOnce("Collect")
 		this.collisionBehaviour?.targets.remove("player")
 		this.movementBehaviour?.jump()

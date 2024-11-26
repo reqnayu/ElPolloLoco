@@ -87,6 +87,8 @@ export default abstract class Gui {
 			"#coin-bar",
 			"#bottle-bar",
 			"#endboss-hp-bar",
+			"#hp-buy",
+			"#bottle-buy",
 			"[data-click='PAUSE']",
 			"[data-click='TOGGLE_FULLSCREEN']",
 			"[data-click='MOVE_LEFT']",
@@ -126,17 +128,17 @@ export default abstract class Gui {
 		})
 	}
 
-	public static updateStatusBar(type: keyof statusBars, currentAmount: number, maxAmount: number): void {
+	public static updateStatusBar(
+		type: keyof statusBars,
+		currentAmount: number,
+		maxAmount: number,
+		showError = false
+	): void {
 		const roundedPercent = Util.roundTo(currentAmount / maxAmount, 2)
 		this.statusBars[type].style.setProperty("--value", roundedPercent.toString())
 		this.statusBars[type].getElement(".current-amount").innerHTML = currentAmount.toString()
 		this.statusBars[type].getElement(".max-amount").innerHTML = maxAmount.toString()
-		if (currentAmount === maxAmount) return
-		switch (type) {
-			case "hp":
-			case "endbossHp":
-				this.statusBarError(type)
-		}
+		if (showError === true) return this.statusBarError(type)
 	}
 
 	private static getButtons(): void {
@@ -165,9 +167,11 @@ export default abstract class Gui {
 	}
 
 	private static loadSettings(): void {
-		Util.getElement<HTMLInputElement>("input#snore").checked = !Settings.snoreDisabled
-		Util.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
-		Util.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
+		this.getElement<HTMLInputElement>("input#snore").checked = !Settings.snoreDisabled
+		this.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
+		this.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
+		this.getElement("#hp-buy").innerText = Settings.itemCosts.healthPoints.toString()
+		this.getElement("#bottle-buy").innerText = Settings.itemCosts.bottles.toString()
 	}
 
 	public static updateCountDown(secondsLeft: number): void {
@@ -180,6 +184,7 @@ export default abstract class Gui {
 	}
 
 	public static statusBarError(type: keyof statusBars): void {
+		console.trace()
 		Util.addAnimationClass(this.statusBars[type], "error")
 	}
 }

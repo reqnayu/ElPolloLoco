@@ -49,11 +49,12 @@ export default class Coin extends GameObject {
 		// console.log("coin collected!")
 		switch (target.name) {
 			case "player":
-				this.collect()
+				this.collect(target)
 		}
 	}
 
-	private collect(): void {
+	private collect(player: GameObject): void {
+		if (player.resourceBehaviour!.coins?.fraction === 1) return
 		this.soundBehaviour?.playOnce("Collect")
 		this.collisionBehaviour?.targets.remove("player")
 		this.movementBehaviour?.jump()

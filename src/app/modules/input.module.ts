@@ -1,5 +1,5 @@
 import "../.types/prototypes.js"
-import { keyInputAction, inputMap, mouseInputAction, audioTypes, lang } from "../.types/types.js"
+import { keyInputAction, inputMap, mouseInputAction, audioTypes, lang, resourceAmountParams } from "../.types/types.js"
 import Util from "../util/general.util.js"
 import SoundManager from "../managers/sound.manager.js"
 import KeyBindManager from "../managers/keybind.manager.js"
@@ -93,6 +93,12 @@ export default class Input {
 		},
 		RESUME_GAME: {
 			release: () => this.togglePause()
+		},
+		BUY_HEALTH: {
+			release: () => this.buyHealth()
+		},
+		BUY_BOTTLE: {
+			release: () => this.buyBottle()
 		}
 	}
 
@@ -185,6 +191,22 @@ export default class Input {
 		if (this.isPlayerInputBlocked) return
 		// console.log("throwing!")
 		Main.player.throwBottle()
+	}
+
+	private static buyHealth(): void {
+		this.buyResource("healthPoints", Settings.itemCosts.healthPoints, 50)
+	}
+
+	private static buyBottle(): void {
+		this.buyResource("bottles", Settings.itemCosts.bottles)
+	}
+
+	private static buyResource(type: keyof resourceAmountParams, cost: number, amount = 1): void {
+		const resourceBehaviour = Main.player.resourceBehaviour!
+		console.log("cost is: " + cost)
+		if (resourceBehaviour[type]!.fraction === 1) return resourceBehaviour[type]!.emptyUse()
+		if (resourceBehaviour.use("coins", cost) === false) return
+		resourceBehaviour.add(type, amount)
 	}
 
 	// gui actions

@@ -26,17 +26,31 @@
 			<div id="gui">
 				<header class="mobile-1 row">
 					<div id="statuses" class="status-container column">
-						<div
-							id="hp-bar"
-							class="status-bar health"
-							style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health.png)">
-							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
+						<div class="row">
+							<div
+								id="hp-bar"
+								class="status-bar health"
+								style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_health.png)">
+								<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
+							</div>
+							<button class="btn btn-primary btn-buy" id="hp-buy" data-click="BUY_HEALTH" data-cost="">
+								+
+							</button>
 						</div>
-						<div
-							id="bottle-bar"
-							class="status-bar bottle"
-							style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
-							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
+						<div class="row">
+							<div
+								id="bottle-bar"
+								class="status-bar bottle"
+								style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
+								<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
+							</div>
+							<button
+								class="btn btn-primary btn-buy"
+								id="bottle-buy"
+								data-click="BUY_BOTTLE"
+								data-cost="">
+								+
+							</button>
 						</div>
 						<!-- <div id="potion-bar" class="status-bar potion" style="--icon: url(app/assets/img/7_statusbars/3_icons/icon_salsa_bottle.png)">
 							<span class="current-amount">100</span><span>/</span><span class="max-amount">100</span>
@@ -57,11 +71,11 @@
 						</div>
 					</div>
 					<div class="row gap-20">
-						<button class="btn btn-primary btn-input" data-click="PAUSE">
+						<button class="btn btn-primary btn-input border" data-click="PAUSE">
 							<div class="keyboard dl" data-keyboard=""></div>
 							<img src="app/assets/img/gui/settings.png" alt="" />
 						</button>
-						<button class="btn btn-primary btn-input fullscreen" data-click="FULLSCREEN">
+						<button class="btn btn-primary btn-input border fullscreen" data-click="FULLSCREEN">
 							<div class="keyboard dl" data-keyboard=""></div>
 							<img src="app/assets/img/gui/enter-fullscreen.png" alt="" />
 							<img src="app/assets/img/gui/exit-fullscreen.png" alt="" />
@@ -72,21 +86,21 @@
 				<div id="countdown"><span>3</span></div>
 				<footer class="mobile-1 row">
 					<div class="row gap-20">
-						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_LEFT">
+						<button class="btn btn-primary btn-input border no-sound" data-click="MOVE_LEFT">
 							<div class="keyboard ur" data-keyboard=""></div>
 							&lt;
 						</button>
-						<button class="btn btn-primary btn-input no-sound" data-click="MOVE_RIGHT">
+						<button class="btn btn-primary btn-input border no-sound" data-click="MOVE_RIGHT">
 							<div class="keyboard ur" data-keyboard=""></div>
 							&gt;
 						</button>
 					</div>
 					<div class="row gap-20">
-						<button class="btn btn-primary btn-input no-sound" data-click="THROW">
+						<button class="btn btn-primary btn-input border no-sound" data-click="THROW">
 							<div class="keyboard ul" data-keyboard=""></div>
 							<img src="app/assets/img/gui/throw.png" alt="" />
 						</button>
-						<button class="btn btn-primary btn-input no-sound" data-click="JUMP">
+						<button class="btn btn-primary btn-input border no-sound" data-click="JUMP">
 							<div class="keyboard ul" data-keyboard=""></div>
 							<img src="app/assets/img/gui/jump.png" alt="" />
 						</button>
@@ -98,32 +112,48 @@
 				<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
 				<div class="splash-screen" data-lang="press_any_button">Press any button to start...</div>
 				<div class="menu-btns column">
-					<button class="btn btn-primary" data-click="NEW_GAME" data-lang="new_game">New Game</button>
-					<button class="btn btn-primary" data-click="RESUME_GAME" data-lang="resume_game">Resume</button>
-					<button class="btn btn-primary" data-click="OPEN_SETTINGS" data-lang="settings">Settings</button>
-					<button class="btn btn-primary" data-click="RESTART_GAME" data-lang="restart_game">Restart</button>
-					<button class="btn btn-primary" data-click="MAIN_MENU" data-lang="main_menu">Main Menu</button>
+					<button class="btn btn-primary border" data-click="NEW_GAME" data-lang="new_game">New Game</button>
+					<button class="btn btn-primary border" data-click="RESUME_GAME" data-lang="resume_game">
+						Resume
+					</button>
+					<button class="btn btn-primary border" data-click="OPEN_SETTINGS" data-lang="settings">
+						Settings
+					</button>
+					<button class="btn btn-primary border" data-click="RESTART_GAME" data-lang="restart_game">
+						Restart
+					</button>
+					<button class="btn btn-primary border" data-click="MAIN_MENU" data-lang="main_menu">
+						Main Menu
+					</button>
 				</div>
 				<div class="menu-content">
 					<div id="settings" class="container">
-						<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+						<button class="close-btn btn btn-secondary border" data-click="CLOSE_CONTAINER">X</button>
 						<div class="menu-btns column">
-							<button class="btn btn-primary" data-click="OPEN_GAME_SETTINGS" data-lang="game_settings">
+							<button
+								class="btn btn-primary border"
+								data-click="OPEN_GAME_SETTINGS"
+								data-lang="game_settings">
 								Game Settings
 							</button>
 							<button
-								class="btn btn-primary desktop"
+								class="btn btn-primary border desktop"
 								data-click="OPEN_KEYBIND_SETTINGS"
 								data-lang="keybind_settings">
 								Keybinds
 							</button>
-							<button class="btn btn-primary" data-click="OPEN_AUDIO_SETTINGS" data-lang="audio_settings">
+							<button
+								class="btn btn-primary border"
+								data-click="OPEN_AUDIO_SETTINGS"
+								data-lang="audio_settings">
 								Audio
 							</button>
 						</div>
 						<div class="menu-content">
 							<div id="game-settings" class="container">
-								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+								<button class="close-btn btn btn-secondary border" data-click="CLOSE_CONTAINER">
+									X
+								</button>
 								<div id="language-setting" class="option">
 									<span data-lang="language_setting"></span>
 									<div class="row">
@@ -141,12 +171,16 @@
 								</div>
 							</div>
 							<div id="keyBindSettings" class="container">
-								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+								<button class="close-btn btn btn-secondary border" data-click="CLOSE_CONTAINER">
+									X
+								</button>
 								<div id="keybinds"></div>
 								<div id="singleKeyBind" class="container"></div>
 							</div>
 							<div id="audio-settings" class="container">
-								<button class="close-btn btn btn-secondary" data-click="CLOSE_CONTAINER">X</button>
+								<button class="close-btn btn btn-secondary border" data-click="CLOSE_CONTAINER">
+									X
+								</button>
 								<span data-lang="volume"></span>
 								<div class="audio-options">
 									<div class="option">
@@ -178,7 +212,10 @@
 					<div class="confirmation column">
 						<span data-lang="bind_key">Press a key to bind or hold "Esc" to cancel</span>
 						<div class="button-progress">
-							<button class="btn btn-primary keyboard" data-click="CANCEL_KEYBIND" data-keyboard="Escape">
+							<button
+								class="btn btn-primary border keyboard"
+								data-click="CANCEL_KEYBIND"
+								data-keyboard="Escape">
 								<span data-lang="cancel">Cancel</span>
 							</button>
 						</div>
@@ -189,8 +226,8 @@
 				<span class="center d-none" data-lang="game_over"></span>
 				<span class="center d-none" data-lang="game_won"></span>
 				<div class="menu-btns column">
-					<div class="btn btn-primary" data-click="NEW_GAME" data-lang="new_game"></div>
-					<div class="btn btn-primary" data-click="MAIN_MENU" data-lang="main_menu"></div>
+					<div class="btn btn-primary border" data-click="NEW_GAME" data-lang="new_game"></div>
+					<div class="btn btn-primary border" data-click="MAIN_MENU" data-lang="main_menu"></div>
 				</div>
 			</div>
 		</div>

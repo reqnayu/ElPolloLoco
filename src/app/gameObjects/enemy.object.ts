@@ -32,7 +32,7 @@ export default abstract class Enemy extends GameObject {
 			walkSpeed: this.walkSpeed,
 			jumpStrength: 0.7
 		}).onAttach(this)
-		// this.movementBehaviour.input.isMovingLeft = true
+		this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			cooldown: 500,

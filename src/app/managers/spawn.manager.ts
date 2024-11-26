@@ -14,7 +14,7 @@ export default abstract class SpawnManager {
 	}
 
 	private static getRandomSpawnDistance(): number {
-		return Util.randomize(800, 1600, true)
+		return Util.randomize(600, 1200, true)
 	}
 
 	private static arch(spawnPosition: number): void {

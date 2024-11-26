@@ -6,4 +6,14 @@ export class CoinResource extends Resource {
 		super.add(amount)
 		Gui.updateStatusBar("coin", this.currentAmount, this.maxAmount)
 	}
+
+	public override use(amount: number): boolean {
+		if (super.use(amount) === false) return false
+		Gui.updateStatusBar("coin", this.currentAmount, this.maxAmount)
+		return true
+	}
+
+	public override emptyUse(): void {
+		Gui.statusBarError("coin")
+	}
 }

@@ -64,9 +64,9 @@ export default abstract class Main {
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
 		this.enemies = [
-			// GameObjectFactory.create("enemy"),
-			// GameObjectFactory.create("enemy"),
-			// GameObjectFactory.create("enemy")
+			GameObjectFactory.create("enemy"),
+			GameObjectFactory.create("enemy"),
+			GameObjectFactory.create("enemy")
 		]
 		SpawnManager.initialize()
 	}

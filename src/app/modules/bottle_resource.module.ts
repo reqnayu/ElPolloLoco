@@ -3,7 +3,7 @@ import Resource from "./resource.module.js"
 
 export class BottleResource extends Resource {
 	public override use(): boolean {
-		const isSuccessful = super.use(1, () => this.emptyUse())
+		const isSuccessful = super.use(1)
 		if (!isSuccessful) return false
 		Gui.updateStatusBar("bottle", this.currentAmount, this.maxAmount)
 		// console.log("using bottle")
@@ -18,6 +18,5 @@ export class BottleResource extends Resource {
 
 	public override emptyUse(): void {
 		Gui.statusBarError("bottle")
-		// console.log("no bottles left!")
 	}
 }

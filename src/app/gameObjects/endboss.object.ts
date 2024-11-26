@@ -74,7 +74,7 @@ export default class Endboss extends Enemy {
 	protected override getHitByBottle(bottle: GameObject): void {
 		super.getHitByBottle(bottle)
 		const { currentAmount, maxAmount } = this.resourceBehaviour!.healthPoints
-		Gui.updateStatusBar("endbossHp", currentAmount, maxAmount)
+		Gui.updateStatusBar("endbossHp", currentAmount, maxAmount, true)
 		if (currentAmount > 0) this.setState("hurt")
 	}
 

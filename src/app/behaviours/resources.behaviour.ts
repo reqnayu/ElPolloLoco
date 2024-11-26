@@ -33,11 +33,6 @@ export default class ResourceBehaviour implements Updateable {
 	}
 
 	public receiveDamage(amount: number): void {
-		if (this.use("healthPoints", amount)) {
-			// this.gameObject.setState("hurt")
-		} else {
-			// this.gameObject.setState("dead")
-		}
-		// console.log(`${this.gameObject.name} took ${amount} damage! current hp: ${this.healthPoints.currentAmount}`)
+		this.use("healthPoints", amount)
 	}
 }

@@ -1,10 +1,9 @@
-import { audioTypes, GameObjectType, keyInputAction, lang, statusBars } from "../.types/types.js"
+import { audioTypes, GameObjectType, keyInputAction, lang, resourceAmountParams, statusBars } from "../.types/types.js"
 import SoundManager from "../managers/sound.manager.js"
 import { Language } from "./language.module.js"
 
 export default abstract class Settings {
-	// public static language: lang = navigator.language.startsWith("de") ? "de" : "en"
-	public static language: lang = "de"
+	public static language: lang = navigator.language.startsWith("de") ? "de" : "en"
 	public static keyBindings: Record<keyInputAction, string> = {
 		MOVE_RIGHT: "KeyD",
 		MOVE_LEFT: "KeyA",
@@ -16,7 +15,7 @@ export default abstract class Settings {
 	public static snoreDisabled = true
 	public static countdownDisabled = false
 	public static fpsEnabled = false
-	static readonly resources: Record<keyof statusBars | string, number> = {
+	public static readonly resources: Record<keyof statusBars | string, number> = {
 		hp: 200,
 		bottle: 8,
 		coin: 20,
@@ -28,10 +27,15 @@ export default abstract class Settings {
 		bottleCost: 3
 	}
 
-	static readonly spawnLocations: Record<GameObjectType | string, number> = {
+	public static readonly itemCosts: Record<keyof Omit<resourceAmountParams, "coins">, number> = {
+		healthPoints: 10,
+		bottles: 3
+	}
+
+	public static readonly spawnLocations: Record<GameObjectType | string, number> = {
 		endboss: 5500
 	}
-	static readonly countdownTime: number = 0
+	public static readonly countdownTime: number = 0
 
 	public static initialize(): void {
 		this.loadSettings()

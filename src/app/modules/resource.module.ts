@@ -13,9 +13,9 @@ export default abstract class Resource {
 		this.currentAmount = currentAmount
 	}
 
-	public use(amount: number, emptyUseCallback?: () => void): boolean {
-		if (this.currentAmount === 0) {
-			emptyUseCallback?.()
+	public use(amount: number): boolean {
+		if (this.currentAmount < amount) {
+			this.emptyUse()
 			return false
 		}
 		this.currentAmount = Math.max(0, this.currentAmount - amount)

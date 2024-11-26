@@ -1,6 +1,7 @@
 import "../.types/prototypes.js"
 import { assetsParams } from "../.types/types.js"
 import AssetManager from "../managers/asset.manager.js"
+import { Language } from "../modules/language.module.js"
 
 export default abstract class Util {
 	public static getElement<T extends HTMLElement>(selector: string, thisArg: HTMLElement | Document = document): T {
@@ -84,9 +85,9 @@ export default abstract class Util {
 	private static confirmationTemplate(options: confirmationOptions): HTMLElement {
 		const HTMLTemplate = /*html*/ `
 				<div class="confirmation column">
-					<p>${options.requestMessage}</p>
+					<p class="row">${options.requestMessage}</p>
 					<div class="row">
-						<button class="cancel btn btn-secondary">${options.cancelMessage || "Cancel"}</button>
+						<button class="cancel btn btn-secondary">${options.cancelMessage || Language.get("cancel")}</button>
 						<button class="affirm btn btn-primary">${options.affirmMessage || "OK"}</button>
 					</div>
 				</div>

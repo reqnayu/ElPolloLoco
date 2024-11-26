@@ -31,11 +31,18 @@ export abstract class Language {
 		this.render()
 	}
 
-	private static get(key: string): string {
+	public static get(key: string): string
+	public static get(key: string, ...params: string[]): string
+	public static get(key: string, ...params: string[]): string {
 		this.checkInitialization()
 		const value = this.data[Settings.language][key]
 		if (!value) throw Error(`${key} not found!`)
-		return value
+		if (params.length && params.length !== value.match(/%\w+%/g)?.length)
+			throw Error(`number of params not matching!`)
+		let paramIndex = 0
+		return value.replace(/%(\w+)%/g, (match, replacable) => {
+			return params[paramIndex++]
+		})
 	}
 
 	private static checkInitialization(): void {

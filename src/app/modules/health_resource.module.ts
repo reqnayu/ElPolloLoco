@@ -1,3 +1,4 @@
+import Gui from "./gui.module.js"
 import Resource from "./resource.module.js"
 
 export class HealthResource extends Resource {
@@ -6,5 +7,10 @@ export class HealthResource extends Resource {
 		if (!hasHealth) return false
 		// console.log(`${dmg} health lost!`)
 		return true
+	}
+
+	public override add(amount: number): void {
+		super.add(amount)
+		Gui.updateStatusBar("hp", this.currentAmount, this.maxAmount)
 	}
 }
