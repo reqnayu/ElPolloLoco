@@ -91,6 +91,9 @@ export default class Input {
 		MAIN_MENU: {
 			release: () => this.enterMainMenu()
 		},
+		IMPRINT: {
+			release: () => this.openImprint()
+		},
 		RESUME_GAME: {
 			release: () => this.togglePause()
 		},
@@ -110,6 +113,7 @@ export default class Input {
 		// this.addZoomFunctionality()
 		this.addVolumeSliderFunctionality()
 		this.addSplashScreenFunctionality()
+		this.addScreenOrientationFunctionality()
 	}
 
 	private static clickHandler(e: Event): void {
@@ -203,13 +207,16 @@ export default class Input {
 
 	private static buyResource(type: keyof resourceAmountParams, cost: number, amount = 1): void {
 		const resourceBehaviour = Main.player.resourceBehaviour!
-		console.log("cost is: " + cost)
 		if (resourceBehaviour[type]!.fraction === 1) return resourceBehaviour[type]!.emptyUse()
 		if (resourceBehaviour.use("coins", cost) === false) return
 		resourceBehaviour.add(type, amount)
 	}
 
 	// gui actions
+
+	private static openImprint(): void {
+		window.open("imprint.html", "_blank")
+	}
 
 	private static enterMainMenu(): void {
 		Gui.getElement(".splash-screen")?.remove()
@@ -319,5 +326,13 @@ export default class Input {
 		}
 		const eventTypes: (keyof WindowEventMap)[] = ["click", "touchend", "keyup"]
 		eventTypes.forEach((type) => window.addEventListener(type, splashScreenFunc, { signal: ac.signal }))
+	}
+
+	private static addScreenOrientationFunctionality(): void {
+		screen.orientation.addEventListener("change", () => {
+			if (screen.orientation.type === "landscape-primary" || screen.orientation.type === "landscape-secondary")
+				return
+			this.pauseGame()
+		})
 	}
 }

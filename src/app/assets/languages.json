@@ -10,6 +10,7 @@
 		"press_any_button": "drücke irgendeine Taste zum Starten...",
 		"new_game": "Neues Spiel",
 		"resume_game": "Fortsetzen",
+		"imprint": "Impressum",
 		"settings": "Einstellungen",
 		"restart_game": "Spiel neu starten",
 		"game_settings": "Spieleinstellungen",
@@ -28,7 +29,8 @@
 		"cancel": "Abbrechen",
 		"game_over": "Game Over!",
 		"game_won": "Du hast gewonnen!",
-		"main_menu": "Hauptmenü"
+		"main_menu": "Hauptmenü",
+		"landscape-warning": "Drehe dein Gerät quer, um spielen zu können!"
 	},
 	"en": {
 		"loading": "loading...",
@@ -41,6 +43,7 @@
 		"press_any_button": "press any button to start...",
 		"new_game": "New Game",
 		"resume_game": "Resume",
+		"imprint": "Imprint",
 		"settings": "Settings",
 		"restart_game": "Restart Game",
 		"game_settings": "Game Settings",
@@ -59,6 +62,7 @@
 		"cancel": "Cancel",
 		"game_over": "Game Over!",
 		"game_won": "You won!",
-		"main_menu": "Main Menu"
+		"main_menu": "Main Menu",
+		"landscape-warning": "To play, put your device into landscape mode!"
 	}
 }

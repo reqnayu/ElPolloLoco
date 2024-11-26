@@ -63,7 +63,6 @@ export default abstract class AssetManager {
 
 	private static async finishLoading(): Promise<void> {
 		Util.getElement(".loading > span").innerHTML = "DONE!"
-		// console.log(allAssets)
 		await Util.sleep(500)
 		Util.getElement(".loading").classList.add("d-none-animated")
 	}

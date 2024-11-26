@@ -12,7 +12,7 @@ export default abstract class Settings {
 		FULLSCREEN: "KeyF",
 		THROW: "KeyT"
 	}
-	public static snoreDisabled = true
+	public static snoreDisabled = false
 	public static countdownDisabled = false
 	public static fpsEnabled = false
 	public static readonly resources: Record<keyof statusBars | string, number> = {

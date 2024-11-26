@@ -83,6 +83,10 @@ canvas {
 	display: none;
 }
 
+#main-menu:not(.start) [data-click="IMPRINT"] {
+	display: none;
+}
+
 #main-menu.start .title {
 	text-align: center;
 	font-size: 3em;
@@ -774,4 +778,22 @@ input[type="checkbox"]:checked::after {
 
 #end-screen {
 	z-index: 995;
+}
+
+#landscape-warning {
+	z-index: 996;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: var(--bg-color-container);
+}
+
+#landscape-warning img {
+	width: 1.5em;
+}
+
+@media screen and (orientation: landscape) {
+	#landscape-warning {
+		display: none;
+	}
 }

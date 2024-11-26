@@ -104,15 +104,16 @@ export default abstract class Gui {
 	}
 
 	public static openWindow(id: string): HTMLElement {
-		const el = this.getElement(`#${id}`)
-		el.classList.add("open")
-		return el
+		const window = this.getElement(`#${id}`)
+		window.classList.add("open")
+		return window
 	}
 
-	public static closeWindow(id: string): void {
-		const container = this.getElement(`#${id}`)
-		container.classList.remove("open")
-		container.getAllElements(".open").forEach((el) => el.classList.remove("open"))
+	public static closeWindow(id: string, closeChildren = true): HTMLElement {
+		const window = this.getElement(`#${id}`)
+		window.classList.remove("open")
+		if (closeChildren) window.getAllElements(".open").forEach((el) => el.classList.remove("open"))
+		return window
 	}
 
 	public static async reset(): Promise<void> {

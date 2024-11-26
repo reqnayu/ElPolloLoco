@@ -40,7 +40,6 @@ export default class Bottle extends GameObject {
 	}
 
 	protected override initialize(): void {
-		// console.log("background created!")
 		this.setBehaviours()
 		super.initialize("6_salsa_bottle/salsa_bottle.png")
 		this.setState()
@@ -75,7 +74,6 @@ export default class Bottle extends GameObject {
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			targets: ["enemy", "endboss"],
 			offsets: [30, 30, 30, 30],
-			cooldown: 1000,
 			damage: 100
 		}).onAttach(this)
 		this.soundBehaviour = BehaviourFactory.create("sound", {
