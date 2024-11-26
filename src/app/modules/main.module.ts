@@ -63,11 +63,6 @@ export default abstract class Main {
 		this.background = GameObjectFactory.create("background")
 		this.clouds = GameObjectFactory.create("clouds")
 		this.player = GameObjectFactory.create("player")
-		this.enemies = [
-			GameObjectFactory.create("enemy"),
-			GameObjectFactory.create("enemy"),
-			GameObjectFactory.create("enemy")
-		]
 		SpawnManager.initialize()
 	}
 
@@ -153,10 +148,5 @@ export default abstract class Main {
 		Gui.openWindow("end-screen")
 		Input.toggleInput(false)
 		// console.log(`${state} in ${Util.formatTime(this.totalTime)}!`)
-	}
-
-	public static spawnEndboss(): void {
-		// console.log("spawning endboss")
-		this.endboss = GameObjectFactory.create("endboss")
 	}
 }

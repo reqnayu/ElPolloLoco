@@ -28,7 +28,7 @@ export default class DrawBehaviour implements Drawable {
 		else ctx.translate(-(rawDx + dWidth), ctx.canvas.height / scale)
 		const dy = -rawDy - dHeight
 		ctx.drawImage(image, 0, dy, dWidth, dHeight)
-		// if (this.gameObject.collisionBehaviour) this.drawCollider(ctx, 0, dy, dWidth, dHeight)
+		if (this.gameObject.collisionBehaviour) this.drawCollider(ctx, 0, dy, dWidth, dHeight)
 		ctx.setTransform(1, 0, 0, 1, 0, 0)
 	}
 

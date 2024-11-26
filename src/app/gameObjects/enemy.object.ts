@@ -1,5 +1,8 @@
-import { GameObjectType, stateMap } from "../.types/types.js"
+import { enemyParams, GameObjectType, stateMap } from "../.types/types.js"
 import BehaviourFactory from "../factories/behaviour.factory.js"
+import Camera from "../modules/camera.module.js"
+import Main from "../modules/main.module.js"
+import Vector from "../modules/vector.module.js"
 import Util from "../util/general.util.js"
 import GameObject from "./gameObject.object.js"
 
@@ -11,18 +14,17 @@ export default abstract class Enemy extends GameObject {
 
 	protected defaultState: keyof stateMap = "walk"
 
-	constructor({ type, walkSpeed, colliderOffsets, healthPoints }: enemyParams) {
+	constructor({ type, spawnPosition, walkSpeed, colliderOffsets, healthPoints }: enemyParams) {
 		super(type)
 		this.walkSpeed = walkSpeed
 		this.colliderOffsets = colliderOffsets
 		this.healthPoints = healthPoints
 		this.dimensions.set(236, 210)
-		this.randomizeStartingPosition()
+		this.position.set(spawnPosition)
 	}
 
 	protected override initialize(): void {
 		super.initialize()
-		this.position.y = this.gravityBehavior!.floorHeight
 		this.setState()
 	}
 
@@ -32,7 +34,7 @@ export default abstract class Enemy extends GameObject {
 			walkSpeed: this.walkSpeed,
 			jumpStrength: 0.7
 		}).onAttach(this)
-		this.movementBehaviour.input.isMovingLeft = true
+		// this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			cooldown: 500,
@@ -41,13 +43,12 @@ export default abstract class Enemy extends GameObject {
 			damage: 20
 		}).onAttach(this)
 		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: this.healthPoints }).onAttach(this)
-	}
-
-	protected randomizeStartingPosition(): void {
-		const minX = 1000
-		const maxX = 2000
-		const randomX = Util.randomize(minX, maxX)
-		this.position.x = randomX
+		this.triggerBehaviour = BehaviourFactory.create("trigger", [
+			{
+				condition: () => this.position.x < Main.player.position.x + Camera._baseResolution.x,
+				callback: () => this.startActing()
+			}
+		])
 	}
 
 	public override collisionCallback(target: GameObject): void {
@@ -58,6 +59,10 @@ export default abstract class Enemy extends GameObject {
 				return
 			}
 		}
+	}
+
+	protected startActing(): void {
+		this.movementBehaviour!.input.isMovingLeft = true
 	}
 
 	protected getHitByBottle(bottle: GameObject): void {
@@ -73,11 +78,4 @@ export default abstract class Enemy extends GameObject {
 		this.setState("dead")
 		this.movementBehaviour?.stopMoving()
 	}
-}
-
-type enemyParams = {
-	type: Extract<GameObjectType, "enemy" | "endboss">
-	walkSpeed: number
-	colliderOffsets: [number, number, number, number]
-	healthPoints: number
 }

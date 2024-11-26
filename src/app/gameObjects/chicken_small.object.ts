@@ -1,6 +1,7 @@
 import { AnimationSet, EnemyAnimationState } from "../.types/types.js"
 import BehaviourFactory from "../factories/behaviour.factory.js"
 import Settings from "../modules/settings.module.js"
+import Vector from "../modules/vector.module.js"
 import Util from "../util/general.util.js"
 import Enemy from "./enemy.object.js"
 import GameObject from "./gameObject.object.js"
@@ -12,9 +13,10 @@ import GameObject from "./gameObject.object.js"
 	]
 })
 export default class ChickenSmall extends Enemy {
-	constructor() {
+	constructor(spawnPosition: Vector) {
 		super({
 			type: "enemy",
+			spawnPosition,
 			walkSpeed: 0.2,
 			colliderOffsets: [10, 15, 10, 15],
 			healthPoints: Settings.resources["enemySmallHp"]

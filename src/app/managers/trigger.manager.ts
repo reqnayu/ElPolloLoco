@@ -5,11 +5,10 @@ export default abstract class TriggerManager {
 
 	public static check(): void {
 		// console.log("checking all", this.allTriggers)
-		this.allTriggers.forEach(({ name, conditionCallback, triggerCallback }) => {
-			if (!name) return
-			if (conditionCallback() === true) {
-				triggerCallback()
-				this.allTriggers.toFiltered(({ name: _name }) => name !== _name)
+		this.allTriggers.forEach((trigger) => {
+			if (trigger.condition() === true) {
+				trigger.callback()
+				this.allTriggers.remove(trigger)
 			}
 		})
 	}

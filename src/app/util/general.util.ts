@@ -70,14 +70,10 @@ export default abstract class Util {
 	public static async confirmation(options: confirmationOptions): Promise<boolean> {
 		const template = this.confirmationTemplate(options)
 		return new Promise((resolve) => {
-			template.getElement(".cancel").addEventListener("click", () => {
+			template.getAllElements(".cancel, .affirm").forEach((el) => el.addEventListener("click", () => {
 				template.remove()
-				resolve(false)
-			})
-			template.getElement(".affirm").addEventListener("click", () => {
-				template.remove()
-				resolve(true)
-			})
+				resolve(el.classList.contains("cancel") ? false : true)
+			}))
 			this.getElement("#game").append(template)
 		})
 	}
@@ -87,8 +83,8 @@ export default abstract class Util {
 				<div class="confirmation column">
 					<p class="row">${options.requestMessage}</p>
 					<div class="row">
-						<button class="cancel btn btn-secondary">${options.cancelMessage || Language.get("cancel")}</button>
-						<button class="affirm btn btn-primary">${options.affirmMessage || "OK"}</button>
+						<button class="cancel btn btn-secondary border">${options.cancelMessage || Language.get("cancel")}</button>
+						<button class="affirm btn btn-primary border">${options.affirmMessage || "OK"}</button>
 					</div>
 				</div>
 		`

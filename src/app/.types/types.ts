@@ -51,9 +51,8 @@ export type assetsParams = {
 export type soundType = GameObjectType | "gui"
 
 export type trigger = {
-	name: string
-	conditionCallback: () => boolean
-	triggerCallback: () => void
+	condition: () => boolean
+	callback: () => void
 }
 
 export type behaviourParamMap = {
@@ -160,6 +159,8 @@ export type mouseInputAction = keyInputAction | string
 
 export type GameObjectType = "player" | "bottle" | "enemy" | "endboss" | "background" | "clouds" | "coin"
 
+export type Spawnable = Extract<GameObjectType, "coin" | "enemy" | "endboss">
+
 export type GameObjectMap = {
 	player: Player
 	bottle: Bottle
@@ -168,6 +169,14 @@ export type GameObjectMap = {
 	endboss: Endboss
 	background: Background
 	coin: Coin
+}
+
+export type enemyParams = {
+	type: Extract<GameObjectType, "enemy" | "endboss">,
+	spawnPosition: Vector
+	walkSpeed: number
+	colliderOffsets: [number, number, number, number]
+	healthPoints: number
 }
 
 export type bottleParams = {
@@ -185,7 +194,7 @@ export type GameObjectParams = {
 	player: undefined
 	bottle: bottleParams
 	clouds: undefined
-	enemy: undefined
+	enemy: enemyParams
 	endboss: undefined
 	background: undefined
 	coin: coinParams

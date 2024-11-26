@@ -36,6 +36,8 @@ export default abstract class Settings {
 		endboss: 5500
 	}
 	public static readonly countdownTime: number = 0
+	public static readonly floorHeight = 85
+	public static readonly maxAmountOfEnemies = 5
 
 	public static initialize(): void {
 		this.loadSettings()

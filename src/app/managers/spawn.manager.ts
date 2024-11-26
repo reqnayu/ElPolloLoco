@@ -1,20 +1,27 @@
+import { coinParams, enemyParams, GameObjectType, Spawnable } from "../.types/types.js"
 import GameObjectFactory from "../factories/gameObject.factory.js"
+import Enemy from "../gameObjects/enemy.object.js"
+import Settings from "../modules/settings.module.js"
 import Vector from "../modules/vector.module.js"
 import Util from "../util/general.util.js"
 
 export default abstract class SpawnManager {
 	public static initialize(): void {
-		for (
-			let spawnPosition = this.getRandomSpawnDistance();
-			spawnPosition < 5000;
-			spawnPosition += this.getRandomSpawnDistance()
-		) {
-			Util.randomize([this.square, this.arch, this.line]).call(this, spawnPosition)
+		this.initializeCoins()
+		this.initializeEnemies()
+	}
+
+	private static initializeCoins(): void {
+		for (let i = Util.randomize(600, 1200, true); i < Settings.spawnLocations.endboss; i += Util.randomize(600, 1200, true)) {
+			Util.randomize([this.square, this.arch, this.line]).call(this, i)
 		}
 	}
 
-	private static getRandomSpawnDistance(): number {
-		return Util.randomize(600, 1200, true)
+	private static initializeEnemies(): void {
+		for (let i = Util.randomize(400, 1200, true), amount = 0; i < Settings.spawnLocations.endboss && amount < Settings.maxAmountOfEnemies; i += Util.randomize(400, 1200, true), amount++) {
+			console.log(`spawning enemy at positionX: ${i}`)
+			this.spawn("enemy", new Vector(i, Settings.floorHeight))
+		}
 	}
 
 	private static arch(spawnPosition: number): void {
@@ -26,7 +33,7 @@ export default abstract class SpawnManager {
 			const angle = (i / (amount - 1)) * Math.PI
 			return centerPoint.plus(Vector.fromAngleAndRadius(angle, radius))
 		})
-		this.spawn(positions)
+		this.spawn("coin", positions)
 	}
 
 	private static square(spawnPosition: number): void {
@@ -39,7 +46,7 @@ export default abstract class SpawnManager {
 			const angle = Math.PI / 4 + rotation + (i * Math.PI) / 2
 			return centerPoint.plus(Vector.fromAngleAndRadius(angle, radius))
 		})
-		this.spawn(positions)
+		this.spawn("coin", positions)
 	}
 
 	private static line(spawnPosition: number): void {
@@ -53,12 +60,18 @@ export default abstract class SpawnManager {
 			const step = length / (amount - 1)
 			return startPoint.plus(Vector.fromAngleAndRadius(rotation, step * i))
 		})
-		this.spawn(positions)
+		this.spawn("coin", positions)
 	}
 
-	private static spawn(positions: Vector[]): void {
+	private static spawn(type: Spawnable, position: Vector): void
+	private static spawn(type: Spawnable, positions: Vector[]): void
+	private static spawn(type: Spawnable, positionOrPositions: Vector | Vector[]): void {
+		const positions = Array.isArray(positionOrPositions) ? positionOrPositions : [positionOrPositions]
+		if (type === "enemy") console.log(positions)
 		positions.forEach((pos, i) => {
-			GameObjectFactory.create("coin", { spawnPosition: pos, startFrame: i % 8 })
+			const params: Partial<coinParams> = { spawnPosition: pos }
+			if (type === "coin") params.startFrame = i % 8
+			GameObjectFactory.create(type, params as enemyParams | coinParams)
 		})
 	}
 

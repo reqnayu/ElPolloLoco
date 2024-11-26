@@ -1,0 +1,16 @@
+- sounds:
+    player:
+        sfx/Win.mp3
+    chicken:
+        sfx/Dead.mp3
+    endboss:
+        sfx/Alert.mp3
+        sfx/Attack.mp3
+        sfx/Hurt.mp3
+        sfx/Dead.mp3
+
+- how to play
+
+- spawn manager enemy + endboss integration
+
+- keybinds names language change thingy

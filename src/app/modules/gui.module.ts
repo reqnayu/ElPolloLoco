@@ -185,7 +185,6 @@ export default abstract class Gui {
 	}
 
 	public static statusBarError(type: keyof statusBars): void {
-		console.trace()
 		Util.addAnimationClass(this.statusBars[type], "error")
 	}
 }

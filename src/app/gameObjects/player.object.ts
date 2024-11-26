@@ -10,6 +10,7 @@ import Main from "../modules/main.module.js"
 import Camera from "../modules/camera.module.js"
 import Util from "../util/general.util.js"
 import GameObject from "./gameObject.object.js"
+import SpawnManager from "../managers/spawn.manager.js"
 
 @Util.Assets({
 	img: [
@@ -55,7 +56,7 @@ export default class Player extends GameObject {
 
 	protected override initialize(): void {
 		this.setBehaviours()
-		this.position.y = this.gravityBehavior!.floorHeight
+		this.position.y = Settings.floorHeight
 		super.initialize("2_character_pepe/1_idle/idle/I-1.png")
 	}
 
@@ -82,7 +83,8 @@ export default class Player extends GameObject {
 				"sfx/Death.mp3",
 				"sfx/Hurt_1.mp3",
 				"sfx/Hurt_2.mp3",
-				"sfx/Hurt_3.mp3"
+				"sfx/Hurt_3.mp3",
+				// "sfx/Win.mp3"
 			]
 		})
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
@@ -92,13 +94,6 @@ export default class Player extends GameObject {
 		}).onAttach(this)
 		const { hp: healthPoints, bottle: bottles, coin: coins } = Settings.resources
 		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints, bottles, coins }).onAttach(this)
-		this.triggerBehaviour = BehaviourFactory.create("trigger", [
-			{
-				name: "endbossSpawn",
-				conditionCallback: () => Settings.spawnLocations.endboss < this.position.x + 1000,
-				triggerCallback: () => Main.spawnEndboss()
-			}
-		]).onAttach(this)
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, PlayerAnimationState> {

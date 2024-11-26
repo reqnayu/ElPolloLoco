@@ -1,4 +1,5 @@
 import { Audible, audioTypes, soundParams, soundType } from "../.types/types.js"
+import GameObject from "../gameObjects/gameObject.object.js"
 import SoundManager from "../managers/sound.manager.js"
 import SoundAsset from "../modules/sound_asset.module.js"
 import Util from "../util/general.util.js"
@@ -11,7 +12,6 @@ export default class SoundBehaviour implements Audible {
 		this.createSounds(assets)
 		this.sounds = SoundManager.AllAudioElements.filter(([name]) => name.startsWith(soundType))
 	}
-
 	private createSounds(assets: string[]): void {
 		assets.forEach((asset) => {
 			const [audioType, name, isPausableString] = asset.split("/") as [
@@ -31,7 +31,10 @@ export default class SoundBehaviour implements Audible {
 	}
 
 	public playRandom(names: string[]): void {
-		this.sounds.get(Util.randomize(names))?.playOnce()
+		const randomSoundName = Util.randomize(names)
+		const randomSound = this.getSound(randomSoundName)
+		if (randomSound === undefined) throw Error(`sound ${randomSoundName} does not exist!`)
+		randomSound.playOnce()
 	}
 
 	public playLooped(name: string): void {

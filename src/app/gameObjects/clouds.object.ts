@@ -9,12 +9,10 @@ import GameObject from "./gameObject.object.js"
 export default class Clouds extends GameObject {
 	direction: 1 | -1 = -1
 	private windSpeed = 0.1
-	private posX = 0
 
 	constructor() {
 		super("clouds")
 		this.initialize("5_background/layers/4_clouds/full.png")
-		// console.log(`wind speed: ${this.windSpeed}`)
 	}
 
 	protected override initialize(imgSrc: string): void {

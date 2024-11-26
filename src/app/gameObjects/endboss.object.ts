@@ -8,6 +8,7 @@ import Main from "../modules/main.module.js"
 import Camera from "../modules/camera.module.js"
 import GameObject from "./gameObject.object.js"
 import Settings from "../modules/settings.module.js"
+import Vector from "../modules/vector.module.js"
 
 @Util.Assets({
 	img: [
@@ -26,9 +27,10 @@ export default class Endboss extends Enemy {
 
 	protected defaultState: keyof stateMap = "alert"
 
-	constructor() {
+	constructor(spawnPosition: Vector) {
 		super({
 			type: "endboss",
+			spawnPosition,
 			walkSpeed: 0.2,
 			colliderOffsets: [200, 60, 70, 60],
 			healthPoints: 400

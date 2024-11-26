@@ -2,11 +2,11 @@ import { Updateable } from "../.types/interfaces.js"
 import { gravityParams } from "../.types/types.js"
 import Vector from "../modules/vector.module.js"
 import GameObject from "../gameObjects/gameObject.object.js"
+import Settings from "../modules/settings.module.js"
 
 export default class GravityBehaviour implements Updateable {
 	gameObject!: GameObject
 	private gravity = new Vector(0, -0.002)
-	floorHeight = 85
 	canFallThroughFloor = false
 	private landCallback
 
@@ -28,7 +28,7 @@ export default class GravityBehaviour implements Updateable {
 	}
 
 	public canFall(): boolean {
-		return this.gameObject.position.y > this.floorHeight
+		return this.gameObject.position.y > Settings.floorHeight
 	}
 
 	private shouldLand(): boolean {
@@ -36,7 +36,7 @@ export default class GravityBehaviour implements Updateable {
 		const vy = this.gameObject.movementBehaviour!.velocity.y
 		const posY = this.gameObject.position.y
 		// console.log(`vy: ${vy}, posY: ${posY}`)
-		return vy < 0 && posY <= this.floorHeight
+		return vy < 0 && posY <= Settings.floorHeight
 	}
 
 	private fall(deltaTime: number): void {
@@ -46,7 +46,7 @@ export default class GravityBehaviour implements Updateable {
 	private land(): void {
 		if (this.gameObject.state?.type === "jump") this.gameObject.setState("idle")
 		this.gameObject.movementBehaviour!.velocity.y = 0
-		this.gameObject.position.y = this.floorHeight
+		this.gameObject.position.y = Settings.floorHeight
 		this.landCallback?.()
 	}
 }
