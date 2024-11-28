@@ -75,7 +75,7 @@ canvas {
 	background-color: var(--bg-color-btn-light);
 }
 
-#main-menu.start > .close-btn {
+#main-menu.start > .btn-close {
 	display: none;
 }
 
@@ -258,7 +258,7 @@ canvas {
 	display: none !important;
 }
 
-.close-btn {
+.btn-close {
 	font-family: "Permanent Marker";
 	--size: calc(var(--game-width) * 0.04);
 	--inset-size: calc(var(--size) / 3);
@@ -792,7 +792,7 @@ input[type="checkbox"]:checked::after {
 	width: 1.5em;
 }
 
-@media screen and (orientation: landscape) {
+@media screen and (orientation: landscape), screen and (hover: hover) {
 	#landscape-warning {
 		display: none;
 	}

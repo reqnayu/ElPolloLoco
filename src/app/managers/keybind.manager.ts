@@ -11,7 +11,6 @@ export default abstract class KeyBindManager {
 
 	public static initialize(): void {
 		this.PreventArrowScrollingBehaviour()
-		this.renderKeybinds()
 		this.renderInputKeys()
 	}
 
@@ -84,6 +83,8 @@ export default abstract class KeyBindManager {
 			}
 		}
 		if (canBind) this.setKeyBind(key, action, keyElement)
+		this.renderKeybinds()
+		// TO-DO reload keybinds
 	}
 
 	private static keyBindOverWriteTemplate(key: string, alreadyBoundAction: keyInputAction): string {
@@ -146,7 +147,7 @@ export default abstract class KeyBindManager {
 		})
 	}
 
-	private static renderKeybinds(): void {
+	public static renderKeybinds(): void {
 		this.renderKeybindSettings()
 		Util.getAllElements(".keyboard").forEach((el) => {
 			const key = el.dataset.keyboard

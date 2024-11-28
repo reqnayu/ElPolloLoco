@@ -56,7 +56,7 @@ export default class Input {
 			release: () => Gui.openWindow("settings")
 		},
 		OPEN_KEYBIND_SETTINGS: {
-			release: () => Gui.openWindow("keyBindSettings")
+			release: () => this.openKeyBindSettings()
 		},
 		OPEN_GAME_SETTINGS: {
 			release: () => this.openGameSettings()
@@ -89,7 +89,7 @@ export default class Input {
 			release: () => this.newGame()
 		},
 		MAIN_MENU: {
-			release: () => this.enterMainMenu()
+			release: () => this.backToMainMenu()
 		},
 		IMPRINT: {
 			release: () => this.openImprint()
@@ -218,7 +218,14 @@ export default class Input {
 		window.open("imprint.html", "_blank")
 	}
 
-	private static enterMainMenu(): void {
+	private static async backToMainMenu(): Promise<void> {
+		const toMenuConfirmed = await Util.confirmation({
+			requestMessage: Language.get("main_menu_request_message")
+		})
+		if (toMenuConfirmed) this.enterMainMenu()
+	}
+
+	private static async enterMainMenu(): Promise<void> {
 		Gui.getElement(".splash-screen")?.remove()
 		Gui.openWindow("main-menu").classList.add("start")
 		Gui.closeWindow("end-screen")
@@ -247,6 +254,11 @@ export default class Input {
 		Gui.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
 		Util.getElement(`[data-lang-setting="${Settings.language}"]`).classList.add("border")
 		Gui.openWindow("game-settings")
+	}
+
+	private static openKeyBindSettings(): void {
+		KeyBindManager.renderKeybinds()
+		Gui.openWindow("keyBindSettings")
 	}
 
 	private static toggleSnore(): void {
@@ -298,8 +310,8 @@ export default class Input {
 
 	public static async restartGame(): Promise<void> {
 		const restartConfirmed = await Util.confirmation({
-			requestMessage: "Do you want to restart? All Progress will be lost!",
-			affirmMessage: "Restart"
+			requestMessage: Language.get("restart_game_request_message"),
+			affirmMessage: Language.get("restart_game_affirm_message")
 		})
 		if (restartConfirmed) this.newGame()
 	}

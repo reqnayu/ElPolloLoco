@@ -13,6 +13,8 @@
 		"imprint": "Impressum",
 		"settings": "Einstellungen",
 		"restart_game": "Spiel neu starten",
+		"restart_game_request_message": "Spiel neu starten? Dein Fortschritt geht verloren!",
+		"restart_game_affirm_message": "Neu starten",
 		"game_settings": "Spieleinstellungen",
 		"keybind_settings": "Tastenbelegung",
 		"audio_settings": "Audioeinstellungen",
@@ -30,6 +32,8 @@
 		"game_over": "Game Over!",
 		"game_won": "Du hast gewonnen!",
 		"main_menu": "Hauptmenü",
+		"main_menu_request_message": "Zurück zum Hauptmenü? Dein Fortschritt geht verloren!",
+		"how_to_play": "Spielanleitung",
 		"landscape-warning": "Drehe dein Gerät quer, um spielen zu können!"
 	},
 	"en": {
@@ -46,6 +50,8 @@
 		"imprint": "Imprint",
 		"settings": "Settings",
 		"restart_game": "Restart Game",
+		"restart_game_request_message": "Do you want to restart? All Progress will be lost!",
+		"restart_game_affirm_message": "Restart",
 		"game_settings": "Game Settings",
 		"keybind_settings": "Keybindings",
 		"audio_settings": "Audio",
@@ -63,6 +69,8 @@
 		"game_over": "Game Over!",
 		"game_won": "You won!",
 		"main_menu": "Main Menu",
+		"main_menu_request_message": "Back to main menu? All progress will be lost!",
+		"how_to_play": "How to Play",
 		"landscape-warning": "To play, put your device into landscape mode!"
 	}
 }
