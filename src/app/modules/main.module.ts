@@ -147,6 +147,7 @@ export default abstract class Main {
 		Gui.openWindow("end-screen")
 		Gui.soundBehaviour.playOnce(won ? "Win" : "Loose")
 		Input.toggleInput(false)
+		Camera.minZoom = 3
 		// console.log(`${state} in ${Util.formatTime(this.totalTime)}!`)
 	}
 }

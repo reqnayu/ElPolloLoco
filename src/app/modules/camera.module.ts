@@ -14,7 +14,7 @@ export default class Camera {
 		return this.zoom
 	}
 	public static readonly maxZoom = 3
-	private static readonly minZoom = 1.3
+	public static minZoom = 1.3
 	public static focusObjects: GameObject[]
 
 	public static get resolution(): Vector {
@@ -36,7 +36,7 @@ export default class Camera {
 	}
 
 	private static get desiredZoom(): number {
-		if (this.focusObjects.length <= 1) return 1
+		if (this.focusObjects.length <= 1) return this.minZoom
 		const [obj1, obj2] = this.getStartAndEndFocusObjects()
 		const distance = obj2.position.x + obj2.Dimensions.x - obj1.position.x
 		const paddingFactor = 1.2
@@ -45,7 +45,8 @@ export default class Camera {
 	}
 
 	public static initialize(): void {
-		this.zoom = 1
+		this.minZoom = 1.3
+		this.zoom = this.minZoom
 		this.focusObjects = [Main.player]
 		// this._focus = this.desiredFocus
 		this._focus = new Vector(this.resolution.x / 2, 0)

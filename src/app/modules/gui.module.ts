@@ -48,8 +48,8 @@ export default abstract class Gui {
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: "gui",
 			assets: [
-				"sfx/ButtonDown.mp3/false",
-				"sfx/ButtonUp.mp3/false",
+				"menu/ButtonDown.mp3/false",
+				"menu/ButtonUp.mp3/false",
 				"sfx/Countdown.mp3",
 				"sfx/Countdown_go.mp3",
 				"sfx/Win.mp3",
