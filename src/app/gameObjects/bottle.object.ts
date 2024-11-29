@@ -2,6 +2,7 @@ import { AnimationSet, BottleAnimationState, GameObjectParams, stateMap } from "
 import BehaviourFactory from "../factories/behaviour.factory.js"
 import AssetManager from "../managers/asset.manager.js"
 import Main from "../modules/main.module.js"
+import Settings from "../modules/settings.module.js"
 import Timer from "../modules/timer.module.js"
 import Vector from "../modules/vector.module.js"
 import Util from "../util/general.util.js"
@@ -22,18 +23,17 @@ import GameObject from "./gameObject.object.js"
 		"6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png",
 		"6_salsa_bottle/2_salsa_bottle_on_ground.png"
 	],
-	audio: ["bottle/Splash.mp3", "bottle/Throw_1.mp3", "bottle/Throw_2.mp3"]
+	audio: ["bottle/Splash.mp3", "bottle/Throw_1.mp3", "bottle/Throw_2.mp3", "bottle/Pick-up.mp3"]
 })
 export default class Bottle extends GameObject {
 	protected states: (keyof stateMap)[] = ["rotation"]
 	protected defaultState: keyof stateMap = "rotation"
 	private startingVelocity = Vector.zero
 
-	constructor({ position, velocity, direction }: GameObjectParams["bottle"]) {
+	constructor({ position, direction }: GameObjectParams["bottle"]) {
 		super("bottle")
 		this.dimensions.set(400, 400).toScaled(0.5)
 		this.position.set(position)
-		// this.startingVelocity.add(velocity)
 		this.direction = direction
 		this.initialize()
 		this.soundBehaviour!.playRandom(["Throw_1", "Throw_2"])
@@ -65,7 +65,9 @@ export default class Bottle extends GameObject {
 		}
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
 		this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
-		this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: 1, jumpStrength: 0.8 }).onAttach(this)
+		this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: 1.5, jumpStrength: 0.6 }).onAttach(
+			this
+		)
 		this.movementBehaviour.velocity.add(this.startingVelocity)
 		this.movementBehaviour.input.isMovingLeft = this.direction === -1
 		this.movementBehaviour.input.isMovingRight = this.direction === 1
@@ -74,11 +76,11 @@ export default class Bottle extends GameObject {
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			targets: ["enemy", "endboss"],
 			offsets: [30, 30, 30, 30],
-			damage: 100
+			damage: Settings.damage.bottle
 		}).onAttach(this)
 		this.soundBehaviour = BehaviourFactory.create("sound", {
 			soundType: "bottle",
-			assets: ["sfx/Splash.mp3", "sfx/Throw_1.mp3", "sfx/Throw_2.mp3"]
+			assets: ["sfx/Splash.mp3", "sfx/Throw_1.mp3", "sfx/Throw_2.mp3", "sfx/Pick-up.mp3"]
 		})
 	}
 
@@ -111,7 +113,7 @@ export default class Bottle extends GameObject {
 		const playerBottles = player.resourceBehaviour!.bottles!
 		if (playerBottles.fraction === 1) return
 		playerBottles.add()
-		this.soundBehaviour?.playOnce("Collect")
+		this.soundBehaviour?.playOnce("Pick-up")
 		this.collisionBehaviour?.targets.remove("player")
 		this.movementBehaviour?.jump()
 		new Timer(() => this.delete(), 300).resume()

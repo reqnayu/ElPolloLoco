@@ -780,6 +780,14 @@ input[type="checkbox"]:checked::after {
 	z-index: 995;
 }
 
+#end-screen span {
+	font-size: 3em;
+	/* background-color: red; */
+	color: transparent;
+	background-image: linear-gradient(to left, var(--bg-color-btn-hover), var(--bg-color-btn));
+	background-clip: text;
+}
+
 #landscape-warning {
 	z-index: 996;
 	display: flex;

@@ -29,7 +29,6 @@ export default abstract class Main {
 	}
 	public static isPaused = true
 	public static readonly frameRate = 60 / 1000
-	public static readonly maxPosX = 10 * 1000
 
 	public static hasStarted = false
 	private static countdownTimer?: Timer
@@ -146,6 +145,7 @@ export default abstract class Main {
 		Gui.getElement("#end-screen").getElement("[data-lang='game_won']").classList.toggle("d-none", !won)
 		Gui.getElement("#end-screen").getElement("[data-lang='game_over']").classList.toggle("d-none", won)
 		Gui.openWindow("end-screen")
+		Gui.soundBehaviour.playOnce(won ? "Win" : "Loose")
 		Input.toggleInput(false)
 		// console.log(`${state} in ${Util.formatTime(this.totalTime)}!`)
 	}

@@ -172,7 +172,7 @@ export type GameObjectMap = {
 }
 
 export type enemyParams = {
-	type: Extract<GameObjectType, "enemy" | "endboss">,
+	type: Extract<GameObjectType, "enemy" | "endboss">
 	spawnPosition: Vector
 	walkSpeed: number
 	colliderOffsets: [number, number, number, number]
@@ -181,7 +181,6 @@ export type enemyParams = {
 
 export type bottleParams = {
 	position: Vector
-	velocity: Vector
 	direction: 1 | -1
 }
 

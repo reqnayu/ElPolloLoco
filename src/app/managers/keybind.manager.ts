@@ -12,6 +12,7 @@ export default abstract class KeyBindManager {
 	public static initialize(): void {
 		this.PreventArrowScrollingBehaviour()
 		this.renderInputKeys()
+		this.renderKeybinds()
 	}
 
 	public static openSingleKeyBind(target: HTMLElement): void {

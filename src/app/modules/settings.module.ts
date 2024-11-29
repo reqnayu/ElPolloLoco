@@ -33,11 +33,18 @@ export default abstract class Settings {
 	}
 
 	public static readonly spawnLocations: Record<GameObjectType | string, number> = {
-		endboss: 5500
+		endboss: 8000
 	}
 	public static readonly countdownTime: number = 0
 	public static readonly floorHeight = 85
-	public static readonly maxAmountOfEnemies = 5
+	public static readonly maxAmountOfEnemies = 10
+	public static readonly drawColliders = false
+	public static readonly damage: Record<Extract<GameObjectType, "enemy" | "endboss" | "bottle">, number> = {
+		enemy: 20,
+		endboss: 50,
+		bottle: 100
+	}
+	public static readonly maxPosX = 10 * 1000
 
 	public static initialize(): void {
 		this.loadSettings()

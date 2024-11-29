@@ -2,6 +2,7 @@ import { Drawable } from "../.types/interfaces.js"
 import { drawParams, Frame } from "../.types/types.js"
 import GameObject from "../gameObjects/gameObject.object.js"
 import Camera from "../modules/camera.module.js"
+import Settings from "../modules/settings.module.js"
 
 export default class DrawBehaviour implements Drawable {
 	private gameObject!: GameObject
@@ -28,7 +29,7 @@ export default class DrawBehaviour implements Drawable {
 		else ctx.translate(-(rawDx + dWidth), ctx.canvas.height / scale)
 		const dy = -rawDy - dHeight
 		ctx.drawImage(image, 0, dy, dWidth, dHeight)
-		if (this.gameObject.collisionBehaviour) this.drawCollider(ctx, 0, dy, dWidth, dHeight)
+		if (Settings.drawColliders && this.gameObject.collisionBehaviour) this.drawCollider(ctx, 0, dy, dWidth, dHeight)
 		ctx.setTransform(1, 0, 0, 1, 0, 0)
 	}
 

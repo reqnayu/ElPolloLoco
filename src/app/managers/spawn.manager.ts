@@ -1,6 +1,5 @@
-import { coinParams, enemyParams, GameObjectType, Spawnable } from "../.types/types.js"
+import { coinParams, enemyParams, Spawnable } from "../.types/types.js"
 import GameObjectFactory from "../factories/gameObject.factory.js"
-import Enemy from "../gameObjects/enemy.object.js"
 import Settings from "../modules/settings.module.js"
 import Vector from "../modules/vector.module.js"
 import Util from "../util/general.util.js"
@@ -9,13 +8,14 @@ export default abstract class SpawnManager {
 	public static initialize(): void {
 		this.initializeCoins()
 		this.initializeEnemies()
+		this.initializeEndboss()
 	}
 
 	private static initializeCoins(): void {
 		for (
-			let i = Util.randomize(600, 1200, true);
+			let i = Util.randomize(600, 1000, true);
 			i < Settings.spawnLocations.endboss;
-			i += Util.randomize(600, 1200, true)
+			i += Util.randomize(1000, 1500, true)
 		) {
 			Util.randomize([this.square, this.arch, this.line]).call(this, i)
 		}
@@ -23,13 +23,17 @@ export default abstract class SpawnManager {
 
 	private static initializeEnemies(): void {
 		for (
-			let i = Util.randomize(400, 1200, true), amount = 0;
+			let i = Util.randomize(800, 1000, true), amount = 0;
 			i < Settings.spawnLocations.endboss && amount < Settings.maxAmountOfEnemies;
-			i += Util.randomize(400, 1200, true), amount++
+			i += Util.randomize(200, 1000, true), amount++
 		) {
-			// console.log(`spawning enemy at positionX: ${i}`)
 			this.spawn("enemy", new Vector(i, Settings.floorHeight))
 		}
+	}
+
+	private static initializeEndboss(): void {
+		const spawnLocation = new Vector(Settings.spawnLocations.endboss, Settings.floorHeight)
+		this.spawn("endboss", spawnLocation)
 	}
 
 	private static arch(spawnPosition: number): void {

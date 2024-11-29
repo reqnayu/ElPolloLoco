@@ -19,17 +19,16 @@ export default class SoundAsset {
 		this.audioElement = AssetManager.getAsset<"audio">(src)
 		SoundManager.addSoundAsset(this.name, this)
 		this.setVolume()
-		if (this.name === "player/Snore") this.disabled = Settings.snoreDisabled
+		if (this.name === "player/Snore") Settings.snoreDisabled ? this.disable() : this.enable()
 	}
 
-	setVolume(): void {
-		const volume = SoundManager.getVolume(this.audioType)
+	setVolume(volume = SoundManager.getVolume(this.audioType)): void {
 		this.audioElement.volume = volume
 		this.instances.forEach((instance) => (instance.volume = volume))
 	}
 
 	async playOnce(): Promise<void> {
-		if (this.disabled) return
+		// if (this.name === "player/Walk") console.trace("playing walk")
 		const sound = this.newInstance()
 		sound.play()
 		return new Promise((resolve, reject) => {
@@ -55,7 +54,6 @@ export default class SoundAsset {
 	}
 
 	async playLooped(): Promise<void> {
-		if (this.disabled) return
 		while (true) {
 			try {
 				await this.playOnce()
@@ -71,16 +69,19 @@ export default class SoundAsset {
 	}
 
 	resume(): void {
-		if (!this.isPaused) return
-		this.instances.forEach((instance) => instance.play())
+		if (!this.isPausable) return
+		this.instances.forEach((instance) => {
+			if (!instance.paused || instance.currentTime === 0) return
+			instance.play()
+		})
 	}
 
 	stop(): void {
+		const stopEvent = new CustomEvent("stop")
 		this.instances.forEach((instance) => {
 			if (instance.currentTime === 0) return
-			instance.currentTime = 0
 			instance.pause()
-			const stopEvent = new CustomEvent("stop")
+			instance.currentTime = 0
 			instance.dispatchEvent(stopEvent)
 		})
 	}
@@ -111,17 +112,18 @@ export default class SoundAsset {
 	}
 
 	disable(): void {
+		console.log(`disabling ${this.name}`)
 		this.disabled = true
-		this.audioElement.volume = 0
+		this.setVolume(0)
 	}
 
 	enable(): void {
+		console.log(`enabling ${this.name}`)
 		this.disabled = false
-		const typeVolume = SoundManager.volumes[this.audioType]
-		this.audioElement.volume = typeVolume
+		this.setVolume()
 	}
 
 	get isPaused(): boolean {
-		return this.audioElement.paused && this.audioElement.currentTime !== 0
+		return !!this.instances.find((instance) => instance.paused)
 	}
 }

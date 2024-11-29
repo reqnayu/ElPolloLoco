@@ -4,6 +4,7 @@ import GameObject from "../gameObjects/gameObject.object.js"
 import Main from "../modules/main.module.js"
 import Vector from "../modules/vector.module.js"
 import Util from "../util/general.util.js"
+import Settings from "../modules/settings.module.js"
 
 export default class MovementBehaviour implements Updateable {
 	gameObject!: GameObject
@@ -32,7 +33,7 @@ export default class MovementBehaviour implements Updateable {
 		if (deltaTime === 0) return
 		const newPosition = this.gameObject.position.plus(this.velocity.scale(deltaTime))
 		const x = this.clampToWorld
-			? Util.clamp(newPosition.x, 0, Main.maxPosX - this.gameObject.Dimensions.x)
+			? Util.clamp(newPosition.x, 0, Settings.maxPosX - this.gameObject.Dimensions.x)
 			: newPosition.x
 		const y = newPosition.y
 		// console.log(`dt: ${deltaTime}, y: ${y}`)

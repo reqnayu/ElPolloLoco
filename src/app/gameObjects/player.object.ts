@@ -10,7 +10,6 @@ import Main from "../modules/main.module.js"
 import Camera from "../modules/camera.module.js"
 import Util from "../util/general.util.js"
 import GameObject from "./gameObject.object.js"
-import SpawnManager from "../managers/spawn.manager.js"
 
 @Util.Assets({
 	img: [
@@ -83,7 +82,7 @@ export default class Player extends GameObject {
 				"sfx/Death.mp3",
 				"sfx/Hurt_1.mp3",
 				"sfx/Hurt_2.mp3",
-				"sfx/Hurt_3.mp3",
+				"sfx/Hurt_3.mp3"
 				// "sfx/Win.mp3"
 			]
 		})
@@ -110,23 +109,19 @@ export default class Player extends GameObject {
 	public throwBottle(): void {
 		if (!this.resourceBehaviour?.use("bottles", 1)) return
 		const spawnPosition = this.position
-		new Bottle({ position: spawnPosition, velocity: this.movementBehaviour!.velocity, direction: this.direction })
+		new Bottle({ position: spawnPosition, direction: this.direction })
 		this.setState("idle")
 	}
 
 	public override collisionCallback(target: GameObject): void {
-		// console.log(`player collided with ${target.name}`)
 		switch (target.name) {
 			case "coin":
 				return this.resourceBehaviour?.add("coins", 1)
-			// case "bottle":
-			// 	return this.resourceBehaviour?.add("bottles", 1)
 			case "enemy":
 			case "endboss": {
 				return this.collideWithEnemy(target)
 			}
 		}
-		// this.resourceBehaviour?.receiveDamage(80)
 	}
 
 	private collideWithEnemy(target: GameObject): void {
@@ -141,12 +136,13 @@ export default class Player extends GameObject {
 	}
 
 	private die(): void {
-		Input.toggleInput(false)
 		this.setState("dead")
 		this.soundBehaviour?.playOnce("Death")
 		new Timer(() => {
+			this.movementBehaviour?.stopMoving()
+			Input.toggleInput(false)
 			this.movementBehaviour = undefined
 			Main.endGame(false)
-		}, 1500).resume()
+		}, 2000).resume()
 	}
 }

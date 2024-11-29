@@ -38,7 +38,7 @@ export default class SoundBehaviour implements Audible {
 	}
 
 	public playLooped(name: string): void {
-		this.getSound(name)!.playLooped()
+		this.getSound(name)?.playLooped()
 	}
 
 	public stop(name: string): void {

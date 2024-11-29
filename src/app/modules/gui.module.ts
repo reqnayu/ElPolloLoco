@@ -31,6 +31,8 @@ import Settings from "./settings.module.js"
 		"gui/ButtonUp.mp3",
 		"gui/Countdown.mp3",
 		"gui/Countdown_go.mp3",
+		"gui/Win.mp3",
+		"gui/Loose.mp3",
 		"gui/Menu.mp3",
 		"gui/Game.mp3"
 	]
@@ -50,6 +52,8 @@ export default abstract class Gui {
 				"sfx/ButtonUp.mp3/false",
 				"sfx/Countdown.mp3",
 				"sfx/Countdown_go.mp3",
+				"sfx/Win.mp3",
+				"sfx/Loose.mp3",
 				"music/Menu.mp3/false",
 				"music/Game.mp3/false"
 			]

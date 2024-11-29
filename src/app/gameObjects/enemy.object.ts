@@ -2,8 +2,7 @@ import { enemyParams, GameObjectType, stateMap } from "../.types/types.js"
 import BehaviourFactory from "../factories/behaviour.factory.js"
 import Camera from "../modules/camera.module.js"
 import Main from "../modules/main.module.js"
-import Vector from "../modules/vector.module.js"
-import Util from "../util/general.util.js"
+import Settings from "../modules/settings.module.js"
 import GameObject from "./gameObject.object.js"
 
 export default abstract class Enemy extends GameObject {
@@ -11,11 +10,13 @@ export default abstract class Enemy extends GameObject {
 	protected states: (keyof stateMap)[] = ["walk", "dead"]
 	private colliderOffsets
 	private healthPoints
+	private type: Extract<GameObjectType, "enemy" | "endboss">
 
 	protected defaultState: keyof stateMap = "walk"
 
 	constructor({ type, spawnPosition, walkSpeed, colliderOffsets, healthPoints }: enemyParams) {
 		super(type)
+		this.type = type
 		this.walkSpeed = walkSpeed
 		this.colliderOffsets = colliderOffsets
 		this.healthPoints = healthPoints
@@ -34,13 +35,12 @@ export default abstract class Enemy extends GameObject {
 			walkSpeed: this.walkSpeed,
 			jumpStrength: 0.7
 		}).onAttach(this)
-		// this.movementBehaviour.input.isMovingLeft = true
 		this.gravityBehavior = BehaviourFactory.create("gravity").onAttach(this)
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
 			cooldown: 500,
 			offsets: this.colliderOffsets,
 			targets: ["bottle", "player"],
-			damage: 20
+			damage: Settings.damage[this.type]
 		}).onAttach(this)
 		this.resourceBehaviour = BehaviourFactory.create("resource", { healthPoints: this.healthPoints }).onAttach(this)
 		this.triggerBehaviour = BehaviourFactory.create("trigger", [
@@ -55,7 +55,6 @@ export default abstract class Enemy extends GameObject {
 		switch (target.name) {
 			case "bottle": {
 				this.getHitByBottle(target)
-				// console.log("bottle hit")
 				return
 			}
 		}
@@ -68,7 +67,6 @@ export default abstract class Enemy extends GameObject {
 	protected getHitByBottle(bottle: GameObject): void {
 		this.resourceBehaviour?.receiveDamage(bottle.collisionBehaviour!.damage)
 		if (this.resourceBehaviour?.healthPoints.currentAmount === 0) {
-			// console.log("dying")
 			this.die()
 		}
 	}

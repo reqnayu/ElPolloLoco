@@ -1,8 +1,9 @@
 import { resourceParams } from "../.types/types.js"
 
 export default abstract class Resource {
-	currentAmount
-	maxAmount
+	public currentAmount
+	public maxAmount
+	protected partialUse = false
 
 	public get fraction(): number {
 		return this.currentAmount > 0 ? this.currentAmount / this.maxAmount : 0
@@ -14,7 +15,7 @@ export default abstract class Resource {
 	}
 
 	public use(amount: number): boolean {
-		if (this.currentAmount < amount) {
+		if (!this.partialUse && this.currentAmount < amount) {
 			this.emptyUse()
 			return false
 		}

@@ -1,4 +1,11 @@
-import { bottleParams, coinParams, enemyParams, GameObjectMap, GameObjectParams, GameObjectType } from "../.types/types.js"
+import {
+	bottleParams,
+	coinParams,
+	enemyParams,
+	GameObjectMap,
+	GameObjectParams,
+	GameObjectType
+} from "../.types/types.js"
 import Background from "../gameObjects/background.object.js"
 import Bottle from "../gameObjects/bottle.object.js"
 import ChickenNormal from "../gameObjects/chicken_normal.object.js"
@@ -23,7 +30,9 @@ export default abstract class GameObjectFactory {
 			case "enemy": {
 				const randomInt = Util.randomize(0, 1, true)
 				const { spawnPosition } = options as enemyParams
-				return (randomInt === 0 ? new ChickenNormal(spawnPosition) : new ChickenSmall(spawnPosition)) as GameObjectMap[T]
+				return (
+					randomInt === 0 ? new ChickenNormal(spawnPosition) : new ChickenSmall(spawnPosition)
+				) as GameObjectMap[T]
 			}
 			case "endboss": {
 				const { spawnPosition } = options as enemyParams

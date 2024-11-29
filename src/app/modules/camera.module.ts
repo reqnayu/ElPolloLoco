@@ -1,6 +1,7 @@
 import GameObject from "../gameObjects/gameObject.object.js"
 import Util from "../util/general.util.js"
 import Main from "./main.module.js"
+import Settings from "./settings.module.js"
 import Vector from "./vector.module.js"
 
 export default class Camera {
@@ -8,12 +9,12 @@ export default class Camera {
 	private static readonly pixelsPerFrame = 1.5
 	public static readonly aspectRatio = 16 / 9
 	public static readonly _baseResolution = new Vector(1280, 720)
-	public static zoom = 1
+	public static zoom = 1.3
 	public static get Zoom(): number {
 		return this.zoom
 	}
 	public static readonly maxZoom = 3
-	private static readonly minZoom = 1
+	private static readonly minZoom = 1.3
 	public static focusObjects: GameObject[]
 
 	public static get resolution(): Vector {
@@ -30,7 +31,7 @@ export default class Camera {
 	public static get desiredFocus(): Vector {
 		const objectFocus = Vector.average(this.getStartAndEndFocusObjects().map(({ focusVector }) => focusVector))
 		const minFocusX = this.resolution.scale(0.5).x
-		objectFocus.x = Util.clamp(objectFocus.x, minFocusX, Main.maxPosX - minFocusX)
+		objectFocus.x = Util.clamp(objectFocus.x, minFocusX, Settings.maxPosX - minFocusX)
 		return objectFocus
 	}
 

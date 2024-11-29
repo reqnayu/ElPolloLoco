@@ -5,7 +5,7 @@ export default class WalkState implements State {
 	public type: keyof stateMap = "walk"
 
 	public enter(gameObject: GameObject): void {
-		// console.log(`'${gameObject.name}' started walking!`)
+		// if (gameObject.name === "player") console.log(`'${gameObject.name}' started walking!`)
 		gameObject.animationBehaviour?.setAnimation("walk")
 		gameObject.soundBehaviour?.playLooped("Walk")
 		gameObject.focusOffset = 400

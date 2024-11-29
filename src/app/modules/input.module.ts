@@ -219,9 +219,11 @@ export default class Input {
 	}
 
 	private static async backToMainMenu(): Promise<void> {
-		const toMenuConfirmed = await Util.confirmation({
-			requestMessage: Language.get("main_menu_request_message")
-		})
+		const toMenuConfirmed =
+			Gui.getElement("#end-screen").classList.contains("open") ||
+			(await Util.confirmation({
+				requestMessage: Language.get("main_menu_request_message")
+			}))
 		if (toMenuConfirmed) this.enterMainMenu()
 	}
 

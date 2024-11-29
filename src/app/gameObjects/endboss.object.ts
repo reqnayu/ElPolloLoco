@@ -7,8 +7,8 @@ import Gui from "../modules/gui.module.js"
 import Main from "../modules/main.module.js"
 import Camera from "../modules/camera.module.js"
 import GameObject from "./gameObject.object.js"
-import Settings from "../modules/settings.module.js"
 import Vector from "../modules/vector.module.js"
+import Input from "../modules/input.module.js"
 
 @Util.Assets({
 	img: [
@@ -17,7 +17,8 @@ import Vector from "../modules/vector.module.js"
 		...GameObject.getSingleAnimation("4_enemie_boss_chicken/3_attack", 13, 20),
 		...GameObject.getSingleAnimation("4_enemie_boss_chicken/4_hurt", 21, 23),
 		...GameObject.getSingleAnimation("4_enemie_boss_chicken/5_dead", 24, 26)
-	]
+	],
+	audio: ["endboss/Alert.mp3", "endboss/Attack.mp3", "endboss/Dead.mp3"]
 })
 export default class Endboss extends Enemy {
 	public direction: 1 | -1 = -1
@@ -36,9 +37,8 @@ export default class Endboss extends Enemy {
 			healthPoints: 400
 		})
 		this.dimensions.set(1045, 1217).toScaled(0.5)
-		this.position.set(Settings.spawnLocations.endboss, 100)
+		// this.position.set(Settings.spawnLocations.endboss, 100)
 		this.initialize()
-		this.spawn()
 	}
 
 	protected override initialize(): void {
@@ -52,6 +52,10 @@ export default class Endboss extends Enemy {
 		const animationSet = this.getAnimationSet()
 		this.image = animationSet.alert[0]
 		this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
+		this.soundBehaviour = BehaviourFactory.create("sound", {
+			soundType: "endboss",
+			assets: ["sfx/Alert.mp3", "sfx/Attack.mp3", "sfx/Dead.mp3"]
+		})
 	}
 
 	protected getAnimationSet(): Pick<AnimationSet, EndbossAnimationState> {
@@ -82,16 +86,23 @@ export default class Endboss extends Enemy {
 
 	private attackPlayer(): void {
 		this.setState("attack")
+		this.soundBehaviour?.playOnce("Attack")
 	}
 
 	protected override die(): void {
 		super.die()
-		Main.endGame(true)
-		new Timer(() => Camera.focusObjects.remove(this), 2000).resume()
+		this.soundBehaviour?.playOnce("Dead")
+		new Timer(() => {
+			Main.endGame(true)
+			Main.player.movementBehaviour?.stopMoving()
+			Input.toggleInput(false)
+			Camera.focusObjects.remove(this)
+		}, 2000).resume()
 	}
 
-	public spawn(): void {
+	public override startActing(): void {
 		this.healthBarElement.classList.remove("d-none")
+		this.soundBehaviour?.playOnce("Alert")
 		Camera.focusObjects.push(this)
 		new Timer(() => {
 			this.hasSpawned = true
