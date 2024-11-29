@@ -48,13 +48,13 @@ export default abstract class Main {
 		this.ctx = this.canvas.getContext("2d")!
 		this.gameElement = gameElement
 		await Language.initialize()
-		await AssetManager.loadAssets()
+		Renderer.initialize()
 		Settings.initialize()
+		await AssetManager.loadAssets()
 		Input.initialize()
 		SoundManager.initialize()
 		TimerManager.initialize()
 		Gui.initialize()
-		Renderer.initialize()
 	}
 
 	private static setUpObjects(): void {
