@@ -78,6 +78,7 @@ export default abstract class Gui {
 			"#keyBindSettings",
 			"#keyBindModal",
 			"#end-screen",
+			"#imprint",
 			".splash-screen",
 			"input#master",
 			"input#sfx",

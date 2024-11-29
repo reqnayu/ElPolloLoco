@@ -215,7 +215,7 @@ export default class Input {
 	// gui actions
 
 	private static openImprint(): void {
-		window.open("imprint.html", "_blank")
+		Gui.openWindow("imprint")
 	}
 
 	private static async backToMainMenu(): Promise<void> {
