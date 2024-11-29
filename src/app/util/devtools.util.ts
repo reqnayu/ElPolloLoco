@@ -5,13 +5,13 @@ export default abstract class Display {
 	private static container = Util.getElement("#display")
 
 	public static new(name: string): void {
-		if (!this.container) return console.log("#display container not found!")
+		// if (!this.container) return console.log("#display container not found!")
 		this.activeDisplays.set(name, "N/A")
 	}
 
 	public static update(name: string, newValue: number): void {
 		const el = this.activeDisplays.get(name)
-		if (!el) return console.log(`display element ${name} not found!`)
+		// if (!el) return console.log(`display element ${name} not found!`)
 		this.activeDisplays.set(name, newValue.toString())
 	}
 

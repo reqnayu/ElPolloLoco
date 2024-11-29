@@ -112,13 +112,11 @@ export default class SoundAsset {
 	}
 
 	disable(): void {
-		console.log(`disabling ${this.name}`)
 		this.disabled = true
 		this.setVolume(0)
 	}
 
 	enable(): void {
-		console.log(`enabling ${this.name}`)
 		this.disabled = false
 		this.setVolume()
 	}

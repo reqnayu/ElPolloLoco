@@ -15,7 +15,6 @@ Window.prototype.addAbortableEventListener = function <K extends keyof WindowEve
 ) {
 	const ac = new AbortController()
 	const abortFunc = () => {
-		console.log("aborting")
 		ac.abort()
 	}
 	this.addEventListener(eventType, (e) => listener(e, abortFunc), { ...options, signal: ac.signal })
@@ -28,7 +27,6 @@ HTMLElement.prototype.addAbortableEventListener = function <K extends keyof HTML
 ) {
 	const ac = new AbortController()
 	const abortFunc = () => {
-		console.log("aborting")
 		ac.abort()
 	}
 	this.addEventListener(eventType, (e) => listener(e, abortFunc), { ...options, signal: ac.signal })
