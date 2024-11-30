@@ -1,7 +1,7 @@
 body {
 	margin: 0;
 	height: 100vh;
-	height: 100dvh;
+	/* height: 100dvh; */
 	width: 100vw;
 	display: grid;
 	overflow: hidden;
@@ -794,6 +794,11 @@ input[type="checkbox"]:checked::after {
 	justify-content: center;
 	align-items: center;
 	background-color: var(--bg-color-container);
+	font-size: clamp(18px, 1em, 1em);
+}
+
+#landscape-warning span {
+	margin: 0 10%;
 }
 
 #landscape-warning img {
