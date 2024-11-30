@@ -16,8 +16,6 @@ export default class GravityBehaviour implements Updateable {
 
 	public onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
-		// this.gameObject.position.y = this.floorHeight
-		// console.log(`gravity behaviour added to '${gameObject.name}'!`)
 		return this
 	}
 
@@ -35,7 +33,6 @@ export default class GravityBehaviour implements Updateable {
 		if (this.canFallThroughFloor === true) return false
 		const vy = this.gameObject.movementBehaviour!.velocity.y
 		const posY = this.gameObject.position.y
-		// console.log(`vy: ${vy}, posY: ${posY}`)
 		return vy < 0 && posY <= Settings.floorHeight
 	}
 

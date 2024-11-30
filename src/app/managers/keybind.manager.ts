@@ -28,7 +28,6 @@ export default abstract class KeyBindManager {
 		action: keyInputAction,
 		reuse: () => void
 	): void {
-		// console.log(`${keyDownEvent.key} pressed!`)
 		const ac = new AbortController()
 		let timer: Timer | undefined = this.cancelKeyBindTimer(ac)
 		if (keyDownEvent.key === "Escape") {
@@ -65,7 +64,6 @@ export default abstract class KeyBindManager {
 		keyElement: HTMLElement,
 		reuse: () => void
 	): Promise<void> {
-		// console.log(`attempting to bind ${key} to ${action}!`)
 		const [alreadyBoundAction, alreadyBoundKey] = this.alreadyBound(key)
 		let canBind = true
 		if (alreadyBoundAction) {
@@ -85,7 +83,6 @@ export default abstract class KeyBindManager {
 		}
 		if (canBind) this.setKeyBind(key, action, keyElement)
 		this.renderKeybinds()
-		// TO-DO reload keybinds
 	}
 
 	private static keyBindOverWriteTemplate(key: string, alreadyBoundAction: keyInputAction): string {
@@ -105,7 +102,6 @@ export default abstract class KeyBindManager {
 	}
 
 	private static setKeyBind(key: string, action: keyInputAction, keyElement: HTMLElement): void {
-		// console.log(`binding ${key} to ${action} successfull!`)
 		Settings.keyBindings[action] = key
 		keyElement.dataset.keyboard = key
 		this.renderInputKeys()
@@ -142,7 +138,6 @@ export default abstract class KeyBindManager {
 	}
 
 	private static renderKeyboardKeysOnChange(records: MutationRecord[]): void {
-		// console.log(records.map(({ target }) => target))
 		records.forEach((record) => {
 			this.renderKeyboardKey(record.target as HTMLElement)
 		})

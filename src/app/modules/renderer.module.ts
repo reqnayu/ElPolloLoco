@@ -43,7 +43,6 @@ export default abstract class Renderer {
 		this.fps = 0
 		this.frameTimes = []
 		this.timeOfLastFrame = 0
-		// console.log("renderer reset")
 	}
 
 	public static updateDimensions(): void {
@@ -61,28 +60,25 @@ export default abstract class Renderer {
 		Main.ctx.clearRect(0, 0, width, height)
 	}
 
-	// private static readonly desiredFps = 60
-	// private static readonly frameDuration = 1000 / this.desiredFps
-
 	public static render() {
 		const now = Date.now()
-		let deltaTime = 0
 		this.wipe()
-
-		deltaTime = now - this.timeOfLastFrame
+		const deltaTime = now - this.timeOfLastFrame
 		this.timeOfLastFrame = now
 
 		this.getSortedObjects().forEach((gameObject) => this.renderObject(gameObject, deltaTime))
-		if (this.shouldUpdate()) {
-			Main.totalTime += deltaTime
-			this.currentFrame++
-			Camera.update(deltaTime)
-			CollisionManager.checkAll()
-		}
+		if (this.shouldUpdate()) this.update(deltaTime)
 
 		this.calculateFps(deltaTime)
 		this.displayPerformanceMetrics()
 		Display.render()
+	}
+
+	private static update(deltaTime: number): void {
+		Main.totalTime += deltaTime
+		this.currentFrame++
+		Camera.update(deltaTime)
+		CollisionManager.checkAll()
 	}
 
 	private static displayPerformanceMetrics(): void {

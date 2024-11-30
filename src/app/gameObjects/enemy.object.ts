@@ -1,5 +1,6 @@
 import { enemyParams, GameObjectType, stateMap } from "../.types/types.js"
 import BehaviourFactory from "../factories/behaviour.factory.js"
+import CollisionManager from "../managers/collision.manager.js"
 import Camera from "../modules/camera.module.js"
 import Main from "../modules/main.module.js"
 import Settings from "../modules/settings.module.js"
@@ -71,7 +72,8 @@ export default abstract class Enemy extends GameObject {
 		}
 	}
 
-	protected die(): void {
+	public die(): void {
+		CollisionManager.removeObject(this.id)
 		this.collisionBehaviour!.targets = []
 		this.setState("dead")
 		this.movementBehaviour?.stopMoving()

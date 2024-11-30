@@ -24,7 +24,6 @@ export default class MovementBehaviour implements Updateable {
 
 	public onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
-		// console.log(`movementBehaviour added to '${gameObject.name}'`)
 		return this
 	}
 
@@ -36,22 +35,18 @@ export default class MovementBehaviour implements Updateable {
 			? Util.clamp(newPosition.x, 0, Settings.maxPosX - this.gameObject.Dimensions.x)
 			: newPosition.x
 		const y = newPosition.y
-		// console.log(`dt: ${deltaTime}, y: ${y}`)
 		this.gameObject.position.set(x, y)
 	}
 
 	private startWalking(): void {
-		// console.log(`${this.gameObject.name} started walking!`)
 		this.velocity.x = this.gameObject.direction * this.maxSpeed.x
 	}
 
 	private stopWalking(): void {
-		// console.log(`${this.gameObject.name} stopped walking!`)
 		this.velocity.x = 0
 	}
 
 	public jump(): void {
-		// console.log("jump!")
 		this.velocity.y = this.maxSpeed.y
 	}
 

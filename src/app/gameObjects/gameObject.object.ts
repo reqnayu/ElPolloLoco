@@ -73,7 +73,6 @@ export default abstract class GameObject {
 	}
 
 	public update(deltaTime: number): void {
-		// console.log("updating")
 		this.animationBehaviour?.update(deltaTime)
 		this.gravityBehavior?.update(deltaTime)
 		this.movementBehaviour?.update(deltaTime)

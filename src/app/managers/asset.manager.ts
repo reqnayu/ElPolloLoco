@@ -18,7 +18,6 @@ export default abstract class AssetManager {
 	private static totalAssetCount = 0
 
 	public static async loadAssets(): Promise<void> {
-		// console.log("loading started!")
 		this.totalAssetCount = [...this.imagePaths, ...this.soundPahts].length
 		const timeOfLoadStart = Date.now()
 		const allPromises = [
@@ -27,7 +26,6 @@ export default abstract class AssetManager {
 		]
 		await Promise.all(allPromises)
 		const timeOfLoadCompletion = Date.now()
-		// console.log(`loading completed in ${(timeOfLoadCompletion - timeOfLoadStart) / 1000} seconds!`)
 	}
 
 	public static loadImage(src: string): Promise<void> {

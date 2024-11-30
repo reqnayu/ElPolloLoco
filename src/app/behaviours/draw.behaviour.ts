@@ -11,7 +11,6 @@ export default class DrawBehaviour implements Drawable {
 
 	public onAttach(gameObject: GameObject): this {
 		this.gameObject = gameObject
-		// console.log(`drawBehaviour added to '${gameObject.name}'`)
 		return this
 	}
 
@@ -19,10 +18,8 @@ export default class DrawBehaviour implements Drawable {
 		const frame = this.requestFrame()
 		const { image, dx: rawDx, dy: rawDy, dWidth, dHeight, direction } = frame
 		ctx.resetTransform()
-
 		const scale = ctx.canvas.width / Camera.resolution.x
 		ctx.scale(direction * scale, scale)
-
 		const { x, y } = Camera.focus
 		ctx.translate(-x * direction, y * scale)
 		if (direction === 1) ctx.translate(rawDx, ctx.canvas.height / scale)

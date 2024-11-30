@@ -46,7 +46,6 @@ export default class Coin extends GameObject {
 	}
 
 	public override collisionCallback(target: GameObject): void {
-		// console.log("coin collected!")
 		switch (target.name) {
 			case "player":
 				this.collect(target)

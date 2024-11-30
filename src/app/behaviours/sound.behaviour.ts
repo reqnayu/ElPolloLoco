@@ -1,5 +1,4 @@
 import { Audible, audioTypes, soundParams, soundType } from "../.types/types.js"
-import GameObject from "../gameObjects/gameObject.object.js"
 import SoundManager from "../managers/sound.manager.js"
 import SoundAsset from "../modules/sound_asset.module.js"
 import Util from "../util/general.util.js"

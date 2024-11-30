@@ -43,14 +43,12 @@ export default class AnimationBehaviour implements Updateable {
 	}
 
 	public onAttach(gameObject: GameObject): this {
-		// console.log(`animationBehaviour added to '${gameObject.name}'`)
 		this.gameObject = gameObject
 		return this
 	}
 
 	public update(deltaTime: number): void {
 		if (!this.isPlaying) return
-		// if (MESSAGER.dispatch("main").renderer.currentFrame % this.framesPerImage > 0) return
 		const now = Date.now()
 		const dt = now - this.timeOfLastFrame
 		if (dt >= this.frameDuration) {

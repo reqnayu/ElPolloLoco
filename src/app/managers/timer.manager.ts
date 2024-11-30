@@ -28,11 +28,9 @@ export default abstract class TimerManager {
 
 	public static addTimer(timer: Timer): void {
 		this.allTimers.push(timer)
-		// if (this.main.isPaused) this.pauseAll()
 	}
 
 	public static addInterval(interval: Interval): void {
 		this.allIntervals.push(interval)
-		// if (this.main.isPaused) this.pauseAll()
 	}
 }

@@ -1,5 +1,5 @@
 import "../.types/prototypes.js"
-import { keyInputAction, inputMap, mouseInputAction, audioTypes, lang, resourceAmountParams } from "../.types/types.js"
+import { keyInputAction, mouseInputAction, audioTypes, lang, resourceAmountParams } from "../.types/types.js"
 import Util from "../util/general.util.js"
 import SoundManager from "../managers/sound.manager.js"
 import KeyBindManager from "../managers/keybind.manager.js"
@@ -8,6 +8,7 @@ import Main from "./main.module.js"
 import Gui from "./gui.module.js"
 import Renderer from "./renderer.module.js"
 import { Language } from "./language.module.js"
+import { InputMap } from "./input_map.module.js"
 
 export default class Input {
 	private static activeInputs: Set<keyInputAction | mouseInputAction> = new Set()
@@ -26,91 +27,11 @@ export default class Input {
 		return this.isPlayerInputBlocked
 	}
 
-	public static keyMap: inputMap<"key"> = {
-		FULLSCREEN: {
-			release: () => this.toggleFullscreen()
-		},
-		PAUSE: {
-			release: () => this.togglePause()
-		},
-		JUMP: {
-			press: () => this.jump(true),
-			release: () => this.jump(false)
-		},
-		MOVE_LEFT: {
-			press: () => this.startMove("left"),
-			release: () => this.stopMove("left")
-		},
-		MOVE_RIGHT: {
-			press: () => this.startMove("right"),
-			release: () => this.stopMove("right")
-		},
-		THROW: {
-			release: () => this.throw()
-		}
-	}
-
-	static clickTargetMap: inputMap<"mouse"> = {
-		...this.keyMap,
-		OPEN_SETTINGS: {
-			release: () => Gui.openWindow("settings")
-		},
-		OPEN_KEYBIND_SETTINGS: {
-			release: () => this.openKeyBindSettings()
-		},
-		OPEN_GAME_SETTINGS: {
-			release: () => this.openGameSettings()
-		},
-		OPEN_SINGLE_KEYBIND: {
-			release: (target) => KeyBindManager.openSingleKeyBind(target)
-		},
-		CANCEL_KEYBIND: {
-			release: () => KeyBindManager.cancelKeybind()
-		},
-		OPEN_AUDIO_SETTINGS: {
-			release: () => this.openAudioSettings()
-		},
-		CLOSE_CONTAINER: {
-			release: (target) => this.closeContainer(target)
-		},
-		RESTART_GAME: {
-			release: () => this.restartGame()
-		},
-		TOGGLE_SNORE: {
-			release: () => this.toggleSnore()
-		},
-		CHANGE_LANGUAGE: {
-			release: (target) => this.changeLanguage(target)
-		},
-		TOGGLE_FPS: {
-			release: () => this.toggleFps()
-		},
-		NEW_GAME: {
-			release: () => this.newGame()
-		},
-		MAIN_MENU: {
-			release: () => this.backToMainMenu()
-		},
-		IMPRINT: {
-			release: () => this.openImprint()
-		},
-		RESUME_GAME: {
-			release: () => this.togglePause()
-		},
-		BUY_HEALTH: {
-			release: () => this.buyHealth()
-		},
-		BUY_BOTTLE: {
-			release: () => this.buyBottle()
-		}
-	}
-
 	public static initialize(): void {
 		KeyBindManager.initialize()
 		window.addEventListener("pointerdown", (e) => this.clickHandler(e))
 		window.addEventListener("keydown", (e) => this.keyHandler(e))
 		window.addEventListener("keyup", (e) => this.keyHandler(e))
-		// this.addZoomFunctionality()
 		this.addVolumeSliderFunctionality()
 		this.addSplashScreenFunctionality()
 		this.addScreenOrientationFunctionality()
@@ -122,7 +43,7 @@ export default class Input {
 		if (!target) return
 		const action = target?.dataset.click
 		if (!action) return
-		const clickFunc = this.clickTargetMap[action]
+		const clickFunc = InputMap.clickTargetMap[action]
 		clickFunc?.press?.(target)
 		const ac = new AbortController()
 		if (target.closest("footer") && target.classList.contains("btn-input")) {
@@ -147,7 +68,6 @@ export default class Input {
 
 	private static keyHandler(e: KeyboardEvent): void {
 		if (this.isBlocked) return
-		// console.log(e.code)
 		const isKeyDown = e.type === "keydown"
 		const action = Object.entries(Settings.keyBindings).find(([, key]) => key === e.code)?.[0] as keyInputAction
 		if (!action) return
@@ -159,16 +79,14 @@ export default class Input {
 	}
 
 	private static pressKey(action: keyInputAction): void {
-		this.keyMap[action].press?.(document.documentElement)
+		InputMap.keyMap[action].press?.(document.documentElement)
 	}
 
 	private static releaseKey(action: keyInputAction): void {
-		this.keyMap[action].release?.(document.documentElement)
+		InputMap.keyMap[action].release?.(document.documentElement)
 	}
 
-	// Player Actions
-
-	private static startMove(direction: "left" | "right"): void {
+	public static startMove(direction: "left" | "right"): void {
 		if (this.isPlayerInputBlocked) return
 		switch (direction) {
 			case "left":
@@ -180,28 +98,27 @@ export default class Input {
 		}
 	}
 
-	private static stopMove(direction: "left" | "right"): void {
+	public static stopMove(direction: "left" | "right"): void {
 		if (this.isPlayerInputBlocked) return
 		if (direction === "left") Main.player.movementBehaviour!.input.isMovingLeft = false
 		else if (direction === "right") Main.player.movementBehaviour!.input.isMovingRight = false
 	}
 
-	private static jump(bool: boolean): void {
+	public static jump(bool: boolean): void {
 		if (this.isPlayerInputBlocked) return
 		Main.player.movementBehaviour!.input.isJumping = bool
 	}
 
-	private static throw(): void {
+	public static throw(): void {
 		if (this.isPlayerInputBlocked) return
-		// console.log("throwing!")
 		Main.player.throwBottle()
 	}
 
-	private static buyHealth(): void {
+	public static buyHealth(): void {
 		this.buyResource("healthPoints", Settings.itemCosts.healthPoints, 50)
 	}
 
-	private static buyBottle(): void {
+	public static buyBottle(): void {
 		this.buyResource("bottles", Settings.itemCosts.bottles)
 	}
 
@@ -212,13 +129,11 @@ export default class Input {
 		resourceBehaviour.add(type, amount)
 	}
 
-	// gui actions
-
-	private static openImprint(): void {
+	public static openImprint(): void {
 		Gui.openWindow("imprint")
 	}
 
-	private static async backToMainMenu(): Promise<void> {
+	public static async backToMainMenu(): Promise<void> {
 		const toMenuConfirmed =
 			Gui.getElement("#end-screen").classList.contains("open") ||
 			(await Util.confirmation({
@@ -235,35 +150,35 @@ export default class Input {
 		Gui.soundBehaviour.playLooped("Menu")
 	}
 
-	private static async toggleFullscreen(): Promise<void> {
+	public static async toggleFullscreen(): Promise<void> {
 		await Renderer.toggleFullscreen()
 	}
 
-	private static closeContainer(target: HTMLElement): void {
+	public static closeContainer(target: HTMLElement): void {
 		const id = target.closest(".container")!.id
 		Gui.closeWindow(id)
 		if (id === "main-menu") this.resumeGame()
 	}
 
-	private static openAudioSettings(): void {
+	public static openAudioSettings(): void {
 		Object.entries(SoundManager.volumes).forEach(
 			([type, volume]) => (Gui.getElement<HTMLInputElement>(`input#${type}`).value = (volume * 100).toString())
 		)
 		Gui.openWindow("audio-settings")
 	}
 
-	private static openGameSettings(): void {
+	public static openGameSettings(): void {
 		Gui.getElement<HTMLInputElement>("input#toggle-fps").checked = Settings.fpsEnabled
 		Util.getElement(`[data-lang-setting="${Settings.language}"]`).classList.add("border")
 		Gui.openWindow("game-settings")
 	}
 
-	private static openKeyBindSettings(): void {
+	public static openKeyBindSettings(): void {
 		KeyBindManager.renderKeybinds()
 		Gui.openWindow("keyBindSettings")
 	}
 
-	private static toggleSnore(): void {
+	public static toggleSnore(): void {
 		Settings.snoreDisabled = !Settings.snoreDisabled
 		const isDisabled = Settings.snoreDisabled
 		const snoreSound = SoundManager.getSound("player/Snore")!
@@ -272,13 +187,13 @@ export default class Input {
 		isDisabled ? snoreSound.disable() : snoreSound.enable()
 	}
 
-	private static toggleFps(): void {
+	public static toggleFps(): void {
 		Settings.fpsEnabled = !Settings.fpsEnabled
 		Settings.saveSettings()
 		Gui.getElement("#fps-counter").classList.toggle("d-none", !Settings.fpsEnabled)
 	}
 
-	private static changeLanguage(target: HTMLElement): void {
+	public static changeLanguage(target: HTMLElement): void {
 		const lang = target.dataset.langSetting as lang
 		Language.change(lang)
 		target
@@ -286,7 +201,7 @@ export default class Input {
 			.forEach((button) => button.classList.toggle("border", button === target))
 	}
 
-	private static togglePause(): void {
+	public static togglePause(): void {
 		const mainMenuIsOpen = Gui.getElement("#main-menu").classList.contains("open")
 		mainMenuIsOpen ? this.resumeGame() : this.pauseGame()
 	}

@@ -10,6 +10,7 @@ import Main from "../modules/main.module.js"
 import Camera from "../modules/camera.module.js"
 import Util from "../util/general.util.js"
 import GameObject from "./gameObject.object.js"
+import Enemy from "./enemy.object.js"
 
 @Util.Assets({
 	img: [
@@ -33,7 +34,6 @@ import GameObject from "./gameObject.object.js"
 })
 export default class Player extends GameObject {
 	protected walkSpeed = 0.6
-	// protected walkSpeed: number = 1
 	private jumpStrength = 1
 
 	protected defaultState: keyof stateMap = "idle"
@@ -83,7 +83,6 @@ export default class Player extends GameObject {
 				"sfx/Hurt_1.mp3",
 				"sfx/Hurt_2.mp3",
 				"sfx/Hurt_3.mp3"
-				// "sfx/Win.mp3"
 			]
 		})
 		this.collisionBehaviour = BehaviourFactory.create("collision", {
@@ -119,14 +118,32 @@ export default class Player extends GameObject {
 				return this.resourceBehaviour?.add("coins", 1)
 			case "enemy":
 			case "endboss": {
-				return this.collideWithEnemy(target)
+				return this.collideWithEnemy(target as Enemy)
 			}
 		}
 	}
 
-	private collideWithEnemy(target: GameObject): void {
+	private collideWithEnemy(enemy: Enemy): void {
+		if (this.isCollidingFromAbove(enemy)) this.jumpOnEnemy(enemy)
+		else this.getHitByEnemy(enemy)
+	}
+
+	private isCollidingFromAbove(target: GameObject): boolean {
+		const enemyCollider = target.collisionBehaviour!.collider
+		const playerCollider = this.collisionBehaviour!.collider
+		const isAbove = Math.abs(enemyCollider.y + enemyCollider.height - playerCollider.y) < 10
+		return isAbove
+	}
+
+	private jumpOnEnemy(enemy: Enemy): void {
+		this.movementBehaviour!.jump()
+		this.soundBehaviour!.playOnce("Jump")
+		enemy.die()
+	}
+
+	private getHitByEnemy(enemy: GameObject): void {
 		this.collisionBehaviour!.addCollisionCooldown("enemy", "endboss")
-		const damage = target.name === "enemy" ? 40 : 80
+		const damage = enemy.name === "enemy" ? Settings.damage.enemy : Settings.damage.endboss
 		this.resourceBehaviour!.receiveDamage(damage)
 		const { currentAmount, maxAmount } = this.resourceBehaviour!.healthPoints
 		Gui.updateStatusBar("hp", currentAmount, maxAmount, true)

@@ -32,7 +32,6 @@ export default class CollisionBehaviour implements Updateable {
 	}
 
 	public onAttach(gameObject: GameObject): this {
-		// console.log(`attatching collisionBehaviour to ${gameObject.name}`)
 		this.gameObject = gameObject
 		CollisionManager.addObject(gameObject.id, gameObject)
 		return this
@@ -41,10 +40,7 @@ export default class CollisionBehaviour implements Updateable {
 	public update(deltaTime: number): void {}
 
 	public collide(target: GameObject): void {
-		// console.log(`collision detected between ${this.gameObject.name} and ${target.name}.`)
-
 		this.gameObject.collisionCallback(target)
-		// this.gameObject.health?.recieveDamage(target.collisionBehaviour!.damage)
 	}
 
 	public addCollisionCooldown(...types: GameObjectType[]): void {
@@ -53,9 +49,7 @@ export default class CollisionBehaviour implements Updateable {
 		this._cooldownTimer = new Timer(() => {
 			this.targets.push(...types)
 			this._cooldownTimer = undefined
-			// console.log(`collisionCooldown removed from ${this.gameObject.name}!`)
 		}, this.cooldown).resume()
-		// console.log(`collisionCooldown added to ${this.gameObject.name}!`)
 	}
 
 	public get collider() {

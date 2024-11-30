@@ -24,7 +24,6 @@ export default class Camera {
 	public static get focus(): Vector {
 		const middleVec = this.resolution.scale(0.5)
 		const focusVector = (this._focus ?? Vector.zero).plus(middleVec.scale(-1))
-		// const x = clamp(focusVector.x, 0, this.maxPosX - this.resolution.x)
 		return new Vector(focusVector.x, 0)
 	}
 
@@ -48,7 +47,6 @@ export default class Camera {
 		this.minZoom = 1.3
 		this.zoom = this.minZoom
 		this.focusObjects = [Main.player]
-		// this._focus = this.desiredFocus
 		this._focus = new Vector(this.resolution.x / 2, 0)
 	}
 

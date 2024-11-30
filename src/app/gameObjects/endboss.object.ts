@@ -89,7 +89,7 @@ export default class Endboss extends Enemy {
 		this.soundBehaviour?.playOnce("Attack")
 	}
 
-	protected override die(): void {
+	public override die(): void {
 		super.die()
 		this.soundBehaviour?.playOnce("Dead")
 		new Timer(() => {
