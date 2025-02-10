@@ -145,13 +145,12 @@ export interface State {
 	exit(gameObject: GameObject): void
 }
 
-export type inputMap<T extends "key" | "mouse"> = Record<
-	T extends "key" ? keyInputAction : mouseInputAction,
-	{
-		press?: (target: HTMLElement) => any
-		release?: (target: HTMLElement) => any
-	}
->
+export type inputMap<T extends "key" | "mouse"> = Record<T extends "key" ? keyInputAction : mouseInputAction, inputValue>
+
+export type inputValue = {
+	press?: (target: HTMLElement) => any
+	release?: (target: HTMLElement) => any
+}
 
 export type keyInputAction = "MOVE_LEFT" | "MOVE_RIGHT" | "JUMP" | "PAUSE" | "FULLSCREEN" | "THROW"
 
@@ -212,17 +211,7 @@ export interface Audible {
 	sounds: Map<string, SoundAsset>
 }
 
-export type AnimationState =
-	| "idle"
-	| "idle_long"
-	| "walk"
-	| "jump"
-	| "hurt"
-	| "dead"
-	| "alert"
-	| "attack"
-	| "rotation"
-	| "splash"
+export type AnimationState = "idle" | "idle_long" | "walk" | "jump" | "hurt" | "dead" | "alert" | "attack" | "rotation" | "splash"
 
 export type PlayerAnimationState = Exclude<AnimationState, "alert" | "attack" | "rotation" | "splash">
 export type EnemyAnimationState = Extract<AnimationState, "walk" | "dead">
