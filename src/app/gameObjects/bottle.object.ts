@@ -80,13 +80,7 @@ export default class Bottle extends GameObject {
     const animationSet = this.getAnimationSet()
     this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
     this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
-    this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: 1.5, jumpStrength: 0.6 }).onAttach(
-      this
-    )
-    this.movementBehaviour.velocity.add(this.startingVelocity)
-    this.movementBehaviour.input.isMovingLeft = this.direction === -1
-    this.movementBehaviour.input.isMovingRight = this.direction === 1
-    this.movementBehaviour.jump()
+    this.setMovementBehaviour()
     this.gravityBehavior = BehaviourFactory.create("gravity", { landCallback: () => this.land() }).onAttach(this)
     this.collisionBehaviour = BehaviourFactory.create("collision", {
       targets: ["enemy", "endboss"],
@@ -97,6 +91,16 @@ export default class Bottle extends GameObject {
       soundType: "bottle",
       assets: ["sfx/Splash.mp3", "sfx/Throw_1.mp3", "sfx/Throw_2.mp3", "sfx/Pick-up.mp3"],
     })
+  }
+
+  private setMovementBehaviour() {
+    this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: 1.5, jumpStrength: 0.6 }).onAttach(
+      this
+    )
+    this.movementBehaviour.velocity.add(this.startingVelocity)
+    this.movementBehaviour.input.isMovingLeft = this.direction === -1
+    this.movementBehaviour.input.isMovingRight = this.direction === 1
+    this.movementBehaviour.jump()
   }
 
   protected getAnimationSet(): Pick<AnimationSet, BottleAnimationState> {
