@@ -211,8 +211,8 @@ export default class Player extends GameObject {
   private isCollidingFromAbove(target: GameObject): boolean {
     const enemyCollider = target.collisionBehaviour!.collider
     const playerCollider = this.collisionBehaviour!.collider
-    const isAbove = Math.abs(enemyCollider.y + enemyCollider.height - playerCollider.y) < 10
-    return isAbove
+    const isAbove = Math.abs(enemyCollider.y + enemyCollider.height - playerCollider.y) < 20
+    return isAbove && this.movementBehaviour!.velocity.y < 0
   }
 
   /**
