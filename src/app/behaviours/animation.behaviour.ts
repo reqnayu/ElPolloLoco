@@ -75,14 +75,12 @@ export default class AnimationBehaviour implements Updateable {
     startFrame?: number
   ): void {
     if (!(animationName in this.animationSet)) return
-
     if (typeof endCallbackOrShouldAlternate === "boolean") {
       this.shouldAlternate = endCallbackOrShouldAlternate
     } else if (typeof endCallbackOrShouldAlternate === "function") {
       this.shouldLoop = false
       this.endOfAnimationCallback = endCallbackOrShouldAlternate
     }
-
     if (this.shouldAlternate) this.shouldAlternate = this.shouldAlternate
     this.currentAnimation = this.animationSet[animationName]!
     this._currentFrameIndex = startFrame !== undefined ? startFrame : 0
@@ -124,15 +122,12 @@ export default class AnimationBehaviour implements Updateable {
     const isOnLastFrame = this.currentFrameIndex === this.currentAnimation.length - 1
     this.currentImage = this.currentAnimation[this.currentFrameIndex]
     this.gameObject.image = this.currentImage
-
     if (isOnLastFrame && !this.shouldLoop) {
       this.isPlaying = false
       this.endOfAnimationCallback?.()
       return
     }
-
     this._currentFrameIndex = isOnLastFrame ? 0 : this.currentFrameIndex + 1
-
     if (isOnLastFrame && this.shouldAlternate) {
       this.currentAnimation.reverse()
     }

@@ -77,23 +77,7 @@ export default class Bottle extends GameObject {
    * @override
    */
   protected override setBehaviours(): void {
-    const animationSet: Pick<AnimationSet, BottleAnimationState> = {
-      rotation: [
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/1_bottle_rotation.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/2_bottle_rotation.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/3_bottle_rotation.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/4_bottle_rotation.png"),
-      ],
-      splash: [
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/4_bottle_splash.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/5_bottle_splash.png"),
-        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png"),
-      ],
-      idle: [AssetManager.getAsset<"img">("6_salsa_bottle/2_salsa_bottle_on_ground.png")],
-    }
+    const animationSet = this.getAnimationSet()
     this.animationBehaviour = BehaviourFactory.create("animation", { animationSet }).onAttach(this)
     this.drawBehaviour = BehaviourFactory.create("draw", { isScaled: true }).onAttach(this)
     this.movementBehaviour = BehaviourFactory.create("movement", { walkSpeed: 1.5, jumpStrength: 0.6 }).onAttach(
@@ -113,6 +97,26 @@ export default class Bottle extends GameObject {
       soundType: "bottle",
       assets: ["sfx/Splash.mp3", "sfx/Throw_1.mp3", "sfx/Throw_2.mp3", "sfx/Pick-up.mp3"],
     })
+  }
+
+  protected getAnimationSet(): Pick<AnimationSet, BottleAnimationState> {
+    return {
+      rotation: [
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/1_bottle_rotation.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/2_bottle_rotation.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/3_bottle_rotation.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/4_bottle_rotation.png"),
+      ],
+      splash: [
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/4_bottle_splash.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/5_bottle_splash.png"),
+        AssetManager.getAsset<"img">("6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png"),
+      ],
+      idle: [AssetManager.getAsset<"img">("6_salsa_bottle/2_salsa_bottle_on_ground.png")],
+    }
   }
 
   /**

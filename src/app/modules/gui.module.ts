@@ -198,6 +198,7 @@ export default abstract class Gui {
    */
   private static getButtons(): void {
     this.buttons = Util.getAllElements("#game button, input[type='checkbox']")
+    this.buttons.forEach((button) => button.addEventListener("contextmenu", (event) => event.preventDefault()))
   }
 
   /**
